@@ -1,0 +1,4 @@
+- src: ssh://gerrit.glms.internal.rbigroup.cloud:29418/ewp/ewp-deploy-lib
+  scm: git
+- src: ssh://gerrit.glms.internal.rbigroup.cloud:29418/glms/glms-deploy-lib
+  scm: git

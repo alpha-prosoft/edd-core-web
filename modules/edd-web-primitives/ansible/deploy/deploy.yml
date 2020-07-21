@@ -1,0 +1,36 @@
+- hosts: localhost
+  tasks:  
+  - include_role:
+      name: ewp-deploy-lib/resolve-params
+    vars:
+      stacks:
+       - type: "BASE"
+         name: "glms-base"
+       - type: "DB"
+         name: "glms-health-db"
+       - type: "LAMBDA"
+         name: "glms-login-svc"
+
+  - include_role: 
+      name: glms-deploy-lib/web-page
+
+  - name: 'Copy s3 content to bucket'
+    environment: '{{ parameters }}'
+    s3_sync:
+      region: "{{ parameters['Region'] }}"
+      bucket: "{{ parameters['S3BucketName'] }}"
+      file_root: "/dist/s3"
+      file_change_strategy: force
+      delete: true
+      mime_map:
+        .js: application/javascript
+        .json: application/json
+        .css: text/css
+        .html: text/html
+        .svg: image/svg+xml
+        .svgz: image/svg+xml
+        .ico: image/x-icon
+
+  - name: "Invaludate cache"
+    shell: 'aws apigateway flush-stage-cache --rest-api-id "{{ parameters["RestApiID"]  }}" --stage-name "{{ parameters["EnvironmentNameUpper"] }}"'
+        
