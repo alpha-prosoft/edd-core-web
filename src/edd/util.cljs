@@ -4,8 +4,8 @@
    [edd.subs :as subs]))
 
 (defn placeholder
-  [components classes]
+  [{:keys [panels classes] :as _ctx}]
   (let [panel @(rf/subscribe [::subs/active-panel])]
-    (if (contains? components panel)
-      ((panel components) classes)
+    (if (contains? panels panel)
+      ((panel panels) classes)
       [:h2 "Not found"])))

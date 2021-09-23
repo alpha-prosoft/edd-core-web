@@ -1,28 +1,32 @@
-{:deps {re-frame/re-frame {:mvn/version "1.2.0"}
-        secretary/secretary {:mvn/version "2.0.0.1-260a59"}
-        bidi/bidi {:mvn/version "2.1.6"}
-        kibu/pushy {:mvn/version "0.3.8"}
-        thheller/shadow-cljs {:mvn/version "2.15.10"}
-        day8.re-frame/http-fx {:mvn/version "0.2.3"}
-        cljs-ajax/cljs-ajax {:mvn/version "0.8.4"}}
+{:deps    {org.clojure/clojure       {:mvn/version "1.10.3"}
+           org.clojure/clojurescript {:mvn/version "1.10.866"}
+           thheller/shadow-cljs      {:mvn/version "2.15.12"}
+           re-frame/re-frame         {:mvn/version "1.2.0"}
+           reagent/reagent           {:mvn/version "1.1.0"}
+           secretary/secretary       {:mvn/version "1.2.3"}
+           bidi/bidi                 {:mvn/version "2.1.6"}
+           kibu/pushy                {:mvn/version "0.3.8"}
+           cljs-ajax/cljs-ajax       {:mvn/version "0.8.4"}
+           day8.re-frame/http-fx     {:mvn/version "0.2.1"}}
 
- :paths ["src" "resources" "modules/src"],
- :aliases {:jar {:extra-paths ["resources"]
-                 :extra-deps {luchiniatwork/cambada {:mvn/version "1.0.2"}},
-                 :main-opts ["-m" "cambada.jar"
-                             "-m" "lambda.core"
-                             "-m" "--copy-source "]},
-           :dev {:extra-paths ["test/clj" "test/cljs"]
-                 :extra-deps {org.clojure/test.check {:mvn/version "1.0.0"}}}
-           :test {:extra-paths ["test/clj" "test/cljs"],
-                  :extra-deps {org.clojure/test.check {:mvn/version "1.0.0"}}},
-           :unit {:extra-paths ["test/clj" "test/cljs"]
-                  :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.700"}},
-                  :main-opts ["-m" "kaocha.runner", "unit"]}
-           :it {:extra-deps {lambdaisland/kaocha {:mvn/version "1.0.700"}},
-                :main-opts ["-m" "kaocha.runner", "it"]}
-           :readme {:extra-paths ["target/src"]
-                    :extra-deps {alpha-prosoft/readme {:mvn/version "1.7"}}
-                    :main-opts ["-m" "seancorfield.readme"]}
+
+ :paths   ["src" "resources" "modules/src"],
+ :aliases {:jar      {:extra-paths ["resources"]
+                      :extra-deps  {luchiniatwork/cambada {:mvn/version "1.0.2"}},
+                      :main-opts   ["-m" "cambada.jar"
+                                    "-m" "lambda.core"
+                                    "-m" "--copy-source "]},
+           :dev      {:extra-paths ["test/clj" "test/cljs"]
+                      :extra-deps  {org.clojure/test.check {:mvn/version "1.0.0"}}}
+           :test     {:extra-paths ["test/clj" "test/cljs"],
+                      :extra-deps  {org.clojure/test.check {:mvn/version "1.0.0"}}},
+           :unit     {:extra-paths ["test/clj" "test/cljs"]
+                      :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0.700"}},
+                      :main-opts   ["-m" "kaocha.runner", "unit"]}
+           :it       {:extra-deps {lambdaisland/kaocha {:mvn/version "1.0.700"}},
+                      :main-opts  ["-m" "kaocha.runner", "it"]}
+           :readme   {:extra-paths ["target/src"]
+                      :extra-deps  {alpha-prosoft/readme {:mvn/version "1.7"}}
+                      :main-opts   ["-m" "seancorfield.readme"]}
            :outdated {:extra-deps {olical/depot {:mvn/version "2.0.1"}}
-                      :main-opts ["-m" "depot.outdated.main"]}}}
+                      :main-opts  ["-m" "depot.outdated.main"]}}}

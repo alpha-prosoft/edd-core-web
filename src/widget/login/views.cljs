@@ -99,19 +99,19 @@
                                           :color    "primary"} (tr :forgot-password)]))
 
         (wrap-dialog-button
-         [:> Button {:key      "cancel"
-                     :on-click #(rf/dispatch [::events/close-dialog])
-                     :color    "secondary"} (tr :cancel)])
+          [:> Button {:key      "cancel"
+                      :on-click #(rf/dispatch [::events/close-dialog])
+                      :color    "secondary"} (tr :cancel)])
         (if (some #(= % form-type) [:login])
           (wrap-dialog-button
-           [:> Button {:key      "login"
-                       :on-click #(rf/dispatch [::events/do-login])
-                       :color    "secondary"} (tr :login)]))
+            [:> Button {:key      "login"
+                        :on-click #(rf/dispatch [::events/do-login])
+                        :color    "secondary"} (tr :login)]))
         (if (some #(= % form-type) [:register])
           (wrap-dialog-button
-           [:> Button {:key      "register"
-                       :on-click #(rf/dispatch [::events/do-register])
-                       :color    "secondary"} (tr :register)]))
+            [:> Button {:key      "register"
+                        :on-click #(rf/dispatch [::events/do-register])
+                        :color    "secondary"} (tr :register)]))
 
         (if (some #(= % form-type) [:confirm-login :confirm-password-reset])
           (wrap-dialog-button
