@@ -11,7 +11,7 @@ ARG BUILD_ID
 # Custom build from here on
 
 USER root
-RUN npm install -g shadow-cljs@2.9.0 karma karma-cljs-test karma-chrome-launcher karma-junit-reporter
+RUN npm install -g shadow-cljs karma karma-cljs-test karma-chrome-launcher karma-junit-reporter
 USER build
 
 COPY --chown=build:build shadow-cljs.edn shadow-cljs.edn
@@ -33,11 +33,11 @@ RUN set -e &&\
             -m cljfmt.main check src/main/ src/test
 
 RUN ls -la /dist
-RUN set -e && npx shadow-cljs release devcards
+RUN set -e && shadow-cljs -A:dev release devcards
 
 RUN set -e && clojure -A:test:runner
-RUN set -e && npx shadow-cljs -A:dev compile test
-RUN set -e && npx shadow-cljs -A:dev compile
+RUN set -e && shadow-cljs -A:dev compile test
+RUN set -e && shadow-cljs -A:dev compile
 
 RUN ls -la /dist
 RUN cp -r resources/public/* /dist/s3/
