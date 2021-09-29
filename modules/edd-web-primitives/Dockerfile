@@ -7,7 +7,9 @@ FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest
 
 ENV PROJECT_NAME edd-web-primitives
 
+ARG ARTIFACT_ORG
 ARG BUILD_ID
+
 # Custom build from here on
 
 USER root
@@ -48,6 +50,7 @@ RUN  set -e && clj -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "
                       -m cambada.jar \
                       --app-version "1.0.b${BUILD_ID}" \
                       --app-artifact-id "${PROJECT_NAME}" \
+                      --app-group-id "${ARTIFACT_ORG}" \
                       --copy-source \
                       -o /dist/release-libs/; \
                     cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.b${BUILD_ID}.jar.pom.xml"; \
