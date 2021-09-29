@@ -140,7 +140,8 @@
                   "& .MuiSwitch-colorSecondary.Mui-checked " {:color "#037080"}
                   "& .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track"
                   {:background-color "#b3d4d8"
-                   :opacity 1}}}
+                   :opacity 1}
+                  "& .MuiSwitch-input" {:left "initial" :width "100%"}}}
                 :MuiAccordion
                 {:root
                  {"&:before" {:opacity 0}
