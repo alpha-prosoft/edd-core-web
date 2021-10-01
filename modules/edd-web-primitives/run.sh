@@ -1,3 +1,3 @@
 #!/bin/bash
 
-shadow-cljs watch devcards
+shadow-cljs watch devcards -A:dev

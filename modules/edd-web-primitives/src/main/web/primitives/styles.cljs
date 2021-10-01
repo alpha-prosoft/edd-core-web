@@ -105,7 +105,8 @@
                           :letter-spacing "0.3px"}}
                 :MuiIconButton
                 {:root
-                 {"&.Mui-disabled" {:opacity 0.5}
+                 {:color "inherit"
+                  "&.Mui-disabled" {:opacity 0.5}
                   "&.MuiIconButton-sizeSmall" {:padding 10}}}
                 :MuiButton
                 {:contained

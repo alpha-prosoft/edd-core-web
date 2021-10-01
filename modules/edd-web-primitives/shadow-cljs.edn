@@ -9,7 +9,6 @@
                                   :closure-warnings {:global-this :off}
                                   :closure-defines  {"re_frame.trace.trace_enabled_QMARK_"        true
                                                      "day8.re_frame.tracing.trace_enabled_QMARK_" true}}
-
                      :devtools   {:infer-externs    :auto
                                   :http-port        3001
                                   :http-root        "resources/public"
