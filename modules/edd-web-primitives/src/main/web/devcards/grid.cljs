@@ -35,7 +35,7 @@
                                :padding 5
                                :text-align "center"}}]
 
-    [RawGrid {:container true :spacing 2 :justify "space-between" :alignContent "space-between"
+    [RawGrid {:container true :spacing 2 :justify-content "space-between" :alignContent "space-between"
               :style {:background-color "#ececec"}}
      [RawGrid {:item true :xs 1}
       [RawGrid content-props "xs 1"]]

@@ -48,11 +48,11 @@
                   [RawAlert
                    {:id "info-success"
                     :severity "info"}
-                   [:> Grid {:container true :justify "space-between"}
+                   [:> Grid {:container true :justify-content "space-between"}
                     [:> Grid {:item true} "Info Alert"]
                     [:> Grid {:container true
                               :item true
                               :xs 1
                               :alignContent "center"
-                              :justify "flex-end"}
+                              :justify-content "flex-end"}
                      [ClearIcon]]]]]]))
