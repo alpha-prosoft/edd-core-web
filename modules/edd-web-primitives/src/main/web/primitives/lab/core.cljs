@@ -23,7 +23,7 @@
   [:> Alert (merge {:severity severity}
                    (when (some? id)
                      {:id id}
-                     props))
+                     (dissoc props :title-props)))
    (when (some? title)
      [:> AlertTitle (if (some? title-props) title-props {}) title])
    content])

@@ -47,7 +47,9 @@
                  [:> Grid {:item true :container true}
                   [RawAlert
                    {:id "info-success"
-                    :severity "info"}
+                    :severity "info"
+                    :title "Info Alert Title"
+                    :title-props {:variant "h4"}}
                    [:> Grid {:container true :justify-content "space-between"}
                     [:> Grid {:item true} "Info Alert"]
                     [:> Grid {:container true
