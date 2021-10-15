@@ -3,17 +3,20 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
+   [reagent.core :as r]
 
-   [web.primitives.inputs.core :refer [RawCheckbox]]
    [web.devcards.utils :refer [apply-stiles]]
-   [reagent.core :as r]))
 
-(defcard-rg checkbox
+   [web.primitives.components :refer [RawCheckbox]]))
+
+(defcard-rg :checkbox
   "## Checkbox"
   (fn [data-atom _]
-    (apply-stiles [RawCheckbox
-                   {:checked (:checked @data-atom)
-                    :on-change (fn [x] (swap! data-atom merge {:checked (not (:checked @data-atom))}))}]))
+    (apply-stiles
+     [RawCheckbox
+      {:checked (:checked @data-atom)
+       :label ""
+       :on-change (fn [x] (swap! data-atom merge {:checked (not (:checked @data-atom))}))}]))
   (r/atom {:checked false}))
 
 (defn- handle-state [atom]
@@ -23,7 +26,7 @@
       {:checked false :indeterminate false}
       {:checked true :indeterminate false})))
 
-(defcard-rg checkbox-with-indeterminate-state
+(defcard-rg :checkbox-with-indeterminate-state
   "## Checkbox with indeterminate state and lable"
   (fn [data-atom _]
     (apply-stiles [RawCheckbox
@@ -33,7 +36,7 @@
                     :label "Label"}]))
   (r/atom {:checked true :indeterminate true}))
 
-(defcard-rg checkbox-with-label-placement-start
+(defcard-rg :checkbox-with-label-placement-start
   "## Checkbox with label-placement on start"
   (fn [data-atom _]
     (apply-stiles [RawCheckbox
@@ -44,7 +47,7 @@
                     :label "Label"}]))
   (r/atom {:checked true :indeterminate true}))
 
-(defcard-rg checkbox-disabled
+(defcard-rg :checkbox-disabled
   "## Checkbox disabled"
   (fn [data-atom _]
     (apply-stiles [RawCheckbox

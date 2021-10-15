@@ -4,6 +4,7 @@
                      :output-dir "resources/public/js"
                      :asset-path "/js"
                      :modules    {:main {:entries [web.devcards.start-ui]}}
+                     :js-options {:entry-keys ["module" "browser" "main"]}
                      :compiler-options
                                  {:infer-externs    :auto
                                   :closure-warnings {:global-this :off}

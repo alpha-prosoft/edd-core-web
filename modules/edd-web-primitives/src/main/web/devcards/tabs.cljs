@@ -6,10 +6,9 @@
    [reagent.core :as r]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.navigation.core :refer [RawTabs]]
-   [web.primitives.layout.core :refer [RawGrid]]))
+   [web.primitives.components :refer [RawGrid RawTabs]]))
 
-(defcard-rg tabs "## Tabs"
+(defcard-rg :tabs "## Tabs"
   (fn [data-atom _]
     (apply-stiles [RawGrid {:container true}
                    [RawGrid {:item true :xs 12}

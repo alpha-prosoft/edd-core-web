@@ -1,10 +1,10 @@
 (ns web.primitives.data-display.core
   (:require
-   ["@material-ui/core" :refer [Badge Divider Grid
-                                List ListItem ListItemText ListItemIcon ListSubheader
-                                Menu MenuItem MenuList
-                                Typography Tooltip
-                                Table TableBody TableCell TableContainer TableHead TableRow]]))
+   ["@mui/material/index" :refer [Badge Divider Grid
+                                  List ListItem ListItemText ListItemIcon ListSubheader
+                                  Menu MenuItem MenuList
+                                  Typography Tooltip
+                                  Table TableBody TableCell TableContainer TableHead TableRow]]))
 
 (defn RawBadge [{:keys [color]
                  :or   {color "primary"}
@@ -17,7 +17,7 @@
    (:content props)])
 
 (defn RawTooltip [props content]
-  [:> Tooltip  (merge {:arrow true} props)
+  [:> Tooltip (merge {:arrow true} props)
    [:> Grid {:item true :style {:width "fit-content"}}
     content]])
 
@@ -44,8 +44,8 @@
 (defn RawDivider [props]
   [:> Divider props])
 
-(defn RawMenu [props  & children]
-  (into [:> Menu props]
+(defn RawMenu [{:keys [open] :or {open false} :as props} & children]
+  (into [:> Menu (merge props {:open (boolean open)})]
         (for [child children]
           child)))
 

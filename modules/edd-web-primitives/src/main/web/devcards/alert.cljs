@@ -1,60 +1,61 @@
 (ns web.devcards.alert
   (:require
+   [reagent.core :as r]
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
-   ["@material-ui/core" :refer [Grid]]
 
-   [web.primitives.icons.core :refer [ClearIcon]]
-   [web.primitives.lab.core :refer [RawAlert]]
-   [web.devcards.utils :refer [apply-stiles]]))
+   [web.devcards.utils :refer [apply-stiles]]
+   [web.primitives.components :refer [RawGrid RawAlert RawIconButton]]
+   [web.primitives.icons.core :refer [ClearIcon]]))
 
-(defcard-rg success-alert
+(defcard-rg :success-alert
   "## Success Alert"
-  (apply-stiles [:> Grid {:container true}
+  (apply-stiles [RawGrid {:container true}
                  [RawAlert
-                  {:id "alert-success"
+                  {:id       "alert-success"
                    :severity "success"}
                   "Success Alert"]]))
 
-(defcard-rg success-alert-with-title
+(defcard-rg :success-alert-with-title
   "## Success Alert with Title"
-  (apply-stiles [:> Grid {:container true}
+  (apply-stiles [RawGrid {:container true}
                  [RawAlert
-                  {:id "alert-success-with-title"
+                  {:id       "alert-success-with-title"
                    :severity "success"
-                   :title "Success"}
+                   :title    "Success"}
                   "Success Alert"]]))
 
-(defcard-rg error-alert
+(defcard-rg :error-alert
   "## Error Alert"
-  (apply-stiles [:> Grid {:container true}
+  (apply-stiles [RawGrid {:container true}
                  [RawAlert
-                  {:id "error-success"
+                  {:id       "error-success"
                    :severity "error"}
                   "Error Alert"]]))
 
-(defcard-rg warning-alert
+(defcard-rg :warning-alert
   "## Warning Alert"
-  (apply-stiles [:> Grid {:container true} [RawAlert
-                                            {:id "warning-success"
-                                             :severity "warning"}
-                                            "Warning Alert"]]))
+  (apply-stiles [RawGrid {:container true}
+                 [RawAlert
+                  {:id       "warning-success"
+                   :severity "warning"}
+                  "Warning Alert"]]))
 
-(defcard-rg info-alert
+(defcard-rg :info-alert
   "## Info Alert with Grids"
-  (apply-stiles [:> Grid {:container true}
-                 [:> Grid {:item true :container true}
+  (apply-stiles [RawGrid {:container true}
+                 [RawGrid {:item true :container true}
                   [RawAlert
-                   {:id "info-success"
-                    :severity "info"
-                    :title "Info Alert Title"
-                    :title-props {:variant "h4"}}
-                   [:> Grid {:container true :justify-content "space-between"}
-                    [:> Grid {:item true} "Info Alert"]
-                    [:> Grid {:container true
-                              :item true
-                              :xs 1
-                              :alignContent "center"
-                              :justify-content "flex-end"}
-                     [ClearIcon]]]]]]))
+                   {:id          "info-success"
+                    :severity    "info"
+                    :title       "Info Alert Title"
+                    :title-props {:variant "h4"}
+                    :action      (r/as-element [RawIconButton {} [ClearIcon]])}
+                   [RawGrid {:container true :justify-content "space-between"}
+                    [RawGrid {:item true} "Info Alert"]
+                    [RawGrid {:container       true
+                              :item            true
+                              :xs              1
+                              :alignContent    "center"
+                              :justify-content "flex-end"}]]]]]))

@@ -4,19 +4,18 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.data-display.core :refer [RawBadge]]
+   [web.primitives.components :refer [RawBadge RawGrid]]
    [web.primitives.icons.core :refer [NotificationsNoneIcon]]
-   [web.primitives.layout.core :refer [RawGrid]]
    [web.devcards.utils :refer [apply-stiles]]))
 
-(defcard-rg badge
+(defcard-rg :badge
   "## Badge"
   (apply-stiles [RawBadge
                  {:id "badge"
                   :content "Amount of something"
                   :badge-content 15}]))
 
-(defcard-rg notifications-with-badge
+(defcard-rg :notifications-with-badge
   "## Notifications with Badge"
   (apply-stiles
    [RawGrid {:container true :spacing 2}

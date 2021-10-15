@@ -1,9 +1,11 @@
 (ns web.primitives.inputs.utils
   (:require [reagent.core :as r]
             [cljs-time.core :as t]
+            [cljs-time.coerce :as t-coerce]
             [cljs-time.format :as time-fmt]
-            ["@material-ui/core" :refer [CircularProgress TextField]]
-            [clojure.string :as string]))
+            ["@mui/material/TextField" :default TextField]
+            [clojure.string :as string]
+            [cljs.pprint :as pprint]))
 
 (def adapted-text-field (r/adapt-react-class TextField))
 
@@ -24,18 +26,12 @@
   (into {} (for [k (.keys js/Object x)]
              [k (aget x k)])))
 
-(defn handle-date-picker-date-change
-  [callback set-focused date]
-  (set-focused true)
-  (try
-    (-> date
-        (.toISO)
-        (.substring 0 10)
-        (callback))
-    (catch js/Error e
-      (.log js/console e)
-      (print (nil? date))
-      (callback date))))
+(def timestamp-server-formatter (time-fmt/formatter "yyyy-MM-dd"))
+
+(defn date-time->date-string [date-time]
+  (if date-time
+    (time-fmt/unparse timestamp-server-formatter (t-coerce/from-date date-time))
+    date-time))
 
 (defn date?
   ([date]
@@ -45,7 +41,7 @@
        false))))
 
 (defn invalid-date? [touched? focused? {:keys [value required]
-                                        :or {required false}}]
+                                        :or   {required false}}]
   (and touched? (not focused?) (if required
                                  (not (date? value))
                                  (if (nil? value)

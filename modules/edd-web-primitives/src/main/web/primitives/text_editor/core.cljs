@@ -1,13 +1,14 @@
 (ns web.primitives.text-editor.core
-  (:require ["suneditor-react" :default SunEditor]
-            ["@material-ui/core" :refer [Grid Button IconButton]]
-            [re-frame.core :as rf]
-            [reagent.core :as r]
+  (:require
+   ["suneditor-react" :default SunEditor]
+   ["@mui/material/index" :refer [Grid Button IconButton]]
+   [re-frame.core :as rf]
+   [reagent.core :as r]
 
-            [web.primitives.db :as db]
-            [web.primitives.icons.core :refer [EditIcon]]
-            [web.primitives.text-editor.utils :refer [sun-editor-button-list handle-on-paste handle-on-drop handle-on-save]]
-            [web.primitives.text-editor.model :as model]))
+   [web.primitives.db :as db]
+   [web.primitives.icons.core :refer [EditIcon]]
+   [web.primitives.text-editor.utils :refer [sun-editor-button-list handle-on-paste handle-on-drop handle-on-save]]
+   [web.primitives.text-editor.model :as model]))
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [:> Grid {:container true :style {:position "relative"}}

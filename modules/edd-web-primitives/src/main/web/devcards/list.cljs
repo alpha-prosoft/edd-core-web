@@ -5,7 +5,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.data-display.core :refer [RawList RawListItem RawListItemText RawListItemIcon RawListSubheader]]))
+   [web.primitives.components :refer [RawList RawListItem RawListItemText RawListItemIcon RawListSubheader]]))
 
 (defcard-rg list
   "## List"

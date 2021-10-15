@@ -24,12 +24,3 @@
                   :enterNextDelay 1000}
 
                  [RawButton {} "Tooltip"]]))
-
-(defcard-rg tooltip-interactive
-  "## Tooltip interactive"
-  (apply-stiles [RawTooltip
-                 {:title "Tooltip text"
-                  :leaveDelay 1000
-                  :interactive true}
-
-                 [RawButton {} "Tooltip"]]))

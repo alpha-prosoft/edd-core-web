@@ -4,12 +4,10 @@
    [cljsjs.react.dom]
    [reagent.core :as r]
    [devcards.core :refer-macros (defcard-rg)]
-   [web.primitives.data-display.core :refer [RawMenu RawMenuList RawMenuItem]]
-   [web.primitives.inputs.core :refer [RawButton]]
-   [web.primitives.layout.core :refer [RawGrid]]
-   [web.devcards.utils :refer [apply-stiles]]))
+   [web.devcards.utils :refer [apply-stiles]]
+   [web.primitives.components :refer [RawMenu RawMenuList RawMenuItem RawButton RawGrid]]))
 
-(defcard-rg menu
+(defcard-rg :menu
   "## Menu"
   (fn [data-atom _]
     (apply-stiles

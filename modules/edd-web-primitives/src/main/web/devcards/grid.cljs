@@ -4,9 +4,9 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.layout.core :refer [RawGrid]]))
+   [web.primitives.components :refer [RawGrid]]))
 
-(defcard-rg grid
+(defcard-rg :grid
   "## Grid"
   (let [item-style {:background-color "#c5c3c3"}
         content-props {:style {:background-color "#c5c3c3"

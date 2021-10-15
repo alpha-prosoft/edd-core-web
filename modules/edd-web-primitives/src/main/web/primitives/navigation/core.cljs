@@ -1,11 +1,16 @@
 (ns web.primitives.navigation.core
-  (:require ["@material-ui/core" :refer [Link Tabs Tab]]
-            [reagent.core :as r]))
+  (:require
+   ["@mui/material/index" :refer [Tabs Tab Link]]
+   [reagent.core :as r]))
+
+(def adapted-RawTabs (r/adapt-react-class Tabs))
+
+(def adapted-RawTab (r/adapt-react-class Tab))
 
 (defn RawTabs [props]
   (into
-   [:> Tabs (dissoc props :children)]
-   (map (fn [item-props] (r/as-element [:> Tab item-props])) (:tabs props))))
+   [adapted-RawTabs (dissoc props :children)]
+   (map (fn [item-props] (r/as-element [adapted-RawTab item-props])) (:tabs props))))
 
 (defn RawLink [props content]
-  [:> Link props content])
+  [(r/adapt-react-class Link) props content])

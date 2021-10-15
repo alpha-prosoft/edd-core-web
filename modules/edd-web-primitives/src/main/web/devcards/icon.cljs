@@ -2,7 +2,7 @@
   (:require
    [cljsjs.react]
    [cljsjs.react.dom]
-   ["@material-ui/core" :refer [Grid]]
+   ["@mui/core" :refer [Grid]]
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.icons.core :refer [AddIcon SaveIcon DeleteIcon ClearIcon SearchIcon RefreshIcon

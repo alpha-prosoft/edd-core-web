@@ -2,13 +2,12 @@
   (:require
    [re-frame.core :as rf]
    [reagent.core :as r]
-   ["@material-ui/core" :refer [Accordion AccordionSummary AccordionDetails
-                                Card CardHeader CardMedia CardContent CardActions
-                                ClickAwayListener
-                                Grid
-                                IconButton]]
-   ["@material-ui/icons/ExpandMore" :default ExpandMoreIcon]
-   ["@material-ui/icons/ExpandLess" :default ExpandLessIcon]
+   ["@mui/material/index" :refer [Accordion AccordionSummary AccordionDetails
+                                  Card CardHeader CardMedia CardContent CardActions
+                                  ClickAwayListener
+                                  Grid
+                                  IconButton]]
+   [web.primitives.icons.core :refer [ExpandMoreIcon ExpandLessIcon]]
 
    [web.primitives.surfaces.model :as model]))
 
@@ -37,25 +36,25 @@
     [:> Grid {:container true :alignItems "center"}
      [:> Grid {:item true
                :style (merge
-                       {:position "absolute" :top 0}
-                       (if (= control-position :right) {:right 0}))}
+                       {:position "absolute" :top "0px"}
+                       (if (= control-position :right) {:right "0px"}))}
       [:> IconButton
        (merge
         {:on-click on-click
          :disabled disabled
          :style (if (= control-position :right)
-                  {:margin-right "-1.1rem"}
-                  {:margin-left "-1.1rem"})}
+                  {:marginRight "-1.1rem"}
+                  {:marginLeft "-1.1rem"})}
         (if (:id props) {:id (:id props)}))
-       (if expanded? [:> ExpandLessIcon] [:> ExpandMoreIcon])]]
+       (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
      [:> Grid {:container true :style (if (= control-position :right)
-                                        {:padding-right "2.5rem"}
-                                        {:padding-left "2.5rem"})}
+                                        {:paddingRight "2.5rem"}
+                                        {:paddingLeft "2.5rem"})}
       (if (and expanded? (contains? props :header-expanded))
         (:header-expanded props)
         (:header props))]]]
    (into [:> AccordionDetails
-          {:style (merge {:padding 0} details-style)}
+          {:style (merge {:padding "0px"} details-style)}
           content])])
 
 (defn EddAccordion [props content]

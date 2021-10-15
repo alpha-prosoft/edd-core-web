@@ -10,19 +10,19 @@
 
 (defcard-rg switch
   "## Switch"
-  (apply-stiles [RawSwitch {}]))
+  (apply-stiles [RawSwitch {:value true}]))
 
 (defcard-rg switch-disabled
   "## Switch disabled"
-  (apply-stiles [RawSwitch {:disabled true :label "Disabled Switch"}]))
+  (apply-stiles [RawSwitch {:value true :disabled true :label "Disabled Switch"}]))
 
 (defcard-rg switch-with-label
   "## Switch with label"
-  (apply-stiles [RawSwitch {:label "Switch with label"}]))
+  (apply-stiles [RawSwitch {:value true :label "Switch with label"}]))
 
 (defcard-rg switch-with-label-placement-start
   "## Switch with label placement on the start"
-  (apply-stiles [RawSwitch {:label "Switch with label" :label-placement "start"}]))
+  (apply-stiles [RawSwitch {:value false :label "Switch with label" :label-placement "start"}]))
 
 (defcard-rg switch-with-two-variants
   "## Switch with two variants"

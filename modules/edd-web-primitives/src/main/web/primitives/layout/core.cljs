@@ -1,6 +1,6 @@
 (ns web.primitives.layout.core
-  (:require ["@material-ui/core" :refer [Grid Box]]
-            [reagent.core :as r]))
+  (:require
+   ["@mui/material/index" :refer [Box Grid]]))
 
 (defn RawGrid [props & children]
   (into

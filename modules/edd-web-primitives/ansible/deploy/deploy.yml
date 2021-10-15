@@ -1,4 +1,5 @@
 - hosts: localhost
+  connection: local
   tasks:  
   - include_role:
       name: ewp-deploy-lib/resolve-params

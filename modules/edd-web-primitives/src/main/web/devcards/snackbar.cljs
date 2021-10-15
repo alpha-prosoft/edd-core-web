@@ -5,14 +5,10 @@
    [devcards.core :refer-macros (defcard-rg)]
    [reagent.core :as r]
 
-   [web.primitives.feedback.core :refer [RawSnackbar]]
-   [web.primitives.lab.core :refer [RawAlert]]
-   [web.primitives.layout.core :refer [RawGrid]]
-   [web.primitives.inputs.core :refer [RawButton]]
+   [web.devcards.utils :refer [apply-stiles]]
+   [web.primitives.components :refer [RawSnackbar RawAlert RawGrid RawButton]]))
 
-   [web.devcards.utils :refer [apply-stiles]]))
-
-(defcard-rg snackbar-alert
+(defcard-rg :snackbar-alert
   "## Snackbar"
   (fn [data-atom _]
     (apply-stiles
@@ -26,7 +22,7 @@
                     :key "msg"}]]))
   (r/atom {:open false}))
 
-(defcard-rg snackbar-alert
+(defcard-rg :snackbar-error-alert
   "## Snackbar with :error alert"
   (fn [data-atom _]
     (apply-stiles
@@ -36,6 +32,22 @@
        "Open snack bar"]
       [RawSnackbar {:open (:open @data-atom)
                     :on-close #(swap! data-atom merge {:open false})
-                    :key "error"}
-       [RawAlert {:severity :error} "Error message"]]]))
+                    :key "error"
+                    :message "Error message"
+                    :alert-props {:severity "error"}}]]))
+  (r/atom {:open false}))
+
+(defcard-rg :snackbar-info-alert
+  "## Snackbar with :info alert"
+  (fn [data-atom _]
+    (apply-stiles
+     [RawGrid {:container true}
+      [RawButton
+       {:on-click #(swap! data-atom merge {:open true})}
+       "Open snack bar"]
+      [RawSnackbar {:open (:open @data-atom)
+                    :on-close #(swap! data-atom merge {:open false})
+                    :key "info"
+                    :message "Info message"
+                    :alert-props {:severity "info"}}]]))
   (r/atom {:open false}))

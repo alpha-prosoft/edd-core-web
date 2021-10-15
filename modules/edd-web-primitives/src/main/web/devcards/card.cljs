@@ -5,18 +5,16 @@
 
    [devcards.core :refer-macros (defcard-rg)]
    [web.devcards.utils :refer [apply-stiles]]
-   ["@material-ui/core" :refer [Grid]]
+   [web.primitives.components :refer [RawGrid RawCard]]))
 
-   [web.primitives.surfaces.core :refer [RawCard]]))
-
-(defcard-rg card
+(defcard-rg :card
   "## Card"
   (apply-stiles [RawCard
                  {:header        {:title     "Header"
                                   :subheader "Subheader"
                                   :action    "action"}
-                  :actions       [:> Grid {:container true} "actions"]}
+                  :actions       [RawGrid {:container true} "actions"]}
 
-                 [:> Grid {:container true :style {:background-color "#ececec"}}
-                  [:> Grid {:item true}
+                 [RawGrid {:container true :style {:background-color "#ececec"}}
+                  [RawGrid {:item true}
                    "Content"]]]))

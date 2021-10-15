@@ -4,6 +4,6 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.data-display.core :refer [RawDivider]]))
+   [web.primitives.components :refer [RawDivider]]))
 
-(defcard-rg divider "## Divider" [RawDivider])
+(defcard-rg :divider "## Divider" [RawDivider])

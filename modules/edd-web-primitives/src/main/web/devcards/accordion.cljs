@@ -4,13 +4,11 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.layout.core :refer [RawGrid]]
-   [web.primitives.surfaces.core :refer [EddAccordion RawCard]]
-   [web.primitives.inputs.core :refer [RawTextField RawButton]]
+   [web.primitives.components :refer [RawGrid EddAccordion RawCard RawTextField RawButton]]
    [web.devcards.utils :refer [apply-stiles]]
    [reagent.core :as r]))
 
-(defcard-rg accordion-init-expanded
+(defcard-rg :accordion-init-expanded
   "## Initially expanded accordion"
   (apply-stiles [EddAccordion {:id "accordion-init-expanded"
                                :header     "Header"
@@ -19,21 +17,21 @@
                                :on-change #(print "on-change")}
                  "Content"]))
 
-(defcard-rg accordion-disabled
+(defcard-rg :accordion-disabled
   "## Disabled accordion"
   (apply-stiles [EddAccordion {:id "accordion-disabled"
                                :header     "Header"
                                :disabled true}
                  "Content"]))
 
-(defcard-rg accordion-control-position-right
+(defcard-rg :accordion-control-position-right
   "## Expansion Panel with right control position"
   (apply-stiles [EddAccordion {:id "accordion-control-position-right"
                                :header                "Header"
                                :control-position :right}
                  "Content"]))
 
-(defcard-rg accordion-with-different-headers
+(defcard-rg :accordion-with-different-headers
   "## Expansion Panel with right control position and different header expanded"
   (apply-stiles [EddAccordion {:id "accordion-with-different-headers"
                                :header                "Header"
@@ -69,7 +67,7 @@
                    :InputProps {:disableUnderline true
                                 :readOnly true}}]]])
 
-(defcard-rg accordion-with-multiline-header
+(defcard-rg :accordion-with-multiline-header
   "## Accordion with multiline header"
   (apply-stiles [EddAccordion {:id "accordion-multiline-header"
                                :header     [RawGrid {:container true}
@@ -83,7 +81,7 @@
                                [RawGrid {:container true :spacing 1}
                                 [RawGrid {:item true :xs 12} "Content..."]]]]]))
 
-(defcard-rg accordion-controlled-from-outside
+(defcard-rg :accordion-controlled-from-outside
   "## Accordion controlled from outside"
   (fn [data-atom _]
     (apply-stiles [RawGrid {:container true}

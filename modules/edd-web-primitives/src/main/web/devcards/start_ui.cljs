@@ -15,6 +15,8 @@
    [web.devcards.skeleton]
    [web.devcards.switch]
    [web.devcards.checkbox]
+   [web.devcards.select]
+   [web.devcards.form-select]
    [web.devcards.toggle-button]
    [web.devcards.tooltip]
    [web.devcards.card]
@@ -29,7 +31,6 @@
    [web.devcards.snackbar]
    [web.devcards.divider]
    [web.devcards.tabs]
-   [web.devcards.snackbar]
    [web.devcards.floating-action-button]
    [web.devcards.radio]
    [web.devcards.box]
@@ -37,7 +38,8 @@
    [web.devcards.linear-progress]
    [web.devcards.table]
    [web.devcards.timeline]
-   [web.devcards.slide]))
+   [web.devcards.slide]
+   [web.devcards.backdrop]))
 
 (defn ^:export init []
   (dc/start-devcard-ui!))

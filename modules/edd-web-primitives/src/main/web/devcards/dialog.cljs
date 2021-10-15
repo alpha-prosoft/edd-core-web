@@ -4,14 +4,11 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
    [reagent.core :as r]
+   [web.devcards.utils :refer [apply-stiles]]
 
-   [web.primitives.feedback.core :refer [RawDialog]]
-   [web.primitives.inputs.core :refer [RawButton]]
-   [web.primitives.layout.core :refer [RawGrid]]
+   [web.primitives.components :refer [RawDialog RawButton RawGrid]]))
 
-   [web.devcards.utils :refer [apply-stiles]]))
-
-(defcard-rg dialog
+(defcard-rg :dialog
   "## Dialog"
   (fn [data-atom _]
     (apply-stiles
@@ -26,7 +23,7 @@
         "Close"]]]))
   (r/atom {:open false}))
 
-(defcard-rg dialog-with-actions
+(defcard-rg :dialog-with-actions
   "## Dialog with actions"
   (fn [data-atom _]
     (apply-stiles

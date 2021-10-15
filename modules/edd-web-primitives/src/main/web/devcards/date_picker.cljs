@@ -10,34 +10,35 @@
    [web.primitives.inputs.core :refer [EddDatePicker]]
    [web.devcards.utils :refer [apply-stiles]]))
 
-(defcard-rg date-picker
+(defcard-rg :date-picker
   "## Date picker"
   (fn [data-atom _]
     (apply-stiles
-     [EddDatePicker {:id "date-picker"
-                     :value (:value @data-atom)
+     [EddDatePicker {:id                   "date-picker"
+                     :value                (:value @data-atom)
                      :invalid-date-message "Date is invalid"
-                     :on-change (fn [x] (swap! data-atom merge {:value x}))}]))
+                     :on-change            (fn [x] (swap! data-atom merge {:value x}))}]))
   (r/atom {:value "2020-09-15"}))
 
-(defcard-rg date-picker-invalid
+(defcard-rg :date-picker-invalid
   "## Invalid Date picker"
   (fn [data-atom _]
     (apply-stiles
-     [EddDatePicker {:id "date-picker-invalid"
-                     :value (:value @data-atom)
-                     :required true
-                     :label "Please set required date"
-                     :on-change (fn [x] (swap! data-atom merge {:value x}))}]))
-  (r/atom {:invalid? true :value nil}))
+     [EddDatePicker (merge
+                     {:id          "date-picker-invalid"
+                      :value       (:value @data-atom)
+                      :required    true
+                      :label       "Please set required date"
+                      :on-change   (fn [x] (swap! data-atom merge {:value x}))})]))
+  (r/atom {:value nil}))
 
-(defcard-rg date-picker-today-disabled
+(defcard-rg :date-picker-today-disabled
   "## Disabled Date picker today"
   (fn [data-atom _]
     (apply-stiles
-     [EddDatePicker {:id "date-picker-today-disabled"
-                     :value (:value @data-atom)
-                     :required true
-                     :disabled true
+     [EddDatePicker {:id        "date-picker-today-disabled"
+                     :value     (:value @data-atom)
+                     :required  true
+                     :disabled  true
                      :on-change (fn [x] (swap! data-atom merge {:value x}))}]))
   (r/atom {:value (format/unparse (format/formatter "yyyy-MM-dd") (time/to-default-time-zone (js/Date.)))}))

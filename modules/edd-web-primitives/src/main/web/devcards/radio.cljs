@@ -8,7 +8,7 @@
    [web.devcards.utils :refer [apply-stiles]]
    [reagent.core :as r]))
 
-(defcard-rg radio
+(defcard-rg :radio
   "## Radio"
   (apply-stiles [RawRadioGroup {:label "Simple radio"
                                 :defaultValue :one
@@ -19,7 +19,7 @@
                                            {:value :tree
                                             :label "Tree"}]}]))
 
-(defcard-rg radio-in-row
+(defcard-rg :radio-in-row
   "## Radio in row"
   (apply-stiles [RawRadioGroup {:label "Simple radio"
                                 :row true
@@ -31,7 +31,7 @@
                                            {:value :tree
                                             :label "Tree"}]}]))
 
-(defcard-rg radio-with-disabled-item
+(defcard-rg :radio-with-disabled-item
   "## Radio with disabled item"
   (apply-stiles [RawRadioGroup {:row true
                                 :defaultValue :one
