@@ -5,9 +5,9 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.data-display.core :refer [RawTableContainer RawTable RawTableHead RawTableRow RawTableCell RawTableBody]]))
+   [web.primitives.components :refer [RawTableContainer RawTable RawTableHead RawTableRow RawTableCell RawTableBody]]))
 
-(defcard-rg table
+(defcard-rg :table
   "## Table"
   (apply-stiles [RawTableContainer
                  [RawTable
@@ -26,7 +26,7 @@
                     [RawTableCell "RawTableBody - RawTableRow - RawTableCell 2/2"]
                     [RawTableCell "RawTableBody - RawTableRow - RawTableCell 2/3"]]]]]))
 
-(defcard-rg table-no-lines
+(defcard-rg :table-no-lines
   "## Table with no Lines"
   (apply-stiles [RawTableContainer
                  [RawTable
@@ -42,7 +42,7 @@
                     [RawTableCell {:style {:border-bottom "none"}} "RawTableBody - RawTableRow - RawTableCell 2/1"]
                     [RawTableCell {:style {:border-bottom "none"}} "RawTableBody - RawTableRow - RawTableCell 2/2"]]]]]))
 
-(defcard-rg table-two-headers
+(defcard-rg :table-two-headers
   "## Table with two headers"
   (apply-stiles [RawTableContainer
                  [RawTable

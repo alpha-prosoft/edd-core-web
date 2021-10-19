@@ -7,7 +7,7 @@
    [cljs-time.core :as time]
    [cljs-time.format :as format]
 
-   [web.primitives.inputs.core :refer [EddDatePicker]]
+   [web.primitives.components :refer [EddDatePicker]]
    [web.devcards.utils :refer [apply-stiles]]))
 
 (defcard-rg :date-picker
@@ -17,7 +17,8 @@
      [EddDatePicker {:id                   "date-picker"
                      :value                (:value @data-atom)
                      :invalid-date-message "Date is invalid"
-                     :on-change            (fn [x] (swap! data-atom merge {:value x}))}]))
+                     :on-change            (fn [x] (doall (print x)
+                                                          (swap! data-atom merge {:value x})))}]))
   (r/atom {:value "2020-09-15"}))
 
 (defcard-rg :date-picker-invalid

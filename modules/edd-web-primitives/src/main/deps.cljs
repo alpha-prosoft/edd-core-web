@@ -11,6 +11,8 @@
             :dayjs                 "^1.8.29"
             :g                     "^2.0.1"
             :js-beautify           "^1.11.0"
+            "@date-io/luxon"       "2.11.1"
+            :luxon                 "^1.21.3"
             :marked                "^2.1.3"
             :moment                "^2.27.0"
             :react                 "17.0.2"

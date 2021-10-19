@@ -5,11 +5,9 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.data-display.core :refer [RawTypography]]
-   [web.primitives.lab.core :refer [RawTimelineDot]]
-   [web.primitives.layout.core :refer [RawGrid]]))
+   [web.primitives.components :refer [RawTypography RawTimelineDot RawGrid]]))
 
-(defcard-rg timeline-dot
+(defcard-rg :timeline-dot
   "## RawTimelineDot
             ##### Outside Timeline size is determined by :style adjusting padding, width and height"
   (apply-stiles

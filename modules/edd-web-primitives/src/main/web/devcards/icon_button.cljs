@@ -4,9 +4,8 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.inputs.core :refer [RawIconButton EddIconButton]]
-   [web.primitives.layout.core :refer [RawGrid]]
    [web.devcards.utils :refer [apply-stiles]]
+   [web.primitives.components :refer [RawGrid RawIconButton EddIconButton]]
    [web.primitives.icons.core :refer [AddIcon CloseIcon DeleteIcon LinkIcon LinkOffIcon]]))
 
 (defcard-rg :iconbutton-add

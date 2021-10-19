@@ -7,11 +7,9 @@
 
    [web.devcards.utils :refer [apply-stiles]]
 
-   [web.primitives.layout.core :refer [RawGrid]]
-   [web.primitives.inputs.core :refer [RawCheckbox RawSwitch]]
-   [web.primitives.utils.core :refer [RawSlide]]))
+   [web.primitives.components :refer [RawGrid RawCheckbox RawSwitch RawSlide]]))
 
-(defcard-rg slide
+(defcard-rg :slide
   "## Slide"
   (fn [data-atom _]
     (apply-stiles
@@ -27,7 +25,7 @@
 
   (r/atom {:show false}))
 
-(defcard-rg double-slide
+(defcard-rg :double-slide
   "## Double Slide"
   (fn [data-atom _]
     (apply-stiles

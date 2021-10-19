@@ -233,4 +233,10 @@
 
                     :MuiLink
                     {:styleOverrides
-                     {:root {:cursor "pointer"}}}}})
+                     {:root {:cursor "pointer"}}}
+
+                    :MuiMenuItem
+                    {:styleOverrides
+                     {:root
+                      {"&.Mui-selected" {:backgroundColor "#d5d5d6!important"
+                                         "&:hover" {:backgroundColor "#d5d5d6"}}}}}}})

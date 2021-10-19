@@ -3,19 +3,18 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
+   [web.devcards.utils :refer [apply-stiles]]
 
-   [web.primitives.data-display.core :refer [RawTooltip]]
-   [web.primitives.inputs.core :refer [RawButton]]
-   [web.devcards.utils :refer [apply-stiles]]))
+   [web.primitives.components :refer [RawTooltip RawButton]]))
 
-(defcard-rg tooltip
+(defcard-rg :tooltip
   "## Tooltip"
   (apply-stiles [RawTooltip
                  {:title "Tooltip text"}
 
                  [RawButton {} "Tooltip"]]))
 
-(defcard-rg tooltip-with-delays
+(defcard-rg :tooltip-with-delays
   "## Tooltip with delays"
   (apply-stiles [RawTooltip
                  {:title "Tooltip text"

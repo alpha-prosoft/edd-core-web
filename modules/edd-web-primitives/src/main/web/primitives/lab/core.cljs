@@ -15,7 +15,6 @@
   [:> Autocomplete (merge
                     {:options           (if options options [])
                      :renderInput       (fn [input-params] (r/as-element [autocomplete-text-field input-params props]))
-                      ;:getOptionSelected (fn [option, value] (= (:id option) (:id value)))
                      :isOptionEqualToValue (fn [option, value] (= (:id option) (:id value)))
                      :free-solo true}
                     (-> props

@@ -4,7 +4,7 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.lab.core :refer [RawSkeleton]]
+   [web.primitives.components :refer [RawSkeleton]]
    [web.devcards.utils :refer [apply-stiles]]))
 
 (defcard-rg skeleton

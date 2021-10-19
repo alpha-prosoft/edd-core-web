@@ -4,9 +4,8 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.inputs.core :refer [RawRadioGroup]]
-   [web.devcards.utils :refer [apply-stiles]]
-   [reagent.core :as r]))
+   [web.primitives.components :refer [RawRadioGroup]]
+   [web.devcards.utils :refer [apply-stiles]]))
 
 (defcard-rg :radio
   "## Radio"

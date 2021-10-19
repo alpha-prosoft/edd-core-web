@@ -3,11 +3,11 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [reagent.core :as r]
-   [web.primitives.text-editor.core :refer [EddTextEditor]]
+   [web.primitives.components :refer [EddTextEditor]]
    [devcards.core :refer-macros (defcard-rg)]
    [web.devcards.utils :refer [apply-stiles]]))
 
-(defcard-rg text-editor
+(defcard-rg :text-editor
   "## Text editor"
   (fn [data-atom _]
     (apply-stiles
@@ -18,7 +18,7 @@
        :on-change (fn [x] (swap! data-atom merge {:draft x}))}]))
   (r/atom {:draft "" :value "Content"}))
 
-(defcard-rg text-editor-with-action-buttons
+(defcard-rg :text-editor-with-action-buttons
   "## Text editor with action buttons"
   (fn [data-atom _]
     (apply-stiles
@@ -29,7 +29,7 @@
        :on-change (fn [x] (swap! data-atom merge {:draft x}))}]))
   (r/atom {:draft "" :value "Content"}))
 
-(defcard-rg text-editor-disabled
+(defcard-rg :text-editor-disabled
   "## Text editor disabled"
   (apply-stiles
    [EddTextEditor

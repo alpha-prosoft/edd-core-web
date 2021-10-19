@@ -1,12 +1,11 @@
 (ns web.devcards.typography
-
   (:require
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.data-display.core :refer [RawTypography]]))
+   [web.primitives.components :refer [RawTypography]]))
 
 (defcard-rg :typography-h1
   "## Typography H1"

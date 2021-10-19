@@ -4,10 +4,9 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
+   [web.devcards.utils :refer [apply-stiles]]
 
-   [web.primitives.lab.core :refer [RawToggleButtonGroup RawToggleButton]]
-   [web.primitives.layout.core :refer [RawGrid]]
-   [web.devcards.utils :refer [apply-stiles]]))
+   [web.primitives.components :refer [RawGrid RawToggleButtonGroup RawToggleButton]]))
 
 (defcard-rg :toggle-buttons
   "## Toggle Button"

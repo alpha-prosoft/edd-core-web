@@ -9,7 +9,7 @@
 
             ["@mui/lab/LocalizationProvider" :default LocalizationProvider]
             ["@mui/lab/DatePicker" :default DatePicker]
-            ["@mui/lab/AdapterDateFns" :default AdapterDateFns]
+            ["@date-io/luxon/build/index.esm.js" :default luxon]
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
@@ -132,7 +132,7 @@
    (:label props)])
 
 (defn RawDatePicker
-  [{:keys [id value on-change label required error helper-text
+  [{:keys [id value label required error helper-text
            set-touched set-focused invalid? invalid-date-message]
     :or   {id                   ::date-picker
            required             false
@@ -141,7 +141,7 @@
     :as   props}]
 
   [:> LocalizationProvider
-   {:dateAdapter AdapterDateFns}
+   {:dateAdapter luxon}
    [:> DatePicker
     (merge
      props
@@ -166,7 +166,10 @@
                                      {:error       true
                                       :helper-text invalid-date-message}))]))
       :on-close               #(comp (set-touched) (set-focused false))
-      :on-change              #(on-change (utils/date-time->date-string %))})]])
+      :on-change              #(utils/handle-date-picker-date-change
+                                (partial (get props :on-change (fn [x] (println "BLL"))))
+                                set-focused
+                                %)})]])
 
 (defn EddDatePicker
   [props]
@@ -235,7 +238,6 @@
                                               (dissoc :on-change)))])
 
     :on-change on-change
-    ;:on-click #(print "on-click")
     :label           label
     :disabled        disabled
     :label-placement label-placement}])

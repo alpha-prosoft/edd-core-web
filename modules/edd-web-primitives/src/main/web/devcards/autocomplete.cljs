@@ -64,6 +64,11 @@
     {:id               "autocomplete-prefilled"
      :options          months-list
      :label            "Autocomplete prefilled"
+     :value            {:id 4 :name "May"}
+     :isOptionEqualToValue (fn [_option _value]
+                             (let [item (js->clj _option :keywordize-keys true)
+                                   value (js->clj _value :keywordize-keys true)]
+                               (= item value)))
      :on-change        (fn [_ option] (print option))
      :get-option-label (fn [option]
                          (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))

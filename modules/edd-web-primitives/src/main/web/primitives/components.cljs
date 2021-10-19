@@ -7,7 +7,8 @@
    [web.primitives.lab.core :as lab-core]
    [web.primitives.navigation.core :as navigation-core]
    [web.primitives.surfaces.core :as surfaces-core]
-   [web.primitives.utils.core :as utils-core]))
+   [web.primitives.utils.core :as utils-core]
+   [web.primitives.text-editor.core :as text-editor-core]))
 
 (def RawGrid layout-core/RawGrid)
 (def RawBox layout-core/RawBox)
@@ -67,4 +68,7 @@
 (def RawClickAwayListener surfaces-core/RawClickAwayListener)
 
 (def RawSlide utils-core/RawSlide)
+
+(def RawTextEditor text-editor-core/RawTextEditor)
+(def EddTextEditor text-editor-core/EddTextEditor)
 

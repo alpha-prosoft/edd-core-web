@@ -7,7 +7,7 @@
    [web.devcards.utils :refer [apply-stiles]]
    [web.primitives.components :refer [RawList RawListItem RawListItemText RawListItemIcon RawListSubheader]]))
 
-(defcard-rg list
+(defcard-rg :list
   "## List"
   (apply-stiles
    [RawList {}

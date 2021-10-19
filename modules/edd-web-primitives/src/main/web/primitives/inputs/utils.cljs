@@ -28,17 +28,24 @@
 
 (def timestamp-server-formatter (time-fmt/formatter "yyyy-MM-dd"))
 
-(defn date-time->date-string [date-time]
-  (if date-time
-    (time-fmt/unparse timestamp-server-formatter (t-coerce/from-date date-time))
-    date-time))
-
 (defn date?
   ([date]
    (try
      (t/date? (time-fmt/parse date))
      (catch js/Error e
        false))))
+
+(defn handle-date-picker-date-change
+  [callback set-focused date]
+  (set-focused true)
+  (if (nil? date)
+    (callback nil)
+    (let [iso (.toISO date)]
+      (if (nil? iso)
+        (callback nil)
+        (-> iso
+            (.substring 0 10)
+            (callback))))))
 
 (defn invalid-date? [touched? focused? {:keys [value required]
                                         :or   {required false}}]

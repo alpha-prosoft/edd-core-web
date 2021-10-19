@@ -6,7 +6,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.inputs.core :refer [RawSelect]]))
+   [web.primitives.components :refer [RawSelect]]))
 
 (defcard-rg :select
   "## Select"
