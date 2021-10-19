@@ -13,12 +13,12 @@
 
 (defn RawAutocomplete [{:keys [options getOptionSelected] :as props}]
   [:> Autocomplete (merge
-                    {:options           (if options options [])
-                     :renderInput       (fn [input-params] (r/as-element [autocomplete-text-field input-params props]))
+                    {:options              (if options options [])
+                     :renderInput          (fn [input-params] (r/as-element [autocomplete-text-field input-params props]))
                      :isOptionEqualToValue (fn [_option _value]
                                              (let [item (js->clj _option :keywordize-keys true)
                                                    value (js->clj _value :keywordize-keys true)]
-                                               (or (= item value) (= (:id item) (:id value)))))}
+                                               (= item value)))}
                     (-> props
                         (dissoc :options)
                         (dissoc :FormHelperTextProps)
