@@ -171,7 +171,9 @@
                     :MuiAutocomplete
                     {:styleOverrides
                      {:loading {:display "none"}
-                      :listbox {:display "grid"}}}
+                      :listbox {:display "grid"}
+                      :option
+                      {"&[aria-selected=\"true\"]" {:backgroundColor "#d5d5d6!important"}}}}
 
                     :MuiGrid
                     {:styleOverrides

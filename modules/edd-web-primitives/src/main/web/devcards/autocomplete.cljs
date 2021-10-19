@@ -21,7 +21,7 @@
                   {:id 10 :name "November"}
                   {:id 11 :name "December"}])
 
-(defcard-rg autocomplete
+(defcard-rg :autocomplete
   "## Autocomplete"
   (apply-stiles
    [RawAutocomplete
@@ -32,7 +32,7 @@
      :get-option-label (fn [option]
                          (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
 
-(defcard-rg autocomplete-with-helper-text
+(defcard-rg :autocomplete-with-helper-text
   "## Autocomplete with helper text"
   (apply-stiles
    [RawAutocomplete
@@ -45,7 +45,7 @@
      :get-option-label    (fn [option]
                             (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
 
-(defcard-rg autocomplete-disabled
+(defcard-rg :autocomplete-disabled
   "## Autocomplete disabled"
   (apply-stiles
    [RawAutocomplete
@@ -57,23 +57,26 @@
      :get-option-label (fn [option]
                          (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
 
-(defcard-rg autocomplete-prefilled
+(defcard-rg :autocomplete-prefilled
   "## Autocomplete prefilled"
-  (apply-stiles
-   [RawAutocomplete
-    {:id               "autocomplete-prefilled"
-     :options          months-list
-     :label            "Autocomplete prefilled"
-     :value            {:id 4 :name "May"}
-     :isOptionEqualToValue (fn [_option _value]
-                             (let [item (js->clj _option :keywordize-keys true)
-                                   value (js->clj _value :keywordize-keys true)]
-                               (= item value)))
-     :on-change        (fn [_ option] (print option))
-     :get-option-label (fn [option]
-                         (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
+  (fn [data-atom _]
+    (apply-stiles
+     [RawAutocomplete
+      {:id                   "autocomplete-prefilled"
+       :options              months-list
+       :label                "Autocomplete prefilled"
+       :value                (:selected @data-atom)
+       :isOptionEqualToValue (fn [_option _value]
+                               (let [item (js->clj _option :keywordize-keys true)
+                                     value (js->clj _value :keywordize-keys true)]
+                                 (= item value)))
+       :on-change            (fn [_ option] (swap! data-atom merge
+                                                   {:selected (js->clj option :keywordize-keys true)}))
+       :get-option-label     (fn [option]
+                               (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
+  (r/atom {:selected {:id 4 :name "May"}}))
 
-(defcard-rg autocomplete-with-loading
+(defcard-rg :autocomplete-with-loading
   "## Autocomplete with loading"
   (fn [data-atom _]
     (apply-stiles
@@ -87,7 +90,7 @@
                            (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
   (r/atom false))
 
-(defcard-rg autocomplete-with-multiple-options
+(defcard-rg :autocomplete-with-multiple-options
   "## Autocomplete with multiple options"
   (fn [data-atom _]
     (apply-stiles

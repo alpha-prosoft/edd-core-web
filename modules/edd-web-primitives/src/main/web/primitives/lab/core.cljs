@@ -15,8 +15,10 @@
   [:> Autocomplete (merge
                     {:options           (if options options [])
                      :renderInput       (fn [input-params] (r/as-element [autocomplete-text-field input-params props]))
-                     :isOptionEqualToValue (fn [option, value] (= (:id option) (:id value)))
-                     :free-solo true}
+                     :isOptionEqualToValue (fn [_option _value]
+                                             (let [item (js->clj _option :keywordize-keys true)
+                                                   value (js->clj _value :keywordize-keys true)]
+                                               (or (= item value) (= (:id item) (:id value)))))}
                     (-> props
                         (dissoc :options)
                         (dissoc :FormHelperTextProps)
