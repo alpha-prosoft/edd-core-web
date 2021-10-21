@@ -132,7 +132,9 @@
                        :textTransform "none"
                        :minWidth      "8rem"}
                       :outlined
-                      {:border "solid 1px #2b2d33"}}}
+                      {:border "solid 1px #2b2d33"}
+                      :containedSecondary
+                      {:color "#fff"}}}
 
                     :MuiToggleButton
                     {:styleOverrides
