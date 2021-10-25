@@ -6,7 +6,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.components :refer [RawGrid RawAutocomplete RawCheckbox RawMenuItem]]))
+   [web.primitives.components :refer [RawAutocomplete RawCheckbox RawMenuItem]]))
 
 (def months-list [{:id 0 :name "January"}
                   {:id 1 :name "February"}

@@ -12,7 +12,7 @@
   [:> Badge (merge
              props
              {:color color}
-             (if (= 0 (:badge-content props))
+             (when (= 0 (:badge-content props))
                {:badge-content "0"}))
    (:content props)])
 

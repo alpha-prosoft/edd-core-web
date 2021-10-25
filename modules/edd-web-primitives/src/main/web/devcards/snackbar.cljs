@@ -6,7 +6,7 @@
    [reagent.core :as r]
 
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.components :refer [RawSnackbar RawAlert RawGrid RawButton]]))
+   [web.primitives.components :refer [RawSnackbar RawGrid RawButton]]))
 
 (defcard-rg :snackbar-alert
   "## Snackbar"

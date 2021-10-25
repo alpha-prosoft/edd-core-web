@@ -28,7 +28,7 @@
       [RawGrid {:item true :xs 6 :style item-style}
        [RawGrid content-props "xs 6"]]]]))
 
-(defcard-rg grid-with-spacing
+(defcard-rg :grid-with-spacing
   "## Grid with spacing"
   (let [content-props {:style {:background-color "#c5c3c3"
                                :border "1px solid #656565"

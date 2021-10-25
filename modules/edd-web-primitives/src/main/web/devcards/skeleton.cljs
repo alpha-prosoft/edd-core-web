@@ -7,7 +7,7 @@
    [web.primitives.components :refer [RawSkeleton]]
    [web.devcards.utils :refer [apply-stiles]]))
 
-(defcard-rg skeleton
+(defcard-rg :skeleton
   "## Skeleton"
   (apply-stiles [RawSkeleton
                  {:id "skeleton"

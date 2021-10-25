@@ -16,7 +16,7 @@
      [RawGrid {:container true}
       [RawGrid {:container true :item true}
        [RawCheckbox {:checked (:show @data-atom)
-                     :on-change (fn [x] (swap! data-atom merge {:show true}))
+                     :on-change (fn [] (swap! data-atom merge {:show true}))
                      :label "Show"}]]
       [RawGrid {:container true :item true}
        [RawBackdrop

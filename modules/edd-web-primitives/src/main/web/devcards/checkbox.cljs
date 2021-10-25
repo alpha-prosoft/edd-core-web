@@ -16,7 +16,7 @@
      [RawCheckbox
       {:checked (:checked @data-atom)
        :label ""
-       :on-change (fn [x] (swap! data-atom merge {:checked (not (:checked @data-atom))}))}]))
+       :on-change (fn [] (swap! data-atom merge {:checked (not (:checked @data-atom))}))}]))
   (r/atom {:checked false}))
 
 (defn- handle-state [atom]
@@ -32,7 +32,7 @@
     (apply-stiles [RawCheckbox
                    {:indeterminate (:indeterminate @data-atom)
                     :checked (:checked @data-atom)
-                    :on-change (fn [x] (swap! data-atom merge (handle-state @data-atom)))
+                    :on-change (fn [] (swap! data-atom merge (handle-state @data-atom)))
                     :label "Label"}]))
   (r/atom {:checked true :indeterminate true}))
 
@@ -43,7 +43,7 @@
                    {:indeterminate (:indeterminate @data-atom)
                     :checked (:checked @data-atom)
                     :label-placement "start"
-                    :on-change (fn [x] (swap! data-atom merge (handle-state @data-atom)))
+                    :on-change (fn [] (swap! data-atom merge (handle-state @data-atom)))
                     :label "Label"}]))
   (r/atom {:checked true :indeterminate true}))
 
@@ -53,7 +53,7 @@
     (apply-stiles [RawCheckbox
                    {:checked true
                     :disabled true
-                    :on-change (fn [x] (swap! data-atom merge (handle-state @data-atom)))
+                    :on-change (fn [] (swap! data-atom merge (handle-state @data-atom)))
                     :label "Disabled Checkbox"}]))
   (r/atom {:checked true :indeterminate true}))
 

@@ -1,15 +1,15 @@
 (ns web.primitives.inputs.core
   (:require [re-frame.core :as rf]
             [reagent.core :as r]
-            ["@mui/material/index" :refer [FormGroup FormControl FormLabel FormControlLabel
+            ["@mui/material/index" :refer [FormControl FormLabel FormControlLabel
                                            Select Switch Button InputAdornment
-                                           TextField Fab Zoom
+                                           Fab Zoom
                                            IconButton Checkbox RadioGroup Radio
                                            MenuItem InputLabel]]
 
             ["@mui/lab/LocalizationProvider" :default LocalizationProvider]
-            ["@mui/lab/DatePicker" :default DatePicker]
-            ["@date-io/luxon/build/index.esm.js" :default luxon]
+            ["@mui/lab/DesktopDatePicker" :default DesktopDatePicker]
+            ["@mui/lab/AdapterDateFns" :default AdapterDateFns]
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
@@ -133,58 +133,85 @@
 
 (defn RawDatePicker
   [{:keys [id value label required error helper-text
-           set-touched set-focused invalid? invalid-date-message]
+           set-touched set-focused invalid? invalid-date-message
+           minDate maxDate min-date max-date]
     :or   {id                   ::date-picker
            required             false
            set-touched          (fn [] (print "set-touched"))
            invalid-date-message "Invalid date"}
     :as   props}]
+  (let [component-min-date (or minDate min-date "1900-01-01")
+        component-max-date (or maxDate max-date "2099-12-31")]
 
-  [:> LocalizationProvider
-   {:dateAdapter luxon}
-   [:> DatePicker
-    (merge
-     props
-     {:input-format           "dd.MM.yyyy"
-      :allowSameDateSelection true
-      :mask                   "__.__.____"
-      :label                  label
-      :clearable              true
-      :clear-text             "Clear"
-      :value                  value
-      :renderInput            (fn [p]
-                                (r/as-element
-                                 [RawTextField
+    [:> LocalizationProvider
+     {:dateAdapter AdapterDateFns}
+     [:> DesktopDatePicker
+      (merge
+       props
+       {:input-format           "dd.MM.yyyy"
+        :allowSameDateSelection true
+        :mask                   "__.__.____"
+        :label                  label
+        :clearable              true
+        :clear-text             "Clear"
+        :value                  value
+        :minDate                (js/Date.parse component-min-date)
+        :maxDate                (js/Date.parse component-max-date)
+        :renderInput            (fn [p]
+                                  (r/as-element
+                                   [RawTextField
+                                    (merge
+                                     (utils/jsx->clj p)
+                                     {:helper-text helper-text
+                                      :id          id
+                                      :required    required
+                                      :error       error
+                                      :on-blur     #(comp (set-touched) (set-focused false))}
+                                     (when invalid?
+                                       {:error       true
+                                        :helper-text invalid-date-message}))]))
+        :on-close               #(comp (set-touched) (set-focused false))
+        :on-change              #(utils/handle-date-picker-date-change
                                   (merge
-                                   (utils/jsx->clj p)
-                                   {:helper-text helper-text
-                                    :id          id
-                                    :required    required
-                                    :error       error
-                                    :on-blur     #(comp (set-touched) (set-focused false))}
-                                   (when invalid?
-                                     {:error       true
-                                      :helper-text invalid-date-message}))]))
-      :on-close               #(comp (set-touched) (set-focused false))
-      :on-change              #(utils/handle-date-picker-date-change
-                                (partial (get props :on-change (fn [x] (println "BLL"))))
-                                set-focused
-                                %)})]])
+                                   props
+                                   {:component-min-date component-min-date
+                                    :component-max-date component-max-date
+                                    :set-focused        set-focused
+                                    :date               %}))})]]))
 
-(defn EddDatePicker
-  [props]
+(defn date-picker-with-state [{:keys [on-invalid-hook]
+                               :or   {on-invalid-hook (fn [])}
+                               :as   props}]
   (r/with-let [date-picker-state-id (keyword (str ::date-picker-state- (str (random-uuid))))]
     (let [focused? @(rf/subscribe [::model/date-picker-focused? date-picker-state-id])
           touched? @(rf/subscribe [::model/date-picker-touched? date-picker-state-id])
+          date-input-invalid? @(rf/subscribe [::model/date-input-invalid? date-picker-state-id])
           set-focused (fn [focused?] (rf/dispatch [::model/set-date-picker-focused date-picker-state-id focused?]))
-          set-touched (fn [] (rf/dispatch [::model/set-date-picker-touched date-picker-state-id]))]
-
+          set-touched (fn [] (rf/dispatch [::model/set-date-picker-touched date-picker-state-id]))
+          set-date-input-invalid (fn [invalid?]
+                                   (doall
+                                    (when (not= date-input-invalid? invalid?) (on-invalid-hook invalid?))
+                                    (rf/dispatch [::model/set-date-input-invalid date-picker-state-id invalid?])))]
       [RawDatePicker
        (merge
-        {:invalid?    (utils/invalid-date? touched? focused? props)
-         :set-focused set-focused
-         :set-touched set-touched}
+        {:invalid?               (utils/invalid-date? (merge
+                                                       {:touched?            touched?
+                                                        :focused?            focused?
+                                                        :date-input-invalid? date-input-invalid?}
+                                                       props))
+         :set-focused            set-focused
+         :set-touched            set-touched
+         :set-date-input-invalid set-date-input-invalid}
         props)])))
+
+(defn EddDatePicker
+  [{:keys [id label value read-only? read-only] :as props}]
+  (if (or read-only? read-only)
+    [RawTextField {:id        id
+                   :read-only true
+                   :label     label
+                   :value     (utils/date-string->ui-view value)}]
+    (date-picker-with-state props)))
 
 (defn RawButton
   [props inner-text]
@@ -237,7 +264,7 @@
                                               (dissoc :label-placement)
                                               (dissoc :on-change)))])
 
-    :on-change on-change
+    :on-change       on-change
     :label           label
     :disabled        disabled
     :label-placement label-placement}])

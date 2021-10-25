@@ -6,7 +6,7 @@
    [devcards.core :refer-macros (defcard-rg)]
    [web.devcards.utils :refer [apply-stiles]]
 
-   [web.primitives.components :refer [RawGrid RawToggleButtonGroup RawToggleButton]]))
+   [web.primitives.components :refer [RawToggleButtonGroup RawToggleButton]]))
 
 (defcard-rg :toggle-buttons
   "## Toggle Button"

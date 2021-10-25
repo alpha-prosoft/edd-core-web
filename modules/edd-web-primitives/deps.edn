@@ -12,7 +12,10 @@
          org.slf4j/slf4j-simple {:mvn/version "1.7.32"}}
 
  :aliases
-        {:dev
+        {:lint
+         {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2021.01.20"}}
+          :main-opts  ["-m" "clj-kondo.main" "--lint src/main"]}
+         :dev
          {:extra-paths ["src/test/clj" "src/test/cljs" "src/test/resources"]
           :extra-deps
                        {devcards/devcards {:mvn/version "0.2.6"

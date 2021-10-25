@@ -23,6 +23,16 @@
    (get-in db [::db/date-picker (keyword date-picker-state-id) :touched?] false)))
 
 (rf/reg-event-db
+ ::set-date-input-invalid
+ (fn [db [_ date-picker-state-id invalid?]]
+   (assoc-in db [::db/date-picker (keyword date-picker-state-id) :date-input-invalid?] invalid?)))
+
+(rf/reg-sub
+ ::date-input-invalid?
+ (fn [db [_ date-picker-state-id]]
+   (get-in db [::db/date-picker (keyword date-picker-state-id) :date-input-invalid?] false)))
+
+(rf/reg-event-db
  ::set-icon-button-hovered
  (fn [db [_ icon-button-state-id state]]
    (assoc-in db [::db/icon-button icon-button-state-id :hovered?] state)))

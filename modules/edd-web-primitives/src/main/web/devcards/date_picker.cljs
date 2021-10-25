@@ -14,32 +14,73 @@
   "## Date picker"
   (fn [data-atom _]
     (apply-stiles
-     [EddDatePicker {:id                   "date-picker"
+     [EddDatePicker {:id                   (str ::date-picker)
                      :value                (:value @data-atom)
                      :invalid-date-message "Date is invalid"
+                     :on-invalid-hook #(print "invalid date: " %)
                      :on-change            (fn [x] (doall (print x)
                                                           (swap! data-atom merge {:value x})))}]))
   (r/atom {:value "2020-09-15"}))
 
-(defcard-rg :date-picker-invalid
-  "## Invalid Date picker"
+(defcard-rg :required-picker
+  "## Required Date picker"
   (fn [data-atom _]
     (apply-stiles
      [EddDatePicker (merge
-                     {:id          "date-picker-invalid"
-                      :value       (:value @data-atom)
-                      :required    true
-                      :label       "Please set required date"
-                      :on-change   (fn [x] (swap! data-atom merge {:value x}))})]))
+                     {:id        (str ::date-picker-invalid)
+                      :value     (:value @data-atom)
+                      :required  true
+                      :on-invalid-hook #(print "invalid date: " %)
+                      :label     "Please set required date"
+                      :on-change (fn [x] (swap! data-atom merge {:value x}))})]))
   (r/atom {:value nil}))
 
-(defcard-rg :date-picker-today-disabled
-  "## Disabled Date picker today"
+(defcard-rg :date-picker-disabled
+  "## Disabled Date picker"
   (fn [data-atom _]
     (apply-stiles
-     [EddDatePicker {:id        "date-picker-today-disabled"
+     [EddDatePicker {:id        (str ::date-picker-disabled)
                      :value     (:value @data-atom)
                      :required  true
                      :disabled  true
+                     :on-invalid-hook #(print "invalid date: " %)
                      :on-change (fn [x] (swap! data-atom merge {:value x}))}]))
   (r/atom {:value (format/unparse (format/formatter "yyyy-MM-dd") (time/to-default-time-zone (js/Date.)))}))
+
+(defcard-rg :date-picker-with-min-and-max-date
+  "## Date picker with min-date of \"2021-01-01\" and max-date - \"2025-12-31\""
+  (fn [data-atom _]
+    (apply-stiles
+     [EddDatePicker (merge
+                     {:id        (str ::date-picker-with-min-and-max-date)
+                      :value     (:value @data-atom)
+                      :min-date  "2021-01-01"
+                      :max-date  "2025-12-31"
+                      :on-invalid-hook #(print "invalid date: " %)
+                      :label     "Please set required date"
+                      :on-change (fn [x] (doall (print x)
+                                                (swap! data-atom merge {:value x})))})]))
+  (r/atom {:value nil}))
+
+(defcard-rg :date-picker-with-disable-past
+  "## Date picker with disable past"
+  (fn [data-atom _]
+    (apply-stiles
+     [EddDatePicker (merge
+                     {:id        (str ::date-picker-with-min-and-max-date)
+                      :value     (:value @data-atom)
+                      :disable-past true
+                      :on-invalid-hook #(print "invalid date: " %)
+                      :label     "Please set required date"
+                      :on-change (fn [x] (doall (print x)
+                                                (swap! data-atom merge {:value x})))})]))
+  (r/atom {:value nil}))
+
+(defcard-rg :date-picker-read-only
+  "## Date picker read only"
+  (apply-stiles
+   [EddDatePicker (merge
+                   {:id        (str ::date-picker-read-only)
+                    :value     "2020-09-15"
+                    :label     "Date"
+                    :read-only true})]))

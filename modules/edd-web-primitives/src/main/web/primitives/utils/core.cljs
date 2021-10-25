@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as r]
 
-   ["@mui/material/index" :refer [Slide Transition Grid]]))
+   ["@mui/material/index" :refer [Slide Grid]]))
 
 (defn RawSlide [{:keys [in direction timeout]
                  :or   {in false direction "left" timeout 500}}

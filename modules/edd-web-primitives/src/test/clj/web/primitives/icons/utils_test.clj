@@ -1,5 +1,5 @@
 (ns web.primitives.icons.utils-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is run-tests]]
             [web.primitives.icons.utils :as utils]))
 
 (deftest handle-props-test

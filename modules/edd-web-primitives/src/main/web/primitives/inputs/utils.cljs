@@ -1,11 +1,8 @@
 (ns web.primitives.inputs.utils
   (:require [reagent.core :as r]
             [cljs-time.core :as t]
-            [cljs-time.coerce :as t-coerce]
             [cljs-time.format :as time-fmt]
-            ["@mui/material/TextField" :default TextField]
-            [clojure.string :as string]
-            [cljs.pprint :as pprint]))
+            ["@mui/material/TextField" :default TextField]))
 
 (def adapted-text-field (r/adapt-react-class TextField))
 
@@ -26,34 +23,55 @@
   (into {} (for [k (.keys js/Object x)]
              [k (aget x k)])))
 
-(def timestamp-server-formatter (time-fmt/formatter "yyyy-MM-dd"))
+(def date-formatter (time-fmt/formatter "yyyy-MM-dd"))
 
-(defn date?
-  ([date]
-   (try
-     (t/date? (time-fmt/parse date))
-     (catch js/Error e
-       false))))
+(defn date-string->ui-view [date-string]
+  (try
+    (time-fmt/unparse (time-fmt/formatter "dd.MM.yyyy") (time-fmt/parse date-formatter date-string))
+    (catch js/Error _ "")))
+
+(defn date? [date]
+  (try
+    (.toISOString date)
+    (catch js/Error _
+      false)))
+
+(defn validate-date-min-max-date [{:keys [component-min-date component-max-date disablePast disable-past
+                                          set-date-input-invalid]} date-string]
+  (let [date (time-fmt/parse date-string)
+        _disablePast (or disablePast disable-past)
+        invalid? (and (some? date-string)
+                      (or (t/before? date (time-fmt/parse component-min-date))
+                          (t/after? date (time-fmt/parse component-max-date))
+                          (t/before? date (t/today-at-midnight))))]
+    (set-date-input-invalid invalid?)
+    date-string))
+
+(defn date->string [{:keys [date required set-date-input-invalid] :as props}]
+  (cond
+    (nil? date) (doall (when required (set-date-input-invalid true)) nil)
+    (false? (date? date)) (doall (set-date-input-invalid true) nil)
+    :else (validate-date-min-max-date props
+                                      (time-fmt/unparse date-formatter
+                                                        (t/to-default-time-zone date)))))
 
 (defn handle-date-picker-date-change
-  [callback set-focused date]
-  (set-focused true)
-  (if (nil? date)
-    (callback nil)
-    (let [iso (.toISO date)]
-      (if (nil? iso)
-        (callback nil)
-        (-> iso
-            (.substring 0 10)
-            (callback))))))
+  [{:keys [set-focused on-change]
+    :or   {on-change #(print "date: " %)}
+    :as   props}]
+  (doall
+   (set-focused true)
+   (on-change
+    (date->string props))))
 
-(defn invalid-date? [touched? focused? {:keys [value required]
-                                        :or   {required false}}]
-  (and touched? (not focused?) (if required
-                                 (not (date? value))
-                                 (if (nil? value)
-                                   false
-                                   (not (date? value))))))
+(defn invalid-date? [{:keys [value required date-input-invalid? touched? focused?]
+                      :or   {required false}}]
+  (and
+   touched?
+   (not focused?)
+   (or
+    date-input-invalid?
+    (and required (nil? value)))))
 
 (defn clean-switch-props [props]
   (->

@@ -21,31 +21,31 @@
 
 (defn RawAccordion [{:keys [expanded? control-position on-click on-change on-expand-func
                             elevation style disabled summary-style summary-class-name details-style]
-                     :or {control-position :left elevation 0 disabled false}
-                     :as props} content]
+                     :or   {control-position :left elevation 0 disabled false}
+                     :as   props} content]
   [:> Accordion
    (merge
-    {:expanded (handle-on-expand-funk expanded? on-expand-func)
+    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
      :elevation elevation
-     :style    (merge {:width "100%"} style)
-     :onChange on-change})
+     :style     (merge {:width "100%"} style)
+     :onChange  on-change})
 
    [:> AccordionSummary
     (merge {:style (merge {} summary-style)}
            (when (some? summary-class-name) {:class-name summary-class-name}))
     [:> Grid {:container true :alignItems "center"}
-     [:> Grid {:item true
+     [:> Grid {:item  true
                :style (merge
                        {:position "absolute" :top "0px"}
-                       (if (= control-position :right) {:right "0px"}))}
+                       (when (= control-position :right) {:right "0px"}))}
       [:> IconButton
        (merge
         {:on-click on-click
          :disabled disabled
-         :style (if (= control-position :right)
-                  {:marginRight "-1.1rem"}
-                  {:marginLeft "-1.1rem"})}
-        (if (:id props) {:id (:id props)}))
+         :style    (if (= control-position :right)
+                     {:marginRight "-1.1rem"}
+                     {:marginLeft "-1.1rem"})}
+        (when (:id props) {:id (:id props)}))
        (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
      [:> Grid {:container true :style (if (= control-position :right)
                                         {:paddingRight "2.5rem"}
@@ -63,12 +63,12 @@
           right? (control-position-right? props)
           on-click (fn [] (rf/dispatch [::model/set-accordion-expanded-state accordion-state-id props]))]
       [RawAccordion (merge {:expanded? expanded?
-                            :right? right?
-                            :on-click on-click} props) content])))
+                            :right?    right?
+                            :on-click  on-click} props) content])))
 
 (defn RawCard [{:keys [header media actions elevation content-props action-props]
-                :or {elevation 3 content-props {} action-props {}}
-                :as props} content]
+                :or   {elevation 3 content-props {} action-props {}}
+                :as   props} content]
   (let [card-props (dissoc props :header :media :actions :content-props :action-props)]
     [:> Card
      (merge card-props

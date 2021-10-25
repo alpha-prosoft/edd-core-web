@@ -1,12 +1,14 @@
 (ns web.primitives.feedback.core
   (:require
-   ["@mui/material/index" :refer [Alert Dialog DialogTitle DialogContent
-                                  DialogContentText DialogActions
+   ["@mui/material/index" :refer [Alert
+                                  Dialog
+                                  DialogTitle
+                                  DialogContent
+                                  DialogActions
                                   LinearProgress
                                   CircularProgress
-                                  Snackbar SnackbarContent
-                                  Slide Grid Backdrop]]
-
+                                  Snackbar
+                                  Backdrop]]
    [reagent.core :as r]))
 
 (defn RawDialog [{:keys [title actions dividers]
@@ -20,7 +22,7 @@
            (dissoc :actions)))
    [:> DialogTitle title]
    [:> DialogContent {:dividers dividers} content]
-   (if (some? actions)
+   (when (some? actions)
      [:> DialogActions actions])])
 
 (defn RawSnackbar [{:keys [anchor-origin open on-close auto-hide-duration message key alert-props]

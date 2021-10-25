@@ -5,7 +5,7 @@
    [reagent.core :as r]
    [devcards.core :refer-macros (defcard-rg)]
    [web.devcards.utils :refer [apply-stiles]]
-   [web.primitives.components :refer [RawMenu RawMenuList RawMenuItem RawButton RawGrid]]))
+   [web.primitives.components :refer [RawMenu RawMenuItem RawButton RawGrid]]))
 
 (defcard-rg :menu
   "## Menu"
