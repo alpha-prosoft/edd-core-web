@@ -13,7 +13,8 @@
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
-            [web.primitives.inputs.model :as model]))
+            [web.primitives.inputs.model :as model]
+            [clojure.string :as string]))
 
 (defn RawTextField
   [{:keys [prefix suffix read-only]
@@ -41,38 +42,46 @@
                                                                   (fn [] (println "BLL")))
                                                              (get props :transform-func (fn [val] val))))})])
 
+(defn switch-with-two-values [{:keys [id label-placement disabled left-label left-value right-label right-value value]
+                               :or   {label-placement "end" disabled false} :as props}]
+  (if (and (some? left-value) (some? right-value) (some? value))
+    [:> FormControlLabel
+     {:control
+      (r/as-element
+       [:> FormControlLabel
+        {:control
+         (r/as-element
+          [:> Switch (merge
+                      (utils/clean-switch-props props)
+                      {:color      "secondary"
+                       :class-name :selector
+                       :checked    (= right-value value)
+                       :on-change  #(utils/handle-switcher-change
+                                     {:left-value  left-value
+                                      :right-value right-value
+                                      :value       value
+                                      :callback    (get props :on-change
+                                                        (fn [] (println "BLL")))})})])
+         :label           left-label
+         :style           {:margin-left  4
+                           :margin-right -4}
+         :disabled        disabled
+         :label-placement "start"}])
+      :label           right-label
+      :disabled        disabled
+      :label-placement label-placement}]
+    (throw
+     (js/Error. (str "For switcher with id: \"" id
+                     "\" and labels: \"" left-label "\" and \"" right-label
+                     "\" expected value is \""
+                     left-value "\" or \"" right-value
+                     "\" but got \"" (if (nil? value) "nil" value) "\"")))))
+
 (defn RawSwitch
-  [{:keys [label label-placement disabled left-label left-value right-label right-value value]
+  [{:keys [label label-placement disabled left-label right-label]
     :or   {label-placement "end" disabled false label ""} :as props}]
   (if (and (some? left-label) (some? right-label))
-    (if (and (some? left-value) (some? right-value) (some? value))
-      [:> FormControlLabel
-       {:control
-        (r/as-element
-         [:> FormControlLabel
-          {:control
-           (r/as-element
-            [:> Switch (merge
-                        (utils/clean-switch-props props)
-                        {:color      "secondary"
-                         :class-name :selector
-                         :checked    (= right-value value)
-                         :on-change  #(utils/handle-switcher-change
-                                       {:left-value  left-value
-                                        :right-value right-value
-                                        :value       value
-                                        :callback    (get props :on-change
-                                                          (fn [] (println "BLL")))})})])
-           :label           left-label
-           :style           {:margin-left  4
-                             :margin-right -4}
-           :disabled        disabled
-           :label-placement "start"}])
-        :label           right-label
-        :disabled        disabled
-        :label-placement label-placement}]
-      (throw
-       (js/Error. "If you want to use switcher with two labels you should provide :left-value :right-value and :value")))
+    (switch-with-two-values props)
 
     [:> FormControlLabel
      {:control         (r/as-element [:> Switch (merge {:color "primary"} (utils/clean-switch-props props))])
