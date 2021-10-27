@@ -2,7 +2,7 @@
   (:require
    [re-frame.core :as rf]
    [reagent.core :as r]
-   ["@mui/material/index" :refer [Accordion AccordionSummary AccordionDetails
+   ["@mui/material/index" :refer [AppBar Toolbar Accordion AccordionSummary AccordionDetails
                                   Card CardHeader CardMedia CardContent CardActions
                                   ClickAwayListener
                                   Grid
@@ -65,6 +65,15 @@
       [RawAccordion (merge {:expanded? expanded?
                             :right?    right?
                             :on-click  on-click} props) content])))
+
+(defn RawAppBar [props content]
+  [:> AppBar props content])
+
+(defn RawToolbar [props & children]
+  (into
+   [:> Toolbar props]
+   (for [child children]
+     child)))
 
 (defn RawCard [{:keys [header media actions elevation content-props action-props]
                 :or   {elevation 3 content-props {} action-props {}}

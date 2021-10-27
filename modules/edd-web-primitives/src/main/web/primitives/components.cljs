@@ -66,6 +66,8 @@
 (def EddAccordion surfaces-core/EddAccordion)
 (def RawCard surfaces-core/RawCard)
 (def RawClickAwayListener surfaces-core/RawClickAwayListener)
+(def RawAppBar surfaces-core/RawAppBar)
+(def RawToolbar surfaces-core/RawToolbar)
 
 (def RawSlide utils-core/RawSlide)
 
