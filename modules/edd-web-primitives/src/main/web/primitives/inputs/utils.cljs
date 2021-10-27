@@ -39,11 +39,10 @@
 (defn validate-date-min-max-date [{:keys [component-min-date component-max-date disablePast disable-past
                                           set-date-input-invalid]} date-string]
   (let [date (time-fmt/parse date-string)
-        _disablePast (or disablePast disable-past)
         invalid? (and (some? date-string)
                       (or (t/before? date (time-fmt/parse component-min-date))
                           (t/after? date (time-fmt/parse component-max-date))
-                          (t/before? date (t/today-at-midnight))))]
+                          (and (or disablePast disable-past) (t/before? date (t/today-at-midnight)))))]
     (set-date-input-invalid invalid?)
     date-string))
 
