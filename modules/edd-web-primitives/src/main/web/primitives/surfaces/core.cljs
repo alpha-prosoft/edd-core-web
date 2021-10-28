@@ -57,6 +57,8 @@
           {:style (merge {:padding "0px"} details-style)}
           content])])
 
+(declare accordion-state-id)
+
 (defn EddAccordion [props content]
   (r/with-let [accordion-state-id (keyword (str "accordion-expanded-state-" (str (random-uuid))))]
     (let [expanded? @(rf/subscribe [::model/get-accordion-expanded-state accordion-state-id props])

@@ -69,6 +69,8 @@
     (read-only-mode props set-edit-mode)
     (edit-mode props set-read-only-mode)))
 
+(declare editor-id)
+
 (defn EddTextEditor
   [props]
   (r/with-let [editor-id (keyword (str "rich-text-editor-mode-" (str (random-uuid))))]

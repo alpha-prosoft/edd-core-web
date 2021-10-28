@@ -13,8 +13,7 @@
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
-            [web.primitives.inputs.model :as model]
-            [clojure.string :as string]))
+            [web.primitives.inputs.model :as model]))
 
 (defn RawTextField
   [{:keys [prefix suffix read-only]
@@ -188,6 +187,8 @@
                                     :set-focused        set-focused
                                     :date               %}))})]]))
 
+(declare date-picker-state-id)
+
 (defn date-picker-with-state [{:keys [on-invalid-hook]
                                :or   {on-invalid-hook (fn [])}
                                :as   props}]
@@ -247,6 +248,8 @@
                         [RawGrid icon-props])
         button-props (if (some? icon) props (conj props {:disabled true}))]
     [:> IconButton button-props adj-size-icon]))
+
+(declare icon-button-state-id)
 
 (defn EddIconButton
   ([props icon]

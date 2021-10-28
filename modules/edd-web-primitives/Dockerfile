@@ -37,6 +37,7 @@ RUN set -e &&\
 RUN ls -la /dist
 RUN set -e && shadow-cljs -A:dev release devcards
 
+RUN set -e && clojure -A:lint --lint src
 RUN set -e && clojure -A:test:runner
 RUN set -e && shadow-cljs -A:dev compile test
 RUN set -e && shadow-cljs -A:dev compile
@@ -48,9 +49,9 @@ RUN ls -la /dist
 
 RUN  set -e && clj -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.2"}}}' \
                       -m cambada.jar \
-                      --app-version "1.0.b${BUILD_ID}" \
+                      --app-version "1.0.${BUILD_ID}" \
                       --app-artifact-id "${PROJECT_NAME}" \
                       --app-group-id "${ARTIFACT_ORG}" \
                       --copy-source \
                       -o /dist/release-libs/; \
-                    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.b${BUILD_ID}.jar.pom.xml"; \
+                    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.${BUILD_ID}.jar.pom.xml"; \

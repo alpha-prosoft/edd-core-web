@@ -52,6 +52,9 @@
   (let [passed-time (if (> time-left time) time (- time time-left))]
     (/ (* passed-time 100) time)))
 
+(declare time-left)
+(declare timer)
+
 (defn EddLinearProgress [{:keys [time]}]
   (r/with-let [time-left (r/atom (* 10 time))
                timer (js/setInterval #(swap! time-left dec) 100)]
