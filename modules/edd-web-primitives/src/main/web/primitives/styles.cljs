@@ -118,7 +118,8 @@
                     :MuiIconButton
                     {:styleOverrides
                      {:root
-                      {:color                      "inherit"
+                      {:padding "12px"
+                       :color                      "inherit"
                        "&.Mui-disabled"            {:opacity 0.5}
                        "&.MuiIconButton-sizeSmall" {:padding 10}}}}
 
@@ -134,7 +135,9 @@
                       :outlined
                       {:border "solid 1px #2b2d33"}
                       :containedSecondary
-                      {:color "#fff"}}}
+                      {:color "#fff"}
+                      :textSecondary
+                      {:color "#037080"}}}
 
                     :MuiToggleButton
                     {:styleOverrides
@@ -243,4 +246,4 @@
                     {:styleOverrides
                      {:root
                       {"&.Mui-selected" {:backgroundColor "#d5d5d6!important"
-                                         "&:hover" {:backgroundColor "#d5d5d6"}}}}}}})
+                                         "&:hover"        {:backgroundColor "#d5d5d6"}}}}}}})

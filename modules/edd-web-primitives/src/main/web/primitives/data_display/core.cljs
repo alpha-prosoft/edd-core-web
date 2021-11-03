@@ -29,8 +29,10 @@
         (for [child children]
           child)))
 
-(defn RawListItem [props content]
-  [:> ListItem props content])
+(defn RawListItem [props & children]
+  (into [:> ListItem props]
+        (for [child children]
+          child)))
 
 (defn RawListItemText [props content]
   [:> ListItemText props content])

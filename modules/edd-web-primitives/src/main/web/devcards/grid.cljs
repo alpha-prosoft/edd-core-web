@@ -10,11 +10,11 @@
   "## Grid"
   (let [item-style {:background-color "#c5c3c3"}
         content-props {:style {:background-color "#c5c3c3"
-                               :border "1px solid #656565"
-                               :padding 5
-                               :text-align "center"}}]
-    [RawGrid {:container true  :style {:padding "1rem"}}
-     [RawGrid {:item true :xs 12
+                               :border           "1px solid #656565"
+                               :padding          5
+                               :text-align       "center"}}]
+    [RawGrid {:container true :style {:padding "1rem"}}
+     [RawGrid {:item  true :xs 12
                :style {:text-align "center" :background-color "#ececec"}}
       "Container"]
 
@@ -31,17 +31,55 @@
 (defcard-rg :grid-with-spacing
   "## Grid with spacing"
   (let [content-props {:style {:background-color "#c5c3c3"
-                               :border "1px solid #656565"
-                               :padding 5
-                               :text-align "center"}}]
+                               :border           "1px solid #656565"
+                               :padding          5
+                               :text-align       "center"}}]
 
     [RawGrid {:container true :spacing 2 :justify-content "space-between" :alignContent "space-between"
-              :style {:background-color "#ececec"}}
+              :style     {:background-color "#ececec"}}
      [RawGrid {:item true :xs 1}
       [RawGrid content-props "xs 1"]]
      [RawGrid {:item true :xs 2}
       [RawGrid content-props "xs 2"]]
      [RawGrid {:item true :xs 3}
       [RawGrid content-props "xs 3"]]
+     [RawGrid {:item true :xs 6}
+      [RawGrid content-props "xs 6"]]]))
+
+(defcard-rg :grid-with-spacing
+  "## Grid with spacing"
+  (let [content-props {:style {:background-color "#c5c3c3"
+                               :border           "1px solid #656565"
+                               :padding          5
+                               :text-align       "center"}}]
+
+    [RawGrid {:container true :spacing 2 :sx {:background-color "#b0f7cf" :padding-bottom "16px" :padding-right "16px"}}
+     [RawGrid {:item true :xs 12}
+      [RawGrid {:container true :item true :column-spacing 2 :justify-content "space-between" :alignContent "space-between"
+                :sx        {:background-color "#ececec"}}
+       [RawGrid {:item true :xs 1}
+        [RawGrid content-props "xs 1"]]
+       [RawGrid {:item true :xs 2}
+        [RawGrid content-props "xs 2"]]
+       [RawGrid {:item true :xs 3}
+        [RawGrid content-props "xs 3"]]
+       [RawGrid {:item true :xs 6}
+        [RawGrid content-props "xs 6"]]]]]))
+
+(defcard-rg :grid-with-spacing
+  "## Grid with spacing"
+  (let [content-props {:style {:background-color "#c5c3c3"
+                               :border           "1px solid #656565"
+                               :padding          5
+                               :text-align       "center"}}]
+
+    [RawGrid {:container true :row-spacing 2 :direction "column"
+              :style     {:background-color "#ececec" :padding "0 16px 16px 16px"}}
+     [RawGrid {:item true :xs 1}
+      [RawGrid content-props "xs 1"]]
+     [RawGrid {:item true :xs 4}
+      [RawGrid content-props "xs 4"]]
+     [RawGrid {:item true :xs 12}
+      [RawGrid content-props "xs 12"]]
      [RawGrid {:item true :xs 6}
       [RawGrid content-props "xs 6"]]]))
