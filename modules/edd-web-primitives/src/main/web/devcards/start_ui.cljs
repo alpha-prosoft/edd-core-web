@@ -39,7 +39,10 @@
    [web.devcards.table]
    [web.devcards.timeline]
    [web.devcards.slide]
-   [web.devcards.backdrop]))
+   [web.devcards.backdrop]
+   [web.devcards.avatar]
+   [web.devcards.drawer]
+   [web.devcards.swipeable-drawer]))
 
 (defn ^:export init []
   (dc/start-devcard-ui!))

@@ -1,6 +1,6 @@
 (ns web.primitives.data-display.core
   (:require
-   ["@mui/material/index" :refer [Badge Divider Grid
+   ["@mui/material/index" :refer [Avatar Badge Divider Grid
                                   List ListItem ListItemText ListItemIcon ListSubheader
                                   Menu MenuItem MenuList
                                   Typography Tooltip
@@ -94,3 +94,9 @@
    [:> TableCell props]
    (for [child children]
      child)))
+
+(defn RawAvatar
+  ([props content]
+   [:> Avatar props content])
+  ([props]
+   [:> Avatar props]))

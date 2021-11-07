@@ -31,6 +31,7 @@
 (def RawTableHead data-display-core/RawTableHead)
 (def RawTableRow data-display-core/RawTableRow)
 (def RawTableCell data-display-core/RawTableCell)
+(def RawAvatar data-display-core/RawAvatar)
 
 (def RawDialog feedback-core/RawDialog)
 (def RawSnackbar feedback-core/RawSnackbar)
@@ -61,6 +62,8 @@
 
 (def RawTabs navigation-core/RawTabs)
 (def RawLink navigation-core/RawLink)
+(def RawDrawer navigation-core/RawDrawer)
+(def RawSwipeableDrawer navigation-core/RawSwipeableDrawer)
 
 (def RawAccordion surfaces-core/RawAccordion)
 (def EddAccordion surfaces-core/EddAccordion)
