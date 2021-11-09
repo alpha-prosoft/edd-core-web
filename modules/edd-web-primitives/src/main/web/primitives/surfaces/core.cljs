@@ -4,7 +4,7 @@
    [reagent.core :as r]
    ["@mui/material/index" :refer [AppBar Toolbar Accordion AccordionSummary AccordionDetails
                                   Card CardHeader CardMedia CardContent CardActions
-                                  ClickAwayListener
+                                  ClickAwayListener CardActionArea
                                   Grid
                                   IconButton]]
    [web.primitives.icons.core :refer [ExpandMoreIcon ExpandLessIcon]]
@@ -77,18 +77,34 @@
    (for [child children]
      child)))
 
-(defn RawCard [{:keys [header media actions elevation content-props action-props]
+(defn card-action-area [{:keys [header media on-click content-props]
+                         :or   {content-props {}}}
+                        content]
+
+  [:> CardActionArea {:on-click on-click}
+   (when (some? header)
+     [:> CardHeader (merge {:titleTypographyProps {:variant "h3"}} header)])
+   (when (some? media)
+     [:> CardMedia media])
+   [:> CardContent content-props content]])
+
+(defn RawCard [{:keys [header media actions on-click elevation content-props action-props]
                 :or   {elevation 3 content-props {} action-props {}}
                 :as   props} content]
-  (let [card-props (dissoc props :header :media :actions :content-props :action-props)]
+  (let [card-props (dissoc props :on-click :header :media :actions :content-props :action-props)]
     [:> Card
      (merge card-props
             {:elevation elevation})
-     (when (some? header)
+
+     (when (and (nil? on-click) (some? header))
        [:> CardHeader (merge {:titleTypographyProps {:variant "h3"}} header)])
-     (when (some? media)
+     (when (and (nil? on-click) (some? media))
        [:> CardMedia media])
-     [:> CardContent content-props content]
+
+     (if (contains? props :on-click)
+       (card-action-area props content)
+       [:> CardContent content-props content])
+
      (when (some? actions)
        [:> CardActions action-props actions])]))
 
