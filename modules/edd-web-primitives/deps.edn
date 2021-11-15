@@ -23,7 +23,7 @@
                                                          cljsjs/react
                                                          cljsjs/react-dom-server]}}}
          :test
-         {:extra-paths ["src/test/clj" "src/test/resources"]
+         {:extra-paths ["src/test/clj" "src/test/cljs" "src/test/resources"]
           :extra-deps  {org.clojure/clojure    {:mvn/version "1.10.2-alpha1"}
                         org.clojure/test.check {:mvn/version "1.0.0"}}}
          :runner

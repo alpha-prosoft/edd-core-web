@@ -294,3 +294,52 @@
        (merge
         {:control (r/as-element [:> Radio (merge {:color "secondary"})])}
         item)]))])
+
+(defn RawNumberField
+  [{:keys [prefix suffix read-only separator]
+    :or   {read-only false} :as props}]
+  [utils/adapted-text-field
+   (merge {:full-width true :color "primary" :variant "standard"}
+          (dissoc props :formatting-func)
+          (when
+           (or (some? (or prefix suffix)) read-only)
+            {:InputProps
+             (merge
+              (when read-only
+                {:disableUnderline true :readOnly true})
+
+              (when (some? prefix)
+                {:startAdornment (r/as-element
+                                  [:> InputAdornment {:position "start"} prefix])})
+
+              (when (some? suffix)
+                {:endAdornment (r/as-element
+                                [:> InputAdornment {:position "end"} suffix])}))})
+
+          {:on-change (fn [event] (utils/handle-input-change-with-number-formatting event
+                                                                                    (get props :on-change
+                                                                                         (fn [] (println "BLL")))
+                                                                                    (get props :formatting-func (fn [val] val))
+                                                                                    separator))})])
+
+(defn RawPercentField
+  [{:keys [prefix read-only]
+    :or   {read-only false} :as props}]
+  [utils/adapted-text-field
+   (merge {:full-width true :color "primary" :variant "standard"}
+          (dissoc props :transform-func)
+          {:InputProps
+           (merge
+            (when read-only
+              {:disableUnderline true :readOnly true})
+
+            (when (some? prefix)
+              {:startAdornment (r/as-element
+                                [:> InputAdornment {:position "start"} prefix])})
+
+            {:endAdornment (r/as-element
+                            [:> InputAdornment {:position "end"} "%"])})}
+
+          {:on-change (fn [event] (utils/handle-input-change-with-percent-formatting event
+                                                                                     (get props :on-change
+                                                                                          (fn [] (println "BLL")))))})])

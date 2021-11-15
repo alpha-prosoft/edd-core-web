@@ -52,6 +52,8 @@
 (def EddIconButton inputs-core/EddIconButton)
 (def RawCheckbox inputs-core/RawCheckbox)
 (def RawRadioGroup inputs-core/RawRadioGroup)
+(def RawNumberField inputs-core/RawNumberField)
+(def RawPercentField inputs-core/RawPercentField)
 
 (def RawAutocomplete lab-core/RawAutocomplete)
 (def RawAlert lab-core/RawAlert)
