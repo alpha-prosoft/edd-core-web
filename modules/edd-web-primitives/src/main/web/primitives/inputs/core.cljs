@@ -319,7 +319,7 @@
           {:on-change (fn [event] (utils/handle-input-change-with-number-formatting event
                                                                                     (get props :on-change
                                                                                          (fn [] (println "BLL")))
-                                                                                    (get props :formatting-func (fn [val] val))
+                                                                                    (get props :formatting-func)
                                                                                     separator))})])
 
 (defn RawPercentField
