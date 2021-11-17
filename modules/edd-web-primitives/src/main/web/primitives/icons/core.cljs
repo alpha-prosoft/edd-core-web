@@ -39,6 +39,7 @@
    ["@mui/icons-material/LinkOff" :default LinkOff]
    ["@mui/icons-material/MarkunreadMailbox" :default MarkunreadMailbox]
    ["@mui/icons-material/Menu" :default Menu]
+   ["@mui/icons-material/MonetizationOn" :default MonetizationOn]
    ["@mui/icons-material/MoreHoriz" :default MoreHoriz]
    ["@mui/icons-material/MoreVert" :default MoreVert]
    ["@mui/icons-material/NoteAdd" :default NoteAdd]
@@ -86,6 +87,9 @@
 
 (defn MenuIcon [props]
   [:> Menu props])
+
+(defn MonetizationOnIcon [props]
+  [:> MonetizationOn props])
 
 (defn TuneIcon [props]
   [:> Tune props])

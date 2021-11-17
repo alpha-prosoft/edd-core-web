@@ -20,7 +20,7 @@
                                       LinkOffIcon ErrorOutlineIcon HelpOutlineIcon PublishIcon
                                       HomeIcon BusinessIcon ReportProblemIcon ChromeReaderModeIcon
                                       ArrowUpwardIcon ArrowDownwardIcon KeyboardTabIcon LaunchIcon
-                                      InfoOutlinedIcon NotificationsNoneIcon]]))
+                                      InfoOutlinedIcon NotificationsNoneIcon MonetizationOnIcon]]))
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -162,3 +162,5 @@
 (defcard-rg :launch-icon "## Launch Icon" [LaunchIcon])
 
 (defcard-rg :notifications-none-icon "## Notifications None Icon" [NotificationsNoneIcon])
+
+(defcard-rg :Monetization-on-icon "## Monetization On Icon" [MonetizationOnIcon])
