@@ -4,6 +4,7 @@
    ["@mui/icons-material/AccountBalanceWallet" :default AccountBalanceWallet]
    ["@mui/icons-material/AccountCircle" :default AccountCircle]
    ["@mui/icons-material/Add" :default Add]
+   ["@mui/icons-material/AdminPanelSettings" :default AdminPanelSettings]
    ["@mui/icons-material/ArrowDownward" :default ArrowDownward]
    ["@mui/icons-material/ArrowUpward" :default ArrowUpward]
    ["@mui/icons-material/AssignmentInd" :default AssignmentInd]
@@ -249,6 +250,9 @@
 
 (defn PersonSearchIcon [props]
   [:> PersonSearch props])
+
+(defn AdminPanelSettingsIcon [props]
+  [:> AdminPanelSettings props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)

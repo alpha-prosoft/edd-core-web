@@ -4,23 +4,25 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.primitives.icons.core :refer [AddIcon SaveIcon DeleteIcon ClearIcon SearchIcon RefreshIcon
-                                      ShareIcon MenuIcon TuneIcon CloseIcon RemoveIcon UnfoldMoreIcon
-                                      UnfoldLessIcon ChatIcon
-                                      ExpandMoreIcon ExpandLessIcon MoreHorizIcon MoreVertIcon ForwardIcon
-                                      SubdirectoryArrowRightIcon CallMadeIcon DialpadIcon EventIcon
-                                      ChatBubbleOutlineIcon AccountBalanceIcon AccountBalanceWalletIcon
-                                      ExposureIcon AccountCircleIcon HomeOutlinedIcon NoteOutlinedIcon
-                                      FormatAlignLeftOutlinedIcon StarBorderIcon PersonIcon InfoIcon
-                                      SettingsIcon EditIcon ArrowRightIcon ArrowLeftIcon AllColapseIcon
-                                      AllExpandIcon LogoIcon  Level1Icon Level2Icon CheckCircleOutlineOutlinedIcon
-                                      EmojiPeopleIcon DirectionsRunIcon AssignmentIndIcon EqualizerIcon
-                                      FindInPageIcon MarkunreadMailboxIcon NoteAddIcon PlaylistAddIcon
-                                      PlaylistAddCheckIcon StarIcon PersonSearchIcon LinkIcon
-                                      LinkOffIcon ErrorOutlineIcon HelpOutlineIcon PublishIcon
-                                      HomeIcon BusinessIcon ReportProblemIcon ChromeReaderModeIcon
-                                      ArrowUpwardIcon ArrowDownwardIcon KeyboardTabIcon LaunchIcon
-                                      InfoOutlinedIcon NotificationsNoneIcon MonetizationOnIcon]]))
+   [web.primitives.icons.core :refer
+    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon AdminPanelSettingsIcon AllColapseIcon
+     AllExpandIcon ArrowDownwardIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon
+     BusinessIcon
+     CallMadeIcon ChatBubbleOutlineIcon ChatIcon CheckCircleOutlineOutlinedIcon ChromeReaderModeIcon ClearIcon CloseIcon
+     DeleteIcon DialpadIcon DirectionsRunIcon
+     EditIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon ExpandMoreIcon ExposureIcon
+     FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon
+     HelpOutlineIcon HomeIcon HomeOutlinedIcon
+     InfoOutlinedIcon InfoIcon
+     KeyboardTabIcon
+     LaunchIcon Level1Icon Level2Icon LinkIcon LinkOffIcon LogoIcon
+     MarkunreadMailboxIcon MenuIcon MonetizationOnIcon MoreHorizIcon MoreVertIcon
+     NoteAddIcon NoteOutlinedIcon NotificationsNoneIcon
+     PersonIcon PersonSearchIcon PlaylistAddCheckIcon PlaylistAddIcon PublishIcon
+     RefreshIcon RemoveIcon ReportProblemIcon
+     SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
+     TuneIcon
+     UnfoldLessIcon UnfoldMoreIcon]]))
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -163,4 +165,6 @@
 
 (defcard-rg :notifications-none-icon "## Notifications None Icon" [NotificationsNoneIcon])
 
-(defcard-rg :Monetization-on-icon "## Monetization On Icon" [MonetizationOnIcon])
+(defcard-rg :monetization-on-icon "## Monetization On Icon" [MonetizationOnIcon])
+
+(defcard-rg :admin-panel-settings-icon "## Admin Panel Settings Icon" [AdminPanelSettingsIcon])
