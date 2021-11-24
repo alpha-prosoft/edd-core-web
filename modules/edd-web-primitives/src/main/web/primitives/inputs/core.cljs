@@ -13,7 +13,11 @@
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
-            [web.primitives.inputs.model :as model]))
+            [web.primitives.inputs.model :as model]
+            [web.primitives.formatting.core :as formatting]
+            [web.primitives.inputs.subs :as subs]
+
+            [cljs.pprint :as pprint]))
 
 (defn RawTextField
   [{:keys [prefix suffix read-only]
@@ -296,13 +300,51 @@
         item)]))])
 
 (defn RawNumberField
-  [{:keys [prefix suffix read-only separator]
+  [{:keys [prefix suffix read-only separator default-value]
     :or   {read-only false} :as props}]
-  [utils/adapted-text-field
-   (merge {:full-width true :color "primary" :variant "standard"}
-          (dissoc props :formatting-func)
-          (when
-           (or (some? (or prefix suffix)) read-only)
+  (let [amount-scaling (if read-only
+                         @(rf/subscribe [::subs/amount-scaling])
+                         "full")
+        contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
+        formatting-func (get props :formatting-func)]
+    [utils/adapted-text-field
+     (merge {:full-width true :color "primary" :variant "standard"}
+            (dissoc props :formatting-func)
+            (when
+             (or (some? (or prefix suffix)) read-only)
+              {:InputProps
+               (merge
+                (when read-only
+                  {:disableUnderline true :readOnly true})
+
+                (when (some? prefix)
+                  {:startAdornment (r/as-element
+                                    [:> InputAdornment {:position "start"} prefix])})
+
+                (when (some? suffix)
+                  {:endAdornment (r/as-element
+                                  [:> InputAdornment {:position "end"} suffix])}))})
+
+            {:on-change (fn [event] (utils/handle-input-change-with-number-formatting event
+                                                                                      (get props :on-change
+                                                                                           (fn [] (println "BLL")))
+                                                                                      formatting-func
+                                                                                      separator))}
+            {:default-value (if (and read-only contains-comma-or-letter?)
+                              default-value
+                              (if (some? separator)
+                                (pprint/cl-format nil (str "~,,'" separator ":D") (/ default-value 100))
+                                (if (some? formatting-func)
+                                  (formatting-func default-value)
+                                  (formatting/format-number default-value amount-scaling))))})]))
+
+(defn RawPercentField
+  [{:keys [prefix suffix read-only default-value]
+    :or   {read-only false} :as props}]
+  (let [contains-percent-or-letter? (some? (re-matches #".*[A-Za-z\%].*" (str default-value)))]
+    [utils/adapted-text-field
+     (merge {:full-width true :color "primary" :variant "standard"}
+            (dissoc props :transform-func)
             {:InputProps
              (merge
               (when read-only
@@ -312,34 +354,12 @@
                 {:startAdornment (r/as-element
                                   [:> InputAdornment {:position "start"} prefix])})
 
-              (when (some? suffix)
-                {:endAdornment (r/as-element
-                                [:> InputAdornment {:position "end"} suffix])}))})
+              {:endAdornment (r/as-element
+                              [:> InputAdornment {:position "end"} suffix])})}
 
-          {:on-change (fn [event] (utils/handle-input-change-with-number-formatting event
-                                                                                    (get props :on-change
-                                                                                         (fn [] (println "BLL")))
-                                                                                    (get props :formatting-func)
-                                                                                    separator))})])
-
-(defn RawPercentField
-  [{:keys [prefix read-only]
-    :or   {read-only false} :as props}]
-  [utils/adapted-text-field
-   (merge {:full-width true :color "primary" :variant "standard"}
-          (dissoc props :transform-func)
-          {:InputProps
-           (merge
-            (when read-only
-              {:disableUnderline true :readOnly true})
-
-            (when (some? prefix)
-              {:startAdornment (r/as-element
-                                [:> InputAdornment {:position "start"} prefix])})
-
-            {:endAdornment (r/as-element
-                            [:> InputAdornment {:position "end"} "%"])})}
-
-          {:on-change (fn [event] (utils/handle-input-change-with-percent-formatting event
-                                                                                     (get props :on-change
-                                                                                          (fn [] (println "BLL")))))})])
+            {:on-change (fn [event] (utils/handle-input-change-with-percent-formatting event
+                                                                                       (get props :on-change
+                                                                                            (fn [] (println "BLL")))))}
+            {:default-value (if (and read-only contains-percent-or-letter?)
+                              default-value
+                              (formatting/format-percent-without-percentage-sign default-value))})]))

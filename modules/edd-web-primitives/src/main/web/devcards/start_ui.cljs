@@ -42,7 +42,8 @@
    [web.devcards.backdrop]
    [web.devcards.avatar]
    [web.devcards.drawer]
-   [web.devcards.swipeable-drawer]))
+   [web.devcards.swipeable-drawer]
+   [web.devcards.formatting]))
 
 (defn ^:export init []
   (dc/start-devcard-ui!))

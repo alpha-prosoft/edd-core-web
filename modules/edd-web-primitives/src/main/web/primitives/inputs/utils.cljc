@@ -34,8 +34,9 @@
 
 #?(:cljs (defn transform-percent [value]
            (let [percent (handle-comma value)
-                 percent-decimal (gstring/format "%.4f" (/ (edn/read-string percent) 100))]
-             (if (str/blank? value) "" percent-decimal))))
+                 percent-decimal (gstring/format "%.4f" (/ (edn/read-string percent) 100))
+                 percent-float (js/parseFloat percent-decimal)]
+             (if (str/blank? value) "" percent-float))))
 
 (defn handle-input-change
   [event callback transform-func]

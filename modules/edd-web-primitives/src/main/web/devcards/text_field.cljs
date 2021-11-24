@@ -2,6 +2,7 @@
   (:require
    [cljsjs.react]
    [cljsjs.react.dom]
+   [goog.object :as g]
    [web.primitives.components :refer [RawTextField RawNumberField RawPercentField]]
    [web.primitives.icons.core :refer [ChatIcon]]
 
@@ -9,6 +10,9 @@
 
    [devcards.core :refer-macros (defcard-rg)]
    [web.devcards.utils :refer [apply-stiles]]))
+
+(g/set js/window "facilities-tab.amount-scaling"
+       "mn")
 
 (defn formatting-func [value]
   (str/replace (str value) #"9" "0"))
@@ -44,25 +48,32 @@
 (defcard-rg :number-field
   "## Number field"
   (apply-stiles [RawNumberField {:label "Label"
-                                 :default-value "1.234"
+                                 :default-value 123400
                                  :on-change (fn [event] (print "event: " event))}]))
 
 (defcard-rg :number-field-custom-separator
   "## Number field with custom separator"
   (apply-stiles [RawNumberField {:label "Label"
-                                 :default-value "1,234"
+                                 :default-value 123400
                                  :on-change (fn [event] (print "event: " event))
                                  :separator ","}]))
 
 (defcard-rg :number-field-custom-formatting-func
   "## Number field with custom formatting function"
   (apply-stiles [RawNumberField {:label "Replaces 9 by 0"
-                                 :default-value "1234"
+                                 :default-value 1234
                                  :on-change (fn [event] (print "event: " event))
                                  :formatting-func formatting-func}]))
+
+(defcard-rg :number-field-read-only-string
+  "## Number field supports Strings on read-only"
+  (apply-stiles [RawNumberField {:label "Auto-formatted value or String possible"
+                                 :default-value "No value-String"
+                                 :read-only true}]))
 
 (defcard-rg :percent-field
   "## Percent field"
   (apply-stiles [RawPercentField {:label "Label"
-                                  :default-value "25,75"
+                                  :suffix "%"
+                                  :default-value 0.2575
                                   :on-change (fn [event] (print "event: " event))}]))

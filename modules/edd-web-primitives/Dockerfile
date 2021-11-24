@@ -19,35 +19,35 @@ USER build
 COPY --chown=build:build shadow-cljs.edn shadow-cljs.edn
 COPY --chown=build:build deps.edn deps.edn
 COPY --chown=build:build tests.edn tests.edn
+COPY --chown=build:build karma.conf.js karma.conf.js
+COPY --chown=build:build resources resources
+COPY --chown=build:build src src
 
 RUN ls -la
 
 
 RUN mkdir -p /dist/s3
 RUN ls -la /dist
-RUN npx shadow-cljs classpath
-
-COPY --chown=build:build resources resources
-COPY --chown=build:build src src
 
 RUN set -e &&\
     clojure -Sdeps '{:deps {cljfmt {:mvn/version "0.6.7"}}}' \
             -m cljfmt.main check src/main/ src/test
 
 RUN ls -la /dist
-RUN set -e && shadow-cljs -A:dev release devcards
-
-RUN set -e && clojure -A:lint --lint src
-RUN set -e && clojure -A:test:runner
-RUN set -e && shadow-cljs -A:dev compile test
-RUN set -e && shadow-cljs -A:dev compile
-
-RUN ls -la /dist
 RUN cp -r resources/public/* /dist/s3/
 RUN sed -i 's/version=1/version='${BUILD_ID}'/g' /dist/s3/index.html
 RUN ls -la /dist
 
-RUN  set -e && clj -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.2"}}}' \
+RUN set -e &&\
+    npx shadow-cljs classpath &&\
+    clojure -A:lint --lint src &&\
+    clojure -A:test:runner &&\
+    shadow-cljs -A:dev compile test &&\
+    shadow-cljs -A:dev compile &&\
+    npx shadow-cljs -A:dev release devcards &&\
+    cp -r resources/public/* /dist/s3/ &&\
+    npx karma start karma.conf.js  --log-level debug --single-run &&\
+    clj -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.2"}}}' \
                       -m cambada.jar \
                       --app-version "1.0.${BUILD_ID}" \
                       --app-artifact-id "${PROJECT_NAME}" \
