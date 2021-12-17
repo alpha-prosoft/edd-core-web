@@ -79,3 +79,5 @@
 (def RawTextEditor text-editor-core/RawTextEditor)
 (def EddTextEditor text-editor-core/EddTextEditor)
 
+(def RawTreeView lab-core/RawTreeView)
+(def RawTreeItem lab-core/RawTreeItem)

@@ -6,6 +6,8 @@
                                   ToggleButtonGroup ToggleButton]]
 
    ["@mui/lab/TimelineDot" :default TimelineDot]
+   ["@mui/lab/TreeView" :default TreeView]
+   ["@mui/lab/TreeItem" :default TreeItem]
 
    [reagent.core :as r]
 
@@ -57,3 +59,15 @@
                       {:variant "filled"}))]
    (for [child children]
      (r/as-element child))))
+
+(defn RawTreeView [props & children]
+  (into
+   [:> TreeView props]
+   (for [child children]
+     child)))
+
+(defn RawTreeItem [props & children]
+  (into
+   [:> TreeItem props]
+   (for [child children]
+     child)))

@@ -22,7 +22,7 @@
      RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon
-     UnfoldLessIcon UnfoldMoreIcon]]))
+     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon]]))
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -55,6 +55,8 @@
 (defcard-rg :expand-more-icon "## Expand More Icon" [ExpandMoreIcon])
 
 (defcard-rg :expand-less-icon "## Expand Less Icon" [ExpandLessIcon])
+
+(defcard-rg :chevron-right-icon "## Chevron Right Icon" [ChevronRightIcon])
 
 (defcard-rg :more-horiz-icon "## More Horiz Icon" [MoreHorizIcon])
 

@@ -63,6 +63,7 @@
    ["@mui/icons-material/Tune" :default Tune]
    ["@mui/icons-material/UnfoldLess" :default UnfoldLess]
    ["@mui/icons-material/UnfoldMore" :default UnfoldMore]
+   ["@mui/icons-material/ChevronRight" :default ChevronRight]
    [web.primitives.icons.utils :refer [handle-props]]))
 
 (defn AddIcon [props]
@@ -253,6 +254,9 @@
 
 (defn AdminPanelSettingsIcon [props]
   [:> AdminPanelSettings props])
+
+(defn ChevronRightIcon [props]
+  [:> ChevronRight props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)
