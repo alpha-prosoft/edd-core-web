@@ -2,7 +2,6 @@
   (:import goog.history.Html5History)
   (:require
    [re-frame.core :as rf]
-   [pushy.core :as pushy]
    [bidi.bidi :as bidi]
    [edd.db :as db]))
 
@@ -15,8 +14,8 @@
        (merge db)
        (assoc-in [::db/selected-language] selected-language)
        (assoc-in [::db/show-language-switcher?] show-language-switcher?)
-       (assoc :config config)
-       (assoc :routes routes))))
+       (assoc ::db/config config)
+       (assoc ::db/routes routes))))
 
 (rf/reg-event-fx
  ::set-active-panel
@@ -63,7 +62,7 @@
                       (.-pathname))]
      (when (and (not= url new-url)
                 (not
-                 (get-in db [:config :mobile] false)))
+                 (get-in db [::db/config :mobile] false)))
        (.pushState (.-history js/window)
                    #js {}
                    ""

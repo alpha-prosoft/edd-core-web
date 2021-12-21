@@ -46,7 +46,7 @@
 (rf/reg-sub
  ::config
  (fn [db]
-   (:config db)))
+   (::db/config db)))
 
 (rf/reg-sub
  ::menu-items

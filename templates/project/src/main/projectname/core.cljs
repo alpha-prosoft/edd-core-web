@@ -11,8 +11,7 @@
 (defn ^:export init
   [config]
   (core/init
-    {:config       (js->clj config)
-     :panels       {:home  home/main-panel
+    {:panels       {:home  home/main-panel
                     :about about/main-panel}
      :languages    [:en :de]
      :translations i18n/translations

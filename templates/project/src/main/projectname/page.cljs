@@ -94,7 +94,7 @@
            :else ":app-bar placeholder")]]]
 
       [:> Grid {:container true :class-name (:page-wrapper classes)}
-       (util/placeholder panels classes)]]]
+       (util/placeholder ctx)]]]
     [:> Grid {:container true :item true} "Loading"]))
 
 

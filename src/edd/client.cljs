@@ -30,7 +30,7 @@
 
 (defn service-uri [service path]
   (let [db @re-frame.db/app-db]
-    (str "https://" (name service) "." (get-in db [:config :HostedZoneName]) path)))
+    (str "https://" (name service) "." (get-in db [::db/config :HostedZoneName]) path)))
 
 (defn add-user
   [req]

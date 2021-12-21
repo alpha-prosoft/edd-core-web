@@ -10,4 +10,6 @@
    ::menu-items              {}
    ::menu-expanded           {}
    ::languages               {}
-   ::translations            {}})
+   ::translations            {}
+   ::config                  {}
+   ::routes                  {}})
