@@ -56,7 +56,7 @@
          {:keys [handler route-params]} (if (keyword? target)
                                           {:handler target
                                            :route-params (or params {})}
-                                          (bidi/match-route (:routes db) target))
+                                          (bidi/match-route (::db/routes db) target))
          pathname (-> js/window
                       (.-location)
                       (.-pathname))]
