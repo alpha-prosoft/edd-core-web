@@ -8,3 +8,7 @@ pom.xml
 lambda-apigw-lib.iml
 .dir-locals.el
 node_modules
+**/node_modules
+**/cljs-runtime
+**/package.json
+**/package-lock.json

@@ -8,8 +8,8 @@
 (rf/reg-event-db
  ::initialize-db
  (fn [db [_ {:keys [selected-language show-language-switcher? config routes]
-             :or {selected-language :en
-                  show-language-switcher? false}}]]
+             :or   {selected-language       :en
+                    show-language-switcher? false}}]]
    (-> db/default-db
        (merge db)
        (assoc-in [::db/selected-language] selected-language)
@@ -54,12 +54,9 @@
                    (bidi/path-for* routes target params)
                    target)
          {:keys [handler route-params]} (if (keyword? target)
-                                          {:handler target
+                                          {:handler      target
                                            :route-params (or params {})}
-                                          (bidi/match-route (::db/routes db) target))
-         pathname (-> js/window
-                      (.-location)
-                      (.-pathname))]
+                                          (bidi/match-route (::db/routes db) target))]
      (when (and (not= url new-url)
                 (not
                  (get-in db [::db/config :mobile] false)))

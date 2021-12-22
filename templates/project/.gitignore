@@ -1,7 +1,7 @@
 /*.log
 /target
 /*-init.clj
-/resources/public/js
+/www/js
 .rebel_redline_history
 .idea
 *.iml
@@ -11,3 +11,6 @@
 node_modules
 .nrepl-port
 out
+.DS_Store
+/plugins/
+/platforms/

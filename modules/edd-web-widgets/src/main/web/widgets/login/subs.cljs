@@ -1,11 +1,11 @@
 (ns web.widgets.login.subs
   (:require
    [edd.db :as edd-db]
-   [widget.login.db :as db]
+   [web.widgets.login.db :as db]
    [re-frame.core :as rf]
    [clojure.string :refer [blank?]]
    [goog.crypt.base64 :as b64]
-   [widget.login.utils :refer [json-parser]]))
+   [web.widgets.login.utils :refer [json-parser]]))
 
 (rf/reg-sub
  :init-login-db

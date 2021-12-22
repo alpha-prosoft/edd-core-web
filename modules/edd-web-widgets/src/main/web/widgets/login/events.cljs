@@ -1,7 +1,7 @@
 (ns web.widgets.login.events
   (:require
    [re-frame.core :as rf]
-   [widget.login.db :as db]
+   [web.widgets.login.db :as db]
    [web.widgets.login.core :as core]
    [clojure.string :as str]
    [edd.db :as edd-db]))

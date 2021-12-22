@@ -6,107 +6,110 @@
 
             ["@mui/icons-material/Visibility" :default Visibility]
             ["@mui/icons-material/VisibilityOff" :default VisibilityOff]
-
-            [web.primitives.components
-             :refer [RawDialog
-                     RawAlert
-                     RawButton
-                     RawTextField
-                     RawIconButton
-                     RawGrid]]))
+            ["@mui/material/Grid" :default Grid]
+            ["@mui/material/Button" :default Button]
+            ["@mui/material/Dialog" :default Dialog]
+            ["@mui/material/DialogTitle" :default DialogTitle]
+            ["@mui/material/DialogContent" :default DialogContent]
+            ["@mui/material/DialogActions" :default DialogActions]
+            ["@mui/material/TextField" :default TextField]
+            ["@mui/material/Alert" :default Alert]
+            ["@mui/material/IconButton" :default IconButton]))
 
 (defn wrap-dialog-button
   [button]
-  [RawGrid {:item        true
+  [:> Grid {:item        true
             :container   true
             :direction   "column"
             :align-items "center"
             :xs          12
             :md          4}
-   [RawGrid {:item true
+   [:> Grid {:item true
              :xs   12}
     button]])
 
 (defn login-dialog-actions [form-type]
-  [RawGrid {:container       true
+  [:> Grid {:container       true
             :direction       "row"
             :justify-content "space-between"
             :sx              {:padding "0 16px 10px 16px"}}
    (when (some #(= % form-type) [:login])
-     [RawGrid {:item true :xs true}
-      [RawButton {:key      "forgot-password"
+     [:> Grid {:item true :xs true}
+      [:> Button {:key      "forgot-password"
                   :on-click #(rf/dispatch [::events/forgot-password])
                   :color    "primary"}
        (tr :forgot-password)]])
 
-   [RawGrid {:item true :xs true :container true :justify-content "end" :column-spacing 2 :sx {:margin 0}}
-    [RawGrid {:item true}
-     [RawButton {:key      "cancel"
+   [:> Grid {:item true :xs true :container true :justify-content "end" :column-spacing 2 :sx {:margin 0}}
+    [:> Grid {:item true}
+     [:> Button {:key      "cancel"
                  :on-click #(rf/dispatch [::events/close-dialog])
                  :color    "secondary"}
       (tr :cancel)]]
     (when (some #(= % form-type) [:login])
-      [RawGrid {:item true}
-       [RawButton {:key      "login"
+      [:> Grid {:item true}
+       [:> Button {:key      "login"
                    :disabled (or @(rf/subscribe [::subs/username-invalid?])
                                  @(rf/subscribe [::subs/password-invalid?]))
                    :on-click #(rf/dispatch [::events/do-login])
                    :color    "secondary"}
         (tr :login)]])
     (when (some #(= % form-type) [:register])
-      [RawGrid {:item true}
-       [RawButton {:key      "register"
+      [:> Grid {:item true}
+       [:> Button {:key      "register"
+                   :disabled (or @(rf/subscribe [::subs/username-invalid?])
+                                 @(rf/subscribe [::subs/password-invalid?]))
                    :on-click #(rf/dispatch [::events/do-register])
                    :color    "secondary"}
         (tr :register)]])
     (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
-      [RawGrid {:item true}
-       [RawButton {:key      "resend-code"
+      [:> Grid {:item true}
+       [:> Button {:key      "resend-code"
                    :on-click #(rf/dispatch [::events/resend-code])
                    :color    "secondary"}
         (tr :resend-code)]])
     (when (some #(= % form-type) [:confirm-login])
-      [RawGrid {:item true}
-       [RawButton {:key      "confirm-login"
+      [:> Grid {:item true}
+       [:> Button {:key      "confirm-login"
                    :on-click #(rf/dispatch [::events/submit-verification])
                    :color    "secondary"}
         (tr :login)]])
     (when (some #(= % form-type) [:confirm-password-reset])
-      [RawGrid {:item true}
-       [RawButton {:key      "confirm-password-code"
+      [:> Grid {:item true}
+       [:> Button {:key      "confirm-password-code"
                    :disabled (or @(rf/subscribe [::subs/password-invalid?])
                                  @(rf/subscribe [::subs/confirmation-code-empty?]))
                    :on-click #(rf/dispatch [::events/confirm-reset-password])
                    :color    "secondary"}
         (tr :confirm-reset-password)]])
     (when (some #(= % form-type) [:forgot-password])
-      [RawGrid {:item true}
-       [RawButton {:key      "confirm-login"
+      [:> Grid {:item true}
+       [:> Button {:key      "confirm-login"
                    :disabled @(rf/subscribe [::subs/username-invalid?])
                    :on-click #(rf/dispatch [::events/reset-password])
                    :color    "secondary"}
         (tr :reset-password)]])]])
 
 (defn username []
-  [RawTextField {:key           "username"
+  [:> TextField {:key           "username"
                  :autoFocus     true
                  :margin        "dense"
                  :default-value ""
                  :label         (tr :username)
-                 :on-change     #(rf/dispatch [::events/username-change %])
+                 :on-change     #(rf/dispatch [::events/username-change (-> % .-target .-value)])
                  :type          "input"
                  :fullWidth     true}])
 
 (defn password []
   (let [show-password? @(rf/subscribe [::subs/show-password?])]
-    [RawTextField {:key           "password"
+    [:> TextField {:key           "password"
                    :autoFocus     true
                    :margin        "dense"
                    :default-value ""
                    :label         (tr :password)
-                   :on-change     #(rf/dispatch [::events/password-change %])
+                   :on-change     #(rf/dispatch [::events/password-change (-> % .-target .-value)])
                    :type          (if show-password? "input" "password")
-                   :suffix        [RawIconButton
+                   :suffix        [:> IconButton
                                    {:on-click #(rf/dispatch [::events/toggle-password-visibility])}
                                    (if show-password?
                                      [:> VisibilityOff {}]
@@ -114,61 +117,62 @@
                    :fullWidth     true}]))
 
 (defn confirm-login []
-  [RawTextField {:key           "confirm-login"
+  [:> TextField {:key           "confirm-login"
                  :autoFocus     true
                  :margin        "dense"
                  :default-value ""
                  :label         (tr :confirmation-code)
-                 :on-change     #(rf/dispatch [::events/confirmation-code-change %])
+                 :on-change     #(rf/dispatch [::events/confirmation-code-change (-> % .-target .-value)])
                  :type          "input"
                  :fullWidth     true}])
 
 (defn login-dialog []
   (let [form-type @(rf/subscribe [::subs/form-type])
         show-error? @(rf/subscribe [::subs/error-message-visible])]
-    [RawDialog {:open            @(rf/subscribe [::subs/dialog-visible])
-                :title           (tr form-type)
+    [:> Dialog {:open            @(rf/subscribe [::subs/dialog-visible])
                 :maxWidth        "xs"
                 :fullWidth       true
                 :onClose         #(rf/dispatch [::events/close-dialog])
-                :actions         (login-dialog-actions form-type)
                 :aria-labelledby "form-dialog-title"}
-     [RawGrid {:container true :direction "column" :spacing 1}
+     [:> DialogTitle (tr form-type)]
+     [:> DialogContent {}
+     [:> Grid {:container true :direction "column" :spacing 1}
       (when (some #(= % form-type) [:register :login :forgot-password])
-        [RawGrid {:item true :xs true}
+        [:> Grid {:item true :xs true}
          (username)])
 
       (when (some #(= % form-type) [:register :login :confirm-password-reset])
-        [RawGrid {:item true} (password)])
+        [:> Grid {:item true} (password)])
 
       (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
-        [RawGrid {:item true} (confirm-login)])
+        [:> Grid {:item true} (confirm-login)])
 
       (when show-error?
-        [RawGrid {:item true}
-         [RawAlert {:severity "error" :style {:width "100%"}}
-          (str (tr @(rf/subscribe [::subs/error-message])))]])]]))
+        [:> Grid {:item true}
+         [:> Alert {:severity "error"}
+          (str (tr @(rf/subscribe [::subs/error-message])))]])]]
+     [:> DialogActions (login-dialog-actions form-type)]]))
 
 (defn logout-button []
-  [RawGrid {:item true}
-   [RawButton {:on-click #(rf/dispatch [::events/logout])}
+  [:> Grid {:item true}
+   [:> Button {:on-click #(rf/dispatch [::events/logout])}
     (tr :logout)]])
 
 (defn register-button []
-  [RawGrid {:item true}
-   [RawButton {:on-click #(rf/dispatch [::events/open-dialog :register])}
+  [:> Grid {:item true}
+   [:> Button {:on-click #(rf/dispatch [::events/open-dialog :register])}
     (tr :register)]
    (login-dialog)])
 
 (defn login-button []
-  [RawGrid {:item true}
-   [RawButton {:on-click #(rf/dispatch [::events/open-dialog :login])}
+  [:> Grid {:item true}
+   [:> Button {:on-click #(rf/dispatch [::events/open-dialog :login])}
     (tr :login)]])
 
 (defn LoginBar [{:keys [] :as params}]
   (let [logged? (boolean @(rf/subscribe [::subs/user-name]))]
     (rf/dispatch [::events/init params])
-    [RawGrid {:container true
+    [:> Grid {:container true
               :justify   "flex-end"
               :spacing   3}
      (when logged?

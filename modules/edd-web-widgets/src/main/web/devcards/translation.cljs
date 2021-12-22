@@ -3,7 +3,7 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
-   [web.primitives.components :refer [RawGrid]]
+   ["@mui/material/Grid" :default Grid]
    [web.widgets.translation.core :as translation-core]
    [web.widgets.translation.subs :as subs]
    [web.widgets.translation.views :refer [LangSelect]]
@@ -24,8 +24,8 @@
 (defcard-rg :login
   "## LoginBar"
   (fn []
-    [RawGrid {:container true :align-items "center"}
-     [RawGrid {:item true :xs 1}
+    [:> Grid {:container true :align-items "center"}
+     [:> Grid {:item true :xs 1}
       [LangSelect {:id "lang-select" :default-lang :en :lang-list [:en :de :ua :cr :ru]}]]
-     [RawGrid {:item true}
+     [:> Grid {:item true}
       (tr :devcards :language)]]))

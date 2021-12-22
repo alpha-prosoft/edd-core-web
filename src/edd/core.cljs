@@ -1,17 +1,15 @@
 (ns edd.core
   (:require
-    [re-frame.core :as rf]
-    [edd.events :as events]
-    [edd.views :as views]
+   [re-frame.core :as rf]
+   [edd.events :as events]
+   [edd.views :as views]
 
-    [reagent.core :as r]
-    [reagent.dom :as dom]
-    [edd.i18n :as i18n]
-    [bidi.bidi :as bidi]
-    [edd.client :as _client]
-    [pushy.core :as pushy]))
-
-
+   [reagent.core :as r]
+   [reagent.dom :as dom]
+   [edd.i18n :as i18n]
+   [bidi.bidi :as bidi]
+   [edd.client :as _client]
+   [pushy.core :as pushy]))
 
 (defn- dispatch-route
   [url])
@@ -19,20 +17,19 @@
 (defn mount-root
   [{:keys [body] :as ctx}]
   (pushy/start!
-    (pushy/pushy #(rf/dispatch [::events/navigate %])
-                 (fn [url] url)))
+   (pushy/pushy #(rf/dispatch [::events/navigate %])
+                (fn [url] url)))
 
   (dom/render
-    (body ctx)
-    (.getElementById js/document "app")))
-
+   (body ctx)
+   (.getElementById js/document "app")))
 
 (defn init
   [{:keys [translations] :as ctx}]
   (let [ctx (-> ctx
                 (assoc :config (js->clj
-                                 (.-eddconfig js/window)
-                                 :keywordize-keys true))
+                                (.-eddconfig js/window)
+                                :keywordize-keys true))
                 (merge (:config ctx {})))]
     (rf/clear-subscription-cache!)
     (rf/dispatch [::events/initialize-db ctx])
