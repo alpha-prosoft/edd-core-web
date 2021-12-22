@@ -1,6 +1,7 @@
 target
 .cpcache
 .project
+target
 pom.xml
 *.iml
 .idea
@@ -8,6 +9,10 @@ pom.xml
 lambda-apigw-lib.iml
 .dir-locals.el
 node_modules
+**/www/js/*
+/templates/project/www/js/
+/templates/project/platforms/
+
 **/node_modules
 **/cljs-runtime
 **/package.json

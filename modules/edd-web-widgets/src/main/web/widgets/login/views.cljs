@@ -173,7 +173,7 @@
   (let [logged? (boolean @(rf/subscribe [::subs/user-name]))]
     (rf/dispatch [::events/init params])
     [:> Grid {:container true
-              :justify   "flex-end"
+              :justify-content   :flex-end
               :spacing   3}
      (when logged?
        (logout-button))
@@ -181,7 +181,6 @@
        (register-button))
      (when (false? logged?)
        (login-button))]))
-
 
 
 
