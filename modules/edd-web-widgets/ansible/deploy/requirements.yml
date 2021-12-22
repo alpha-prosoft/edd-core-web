@@ -1,0 +1,2 @@
+- src: https://gerrit.pipeline.alpha-prosoft.com/a/alpha/alpha-deploy-lib
+  scm: git

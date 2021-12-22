@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Daemon cluster node
+Parameters:
+  ServiceName:
+    Type: String
+
+  EnvironmentNameUpper:
+    Type: String
+  EnvironmentNameLower:
+    Type: String
+  VPCId:
+    Type: String
+
+  PublicHostedZoneId:
+    Type: String
+  PublicHostedZoneName:
+    Type: String
+
+
+  GlobalCertificateArn:
+    Type: String
+
+Resources:
+ S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      BucketName: !Sub "${AWS::AccountId}-${EnvironmentNameLower}-${ServiceName}-bucket"
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+ S3BucketOriginAccessIdentiy:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub '${ServiceName}.${PublicHostedZoneName}'
+
+ BucketPolicyData:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: WebsiteAccessToCDN
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt S3BucketOriginAccessIdentiy.S3CanonicalUserId
+            Action:
+            - s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${S3Bucket}/*"
+      Bucket: !Ref S3Bucket
+
+ CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        IPV6Enabled: true
+        Origins:
+        - Id: !Sub "${AWS::AccountId}-${EnvironmentNameLower}-${ServiceName}-bucket"
+          DomainName: !GetAtt S3Bucket.RegionalDomainName
+          S3OriginConfig:
+            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${S3BucketOriginAccessIdentiy}'
+        Enabled: true
+        HttpVersion: 'http2'
+        Aliases:
+        - !Sub "${ServiceName}.${PublicHostedZoneName}"
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          TargetOriginId: !Sub "${AWS::AccountId}-${EnvironmentNameLower}-${ServiceName}-bucket"
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+            AcmCertificateArn: !Ref GlobalCertificateArn
+            MinimumProtocolVersion: TLSv1.2_2019
+            SslSupportMethod: sni-only
+            
+ CloudFrontDNSRecord:
+    Type: 'AWS::Route53::RecordSet'
+    Properties:
+      HostedZoneId: !Ref PublicHostedZoneId
+      Name: !Sub "${ServiceName}.${PublicHostedZoneName}"
+      Type: CNAME
+      TTL: '3600'
+      ResourceRecords:
+        - !GetAtt CloudFrontDistribution.DomainName
+ 

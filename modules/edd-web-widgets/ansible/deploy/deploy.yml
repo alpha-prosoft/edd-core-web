@@ -1,0 +1,5 @@
+- name: 'Deploy base infrastrucure'
+  hosts: localhost
+  tasks: 
+  - include_role:
+     name: alpha-deploy-lib/web-app

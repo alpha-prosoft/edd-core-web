@@ -1,7 +1,6 @@
 target
 .cpcache
 .project
-target
 pom.xml
 *.iml
 .idea
