@@ -76,10 +76,9 @@
      @(rf/subscribe [::subs/ready])
      (drawer ctx)
      [:> Grid {:container  true
-               :class-name (:root classes)}
+               :spacing 1}
       [:> Grid {:item       true
-                :xs         12
-                :class-name (:header classes)}
+                :xs         12}
        [:> AppBar {:class-name (:app-bar classes)
                    :color      :secondary
                    :position   "static"}
@@ -94,7 +93,8 @@
            app-bar (app-bar)
            :else ":app-bar placeholder")]]]
 
-      [:> Grid {:container true :class-name (:page-wrapper classes)}
+      [:> Grid {:item true }]
+      [:> Grid {:item true }
        (util/placeholder ctx)]]]
     [:> Grid {:container true :item true} "Loading"]))
 
