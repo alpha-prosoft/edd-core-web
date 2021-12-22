@@ -48,7 +48,7 @@
 (rf/reg-event-fx
  ::navigate
  (fn [{:keys [db]} [_ target & [params]]]
-   (let [routes (:routes db)
+   (let [routes (::db/routes db)
          url (::db/url db "/")
          new-url (if (keyword? target)
                    (bidi/path-for* routes target params)
