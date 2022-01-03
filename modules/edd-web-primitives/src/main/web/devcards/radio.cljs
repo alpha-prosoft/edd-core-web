@@ -5,7 +5,8 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.components :refer [RawRadioGroup]]
-   [web.devcards.utils :refer [apply-stiles]]))
+   [web.devcards.utils :refer [apply-stiles]]
+   [reagent.core :as r]))
 
 (defcard-rg :radio
   "## Radio"
@@ -41,3 +42,17 @@
                                            {:value :tree
                                             :disabled true
                                             :label "Tree"}]}]))
+
+(defcard-rg :radio-controlled
+  "## Radio Controlled"
+  (fn [data-atom]
+    (apply-stiles [RawRadioGroup {:label "Simple radio"
+                                  :value (:selected @data-atom)
+                                  :on-change #(swap! data-atom merge {:selected (-> % .-target .-value)})
+                                  :children [{:value :one
+                                              :label "One"}
+                                             {:value :two
+                                              :label "Two"}
+                                             {:value :tree
+                                              :label "Tree"}]}]))
+  (r/atom {:selected :one}))

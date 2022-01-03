@@ -16,6 +16,7 @@
             [web.primitives.inputs.model :as model]
             [web.primitives.formatting.core :as formatting]
             [web.primitives.inputs.subs :as subs]
+            [clojure.string :as string]
 
             [cljs.pprint :as pprint]))
 
@@ -286,12 +287,17 @@
     :label-placement label-placement}])
 
 (defn RawRadioGroup
-  [{:keys [label children default-value defaultValue row on-change]
-    :or   {row false on-change #(print (-> % .-target .-value))}}]
-  [:> FormControl {:on-change on-change}
-   [:> FormLabel {} label]
+  [{:keys [label children row]
+    :or   {row false}
+    :as   props}]
+  [:> FormControl {}
+   (when (and (some? label) (not (string/blank? label)))
+     [:> FormLabel {} label])
    (into
-    [:> RadioGroup {:row row :defaultValue (or default-value defaultValue)}]
+    [:> RadioGroup (merge {:row row}
+                          (-> props
+                              (dissoc :children)
+                              (dissoc :label)))]
 
     (for [item children]
       [:> FormControlLabel
