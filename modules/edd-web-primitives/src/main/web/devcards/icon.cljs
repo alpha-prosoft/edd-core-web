@@ -15,7 +15,7 @@
      HelpOutlineIcon HomeIcon HomeOutlinedIcon
      InfoOutlinedIcon InfoIcon
      KeyboardTabIcon
-     LaunchIcon Level1Icon Level2Icon LinkIcon LinkOffIcon LogoIcon
+     LaunchIcon Level1Icon Level2Icon LinkIcon LinkOffIcon LogoIcon HierarchyIcon
      MarkunreadMailboxIcon MenuIcon MonetizationOnIcon MoreHorizIcon MoreVertIcon
      NoteAddIcon NoteOutlinedIcon NotificationsNoneIcon
      PersonIcon PersonSearchIcon PlaylistAddCheckIcon PlaylistAddIcon PublishIcon
@@ -120,6 +120,8 @@
 (defcard-rg :all-expand-icon "## All Expand Icon" [AllExpandIcon])
 
 (defcard-rg :logo-icon "## Logo Icon" [LogoIcon])
+
+(defcard-rg :hierarchy-icon "## Hierarchy Icon" [HierarchyIcon {:style {:height "48px" :width "48px"}}])
 
 (defcard-rg :level1-icon "## Level1 Icon" [Level1Icon])
 
