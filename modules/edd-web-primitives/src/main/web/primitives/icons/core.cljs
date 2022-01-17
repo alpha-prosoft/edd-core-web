@@ -320,7 +320,7 @@
            :fill-rule "nonzero"}]])
 
 (defn HierarchyIcon [props]
-  [:svg (merge {:viewbox "0 0 48 48"
+  [:svg (merge {:viewBox "0 0 48 48"
                 :version "1.1"
                 :xlmns   "http://www.w3.org/2000/svg"}
                props)
