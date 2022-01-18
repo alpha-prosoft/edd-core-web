@@ -121,7 +121,7 @@
 
 (defcard-rg :logo-icon "## Logo Icon" [LogoIcon])
 
-(defcard-rg :hierarchy-icon "## Hierarchy Icon" [HierarchyIcon {:style {:height "48px" :width "48px"}}])
+(defcard-rg :hierarchy-icon "## Hierarchy Icon" [HierarchyIcon {:style {:height "15px" :width "15px"}}])
 
 (defcard-rg :level1-icon "## Level1 Icon" [Level1Icon])
 

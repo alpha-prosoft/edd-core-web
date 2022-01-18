@@ -320,22 +320,21 @@
            :fill-rule "nonzero"}]])
 
 (defn HierarchyIcon [props]
-  [:svg (merge {:viewBox "0 0 48 48"
+  [:svg (merge {:viewBox "0 0 14 14"
+                :color "red"
                 :version "1.1"
                 :xlmns   "http://www.w3.org/2000/svg"}
                props)
    [:g {:stroke "none", :stroke-width "1", :fill "none", :fill-rule "evenodd"}
-    [:g {:transform "translate(-995.000000, -118.000000)"}
-     [:g {:transform "translate(995.000000, 118.000000)"}
-      [:rect {:x "0", :y "0", :width "48", :height "48"}]
-      [:g {:transform "translate(17.000000, 17.000000)", :fill "#212121"}
-       [:rect {:x "0", :y "0", :width "14", :height "3"}]
-       [:rect {:x "5", :y "6", :width "9", :height "3"}]
-       [:rect {:x "5", :y "11", :width "9", :height "3"}]
-       [:rect {:x "0", :y "4", :width "1", :height "3"}]
-       [:rect {:x "0", :y "7", :width "1", :height "5"}]
-       [:rect {:x "0", :y "7", :width "4", :height "1"}]
-       [:rect {:x "0", :y "12", :width "4", :height "1"}]]]]]])
+    [:rect {:x "0", :y "0", :width "14", :height "14"}]
+    [:g {:fill "#212121"}
+     [:rect {:x "0", :y "0", :width "14", :height "3"}]
+     [:rect {:x "5", :y "6", :width "9", :height "3"}]
+     [:rect {:x "5", :y "11", :width "9", :height "3"}]
+     [:rect {:x "0", :y "4", :width "1", :height "3"}]
+     [:rect {:x "0", :y "7", :width "1", :height "5"}]
+     [:rect {:x "0", :y "7", :width "4", :height "1"}]
+     [:rect {:x "0", :y "12", :width "4", :height "1"}]]]])
 
 (defn Level1Icon [props]
   [:svg (merge {:style {:width   "8px"
