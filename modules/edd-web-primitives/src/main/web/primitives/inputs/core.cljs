@@ -31,7 +31,9 @@
             {:InputProps
              (merge
               (when read-only
-                {:disableUnderline true :readOnly true})
+                {:disableUnderline true
+                 :readOnly true
+                 :style {:border-bottom "1px solid #00000042"}})
 
               (when (some? prefix)
                 {:startAdornment (r/as-element
@@ -321,7 +323,9 @@
               {:InputProps
                (merge
                 (when read-only
-                  {:disableUnderline true :readOnly true})
+                  {:disableUnderline true
+                   :readOnly true
+                   :style {:border-bottom "1px solid #00000042"}})
 
                 (when (some? prefix)
                   {:startAdornment (r/as-element
@@ -354,7 +358,9 @@
             {:InputProps
              (merge
               (when read-only
-                {:disableUnderline true :readOnly true})
+                {:disableUnderline true
+                 :readOnly true
+                 :style {:border-bottom "1px solid #00000042"}})
 
               (when (some? prefix)
                 {:startAdornment (r/as-element
