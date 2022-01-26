@@ -45,6 +45,10 @@
   "## Text field read only"
   (apply-stiles [RawTextField {:read-only true :label "Label" :default-value "value"}]))
 
+(defcard-rg :text-field-read-only-with-underline
+  "## Text field read only with underline"
+  (apply-stiles [RawTextField {:read-only-with-underline true :label "Label" :default-value "value"}]))
+
 (defcard-rg :number-field
   "## Number field"
   (apply-stiles [RawNumberField {:label "Label"
@@ -71,9 +75,22 @@
                                  :default-value "No value-String"
                                  :read-only true}]))
 
+(defcard-rg :number-field-read-only-with-underline
+  "## Number field with custom formatting function"
+  (apply-stiles [RawNumberField {:label "Replaces 9 by 0"
+                                 :default-value 1234
+                                 :read-only-with-underline true}]))
+
 (defcard-rg :percent-field
   "## Percent field"
   (apply-stiles [RawPercentField {:label "Label"
                                   :suffix "%"
                                   :default-value 0.2575
                                   :on-change (fn [event] (print "event: " event))}]))
+
+(defcard-rg :percent-field-read-only-with-underline
+  "## Percent field read only with underline"
+  (apply-stiles [RawPercentField {:label "Label"
+                                  :suffix "%"
+                                  :read-only-with-underline true
+                                  :default-value 0.2575}]))

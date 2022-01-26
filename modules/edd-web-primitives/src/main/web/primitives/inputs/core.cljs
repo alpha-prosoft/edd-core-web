@@ -20,20 +20,28 @@
 
             [cljs.pprint :as pprint]))
 
+(def read-only-underline {:border-bottom "1px solid #00000042"})
+
 (defn RawTextField
-  [{:keys [prefix suffix read-only]
-    :or   {read-only false} :as props}]
+  [{:keys [prefix suffix read-only read-only-with-underline]
+    :or   {read-only                false
+           read-only-with-underline false}
+    :as   props}]
   [utils/adapted-text-field
    (merge {:full-width true :color "primary" :variant "standard"}
-          (dissoc props :transform-func)
+          (dissoc props :transform-func :read-only-with-underline)
           (when
-           (or (some? (or prefix suffix)) read-only)
+           (or (some? (or prefix suffix)) read-only read-only-with-underline)
             {:InputProps
              (merge
               (when read-only
                 {:disableUnderline true
-                 :readOnly true
-                 :style {:border-bottom "1px solid #00000042"}})
+                 :readOnly         true})
+
+              (when read-only-with-underline
+                {:disableUnderline true
+                 :readOnly         true
+                 :style            read-only-underline})
 
               (when (some? prefix)
                 {:startAdornment (r/as-element
@@ -308,8 +316,10 @@
         item)]))])
 
 (defn RawNumberField
-  [{:keys [prefix suffix read-only separator default-value]
-    :or   {read-only false} :as props}]
+  [{:keys [prefix suffix read-only read-only-with-underline separator default-value]
+    :or   {read-only                false
+           read-only-with-underline false}
+    :as   props}]
   (let [amount-scaling (if read-only
                          @(rf/subscribe [::subs/amount-scaling])
                          "full")
@@ -317,15 +327,19 @@
         formatting-func (get props :formatting-func)]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard"}
-            (dissoc props :formatting-func)
+            (dissoc props :formatting-func :read-only-with-underline)
             (when
-             (or (some? (or prefix suffix)) read-only)
+             (or (some? (or prefix suffix)) read-only read-only-with-underline)
               {:InputProps
                (merge
                 (when read-only
                   {:disableUnderline true
-                   :readOnly true
-                   :style {:border-bottom "1px solid #00000042"}})
+                   :readOnly         true})
+
+                (when read-only-with-underline
+                  {:disableUnderline true
+                   :readOnly         true
+                   :style            read-only-underline})
 
                 (when (some? prefix)
                   {:startAdornment (r/as-element
@@ -349,18 +363,24 @@
                                   (formatting/format-number default-value amount-scaling))))})]))
 
 (defn RawPercentField
-  [{:keys [prefix suffix read-only default-value]
-    :or   {read-only false} :as props}]
+  [{:keys [prefix suffix read-only read-only-with-underline default-value]
+    :or   {read-only false
+           read-only-with-underline false}
+    :as props}]
   (let [contains-percent-or-letter? (some? (re-matches #".*[A-Za-z\%].*" (str default-value)))]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard"}
-            (dissoc props :transform-func)
+            (dissoc props :transform-func :read-only-with-underline)
             {:InputProps
              (merge
               (when read-only
                 {:disableUnderline true
-                 :readOnly true
-                 :style {:border-bottom "1px solid #00000042"}})
+                 :readOnly         true})
+
+              (when read-only-with-underline
+                {:disableUnderline true
+                 :readOnly         true
+                 :style            read-only-underline})
 
               (when (some? prefix)
                 {:startAdornment (r/as-element
