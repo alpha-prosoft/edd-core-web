@@ -2,7 +2,6 @@
   (:require
    [cljsjs.react]
    [cljsjs.react.dom]
-   [goog.object :as g]
    [web.primitives.components :refer [RawTextField RawNumberField RawPercentField]]
    [web.primitives.icons.core :refer [ChatIcon]]
 
@@ -10,9 +9,6 @@
 
    [devcards.core :refer-macros (defcard-rg)]
    [web.devcards.utils :refer [apply-stiles]]))
-
-(g/set js/window "facilities-tab.amount-scaling"
-       "mn")
 
 (defn formatting-func [value]
   (str/replace (str value) #"9" "0"))

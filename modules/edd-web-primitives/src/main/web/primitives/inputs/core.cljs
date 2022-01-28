@@ -15,7 +15,6 @@
             [web.primitives.inputs.utils :as utils]
             [web.primitives.inputs.model :as model]
             [web.primitives.formatting.core :as formatting]
-            [web.primitives.inputs.subs :as subs]
             [clojure.string :as string]
 
             [cljs.pprint :as pprint]))
@@ -316,14 +315,12 @@
         item)]))])
 
 (defn RawNumberField
-  [{:keys [prefix suffix read-only read-only-with-underline separator default-value]
+  [{:keys [prefix suffix read-only read-only-with-underline separator default-value amount-scaling]
     :or   {read-only                false
-           read-only-with-underline false}
+           read-only-with-underline false
+           amount-scaling "full"}
     :as   props}]
-  (let [amount-scaling (if read-only
-                         @(rf/subscribe [::subs/amount-scaling])
-                         "full")
-        contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
+  (let [contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
         formatting-func (get props :formatting-func)]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard"}
