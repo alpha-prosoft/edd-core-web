@@ -84,3 +84,12 @@
                     :value     "2020-09-15"
                     :label     "Date"
                     :read-only true})]))
+
+(defcard-rg :date-picker-read-only-with-underline
+  "## Date picker read only with underline"
+  (apply-stiles
+   [EddDatePicker (merge
+                   {:id        (str ::date-picker-read-only)
+                    :value     "2020-09-15"
+                    :label     "Date"
+                    :read-only-with-underline true})]))

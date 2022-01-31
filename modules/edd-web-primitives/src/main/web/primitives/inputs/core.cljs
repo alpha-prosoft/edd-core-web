@@ -229,10 +229,15 @@
         props)])))
 
 (defn EddDatePicker
-  [{:keys [id label value read-only? read-only] :as props}]
-  (if (or read-only? read-only)
+  [{:keys [id label value read-only? read-only read-only-with-underline]
+    :or {read-only? false
+         read-only false
+         read-only-with-underline false}
+    :as props}]
+  (if (or read-only? read-only read-only-with-underline)
     [RawTextField {:id        id
-                   :read-only true
+                   :read-only (or read-only? read-only)
+                   :read-only-with-underline read-only-with-underline
                    :label     label
                    :value     (utils/date-string->ui-view value)}]
     (date-picker-with-state props)))
