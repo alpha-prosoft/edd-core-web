@@ -130,7 +130,9 @@
        :no-validate true
        :full-width  true}
       (dissoc props :id :input-label :render-value :on-change :value :children))
-     [:> InputLabel input-label]
+     [:> InputLabel
+      {:sx {:margin-left "-14px"}}
+      input-label]
      [:> Select
       (merge
        {:id         (str id-pre "-select")
