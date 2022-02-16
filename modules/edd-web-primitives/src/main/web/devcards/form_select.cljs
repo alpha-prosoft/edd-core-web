@@ -30,3 +30,19 @@
        :value     (:selected @data-atom)
        :on-change #(swap! data-atom merge {:selected (.. % -target -value)})}]))
   (r/atom {:selected ""}))
+
+(defcard-rg :select-required-input
+  "## Select - required input"
+  (fn [data-atom _]
+    (apply-stiles
+     [RawFormSelect
+      {:id (str ::form-select-required)
+       :children   (mapv
+                    #(r/as-element
+                      (RawMenuItem {:id (:id %) :key (:id %) :value (:id %)}
+                                   (str (:last-name %) " " (:name %)))) list-options)
+       :input-label "Select name"
+       :value     (:selected @data-atom)
+       :on-change #(swap! data-atom merge {:selected (.. % -target -value)})
+       :required true}]))
+  (r/atom {:selected ""}))

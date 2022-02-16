@@ -120,10 +120,10 @@
                 :required     required?
                 :style        style}]))
 
-(defn RawFormSelect
-  [props]
-  (let [id-pre (:id props)
-        input-label (:input-label props)]
+(defn RawFormSelect [{:keys [id input-label required required?] :as props}]
+  (let [id-pre id
+        input-label input-label
+        required? (or required required?)]
     [:> FormControl
      (merge
       {:id          (str id-pre "-form-control")
@@ -131,7 +131,8 @@
        :full-width  true}
       (dissoc props :id :input-label :render-value :on-change :value :children))
      [:> InputLabel
-      {:sx {:margin-left "-14px"}}
+      {:required required?
+       :sx       {:margin-left "-14px"}}
       input-label]
      [:> Select
       (merge
@@ -232,16 +233,16 @@
 
 (defn EddDatePicker
   [{:keys [id label value read-only? read-only read-only-with-underline]
-    :or {read-only? false
-         read-only false
-         read-only-with-underline false}
-    :as props}]
+    :or   {read-only?               false
+           read-only                false
+           read-only-with-underline false}
+    :as   props}]
   (if (or read-only? read-only read-only-with-underline)
-    [RawTextField {:id        id
-                   :read-only (or read-only? read-only)
+    [RawTextField {:id                       id
+                   :read-only                (or read-only? read-only)
                    :read-only-with-underline read-only-with-underline
-                   :label     label
-                   :value     (utils/date-string->ui-view value)}]
+                   :label                    label
+                   :value                    (utils/date-string->ui-view value)}]
     (date-picker-with-state props)))
 
 (defn RawButton
@@ -325,7 +326,7 @@
   [{:keys [prefix suffix read-only read-only-with-underline separator default-value amount-scaling]
     :or   {read-only                false
            read-only-with-underline false
-           amount-scaling "full"}
+           amount-scaling           "full"}
     :as   props}]
   (let [contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
         formatting-func (get props :formatting-func)]
@@ -368,9 +369,9 @@
 
 (defn RawPercentField
   [{:keys [prefix suffix read-only read-only-with-underline default-value]
-    :or   {read-only false
+    :or   {read-only                false
            read-only-with-underline false}
-    :as props}]
+    :as   props}]
   (let [contains-percent-or-letter? (some? (re-matches #".*[A-Za-z\%].*" (str default-value)))]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard"}
