@@ -55,6 +55,12 @@
                      {:root
                       {:marginLeft "-3px"}}}
 
+                    :MuiFormControl
+                    {:styleOverrides
+                     {:root
+                      {"& .MuiInputLabel-root" {:margin-left            "-14px"
+                                                "&.MuiFormLabel-filled" {:top "9px"}
+                                                "&.Mui-focused"         {:top "9px"}}}}}
                     :MuiGridListTile
                     {:styleOverrides
                      {:tile
@@ -118,7 +124,7 @@
                     :MuiIconButton
                     {:styleOverrides
                      {:root
-                      {:padding "12px"
+                      {:padding                    "12px"
                        :color                      "inherit"
                        "&.Mui-disabled"            {:opacity 0.5}
                        "&.MuiIconButton-sizeSmall" {:padding 10}}}}
