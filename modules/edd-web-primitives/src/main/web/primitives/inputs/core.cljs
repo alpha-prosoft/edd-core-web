@@ -131,7 +131,8 @@
        :full-width  true}
       (dissoc props :id :input-label :render-value :on-change :value :children))
      [:> InputLabel
-      {:required required?}
+      {:class-name :form-select-input-label
+       :required required?}
       input-label]
      [:> Select
       (merge

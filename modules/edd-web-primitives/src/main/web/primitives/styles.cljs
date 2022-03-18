@@ -58,9 +58,10 @@
                     :MuiFormControl
                     {:styleOverrides
                      {:root
-                      {"& .MuiInputLabel-root" {:margin-left            "-14px"
-                                                "&.MuiFormLabel-filled" {:top "9px"}
-                                                "&.Mui-focused"         {:top "9px"}}}}}
+                      {"& .form-select-input-label"
+                       {:margin-left            "-14px"
+                        "&.MuiFormLabel-filled" {:top "9px"}
+                        "&.Mui-focused"         {:top "9px"}}}}}
                     :MuiGridListTile
                     {:styleOverrides
                      {:tile
