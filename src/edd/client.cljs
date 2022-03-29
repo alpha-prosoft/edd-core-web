@@ -27,6 +27,10 @@
     (print mock-result)
     (MockResponse. (:body mock-result) (:status mock-result) (MockHeaders. {"versionid" "mock-response"}))))
 
+(defn document-uri [service path]
+  (let [config @(rf/subscribe [::subs/config])]
+    (str "https://" (name service) "." (:HostedZoneName config) path)))
+
 (defn service-uri [service path]
   (let [config @(rf/subscribe [::subs/config])]
     (str "https://api." (:HostedZoneName config) "/legacy/" (name service) path)))
@@ -127,7 +131,7 @@
 (rf/reg-fx
  :load
  (fn [{:keys [ref service on-success on-failure]}]
-   (let [uri (service-uri :glms-content-svc (str "/load/" (name service) "/" ref))
+   (let [uri (document-uri :glms-content-svc (str "/load/" (name service) "/" ref))
          mock-func-name (str "mock.load." (name service))
          mock-func (g/get js/window mock-func-name)]
      (if (some? mock-func)
@@ -143,7 +147,7 @@
 
 (defn fetch-content
   [{:keys [data service]}]
-  (let [uri (service-uri :glms-content-svc (str "/save/" (name service) "/" (random-uuid)))
+  (let [uri (document-uri :glms-content-svc (str "/save/" (name service) "/" (random-uuid)))
         mock-func-name (str "mock.save." (name service))
         mock-func (g/get js/window mock-func-name)]
     (if (some? mock-func)
