@@ -6,8 +6,7 @@
    [day8.re-frame.http-fx :refer [http-effect]]
    [edd.events :as events]
    [ajax.core :as ajax]
-   [ajax.protocols :refer [-body -get-response-header -get-all-headers]]
-   [ajax.interceptors :refer [map->ResponseFormat]]
+   [edd.subs :as subs]
    [edd.json :as json]
    [edd.db :as db]
    [clojure.string :as string]
@@ -29,8 +28,8 @@
     (MockResponse. (:body mock-result) (:status mock-result) (MockHeaders. {"versionid" "mock-response"}))))
 
 (defn service-uri [service path]
-  (let [db @re-frame.db/app-db]
-    (str "https://" (name service) "." (get-in db [::db/config :HostedZoneName]) path)))
+  (let [config @(rf/subscribe [::subs/config])]
+    (str "https://api." (:HostedZoneName config) "/legacy/" (name service) path)))
 
 (defn add-user
   [req]

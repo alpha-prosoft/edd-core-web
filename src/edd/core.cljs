@@ -2,13 +2,9 @@
   (:require
    [re-frame.core :as rf]
    [edd.events :as events]
-   [edd.views :as views]
 
-   [reagent.core :as r]
    [reagent.dom :as dom]
    [edd.i18n :as i18n]
-   [bidi.bidi :as bidi]
-   [edd.client :as _client]
    [pushy.core :as pushy]))
 
 (defn- dispatch-route
