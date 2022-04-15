@@ -22,7 +22,7 @@
      RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon
-     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon]]))
+     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon]]))
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -174,3 +174,5 @@
 (defcard-rg :admin-panel-settings-icon "## Admin Panel Settings Icon" [AdminPanelSettingsIcon])
 
 (defcard-rg :table-chart-icon "## Table Chart Icon" [TableChartIcon])
+
+(defcard-rg :block-icon "## Block Icon" [BlockIcon])

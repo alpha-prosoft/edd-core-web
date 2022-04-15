@@ -8,6 +8,7 @@
    ["@mui/icons-material/ArrowDownward" :default ArrowDownward]
    ["@mui/icons-material/ArrowUpward" :default ArrowUpward]
    ["@mui/icons-material/AssignmentInd" :default AssignmentInd]
+   ["@mui/icons-material/Block" :default Block]
    ["@mui/icons-material/Business" :default Business]
    ["@mui/icons-material/CallMade" :default CallMade]
    ["@mui/icons-material/Chat" :default Chat]
@@ -225,6 +226,9 @@
 
 (defn HomeIcon [props]
   [:> Home props])
+
+(defn BlockIcon [props]
+  [:> Block props])
 
 (defn BusinessIcon [props]
   [:> Business props])
