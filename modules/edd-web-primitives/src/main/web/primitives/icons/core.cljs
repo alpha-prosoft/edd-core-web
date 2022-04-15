@@ -64,6 +64,7 @@
    ["@mui/icons-material/UnfoldLess" :default UnfoldLess]
    ["@mui/icons-material/UnfoldMore" :default UnfoldMore]
    ["@mui/icons-material/ChevronRight" :default ChevronRight]
+   ["@mui/icons-material/TableChart" :default TableChart]
    [web.primitives.icons.utils :refer [handle-props]]))
 
 (defn AddIcon [props]
@@ -257,6 +258,9 @@
 
 (defn ChevronRightIcon [props]
   [:> ChevronRight props])
+
+(defn TableChartIcon [props]
+  [:> TableChart props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)
