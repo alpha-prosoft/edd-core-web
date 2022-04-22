@@ -33,7 +33,7 @@
 
 (defn service-uri [service path]
   (let [config @(rf/subscribe [::subs/config])]
-    (str "https://api." (:HostedZoneName config) "/legacy/" (name service) path)))
+    (str "https://api." (:HostedZoneName config) "/private/prod/" (name service) path)))
 
 (defn add-user
   [req]
