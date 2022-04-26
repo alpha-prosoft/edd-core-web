@@ -5,7 +5,7 @@
                                            Select Switch Button InputAdornment
                                            Fab Zoom
                                            IconButton Checkbox RadioGroup Radio
-                                           MenuItem InputLabel]]
+                                           MenuItem InputLabel FormHelperText]]
 
             ["@mui/lab/LocalizationProvider" :default LocalizationProvider]
             ["@mui/lab/DesktopDatePicker" :default DesktopDatePicker]
@@ -120,7 +120,7 @@
                 :required     required?
                 :style        style}]))
 
-(defn RawFormSelect [{:keys [id input-label required required?] :as props}]
+(defn RawFormSelect [{:keys [id input-label required required? helper-text] :as props}]
   (let [id-pre id
         input-label input-label
         required? (or required required?)]
@@ -129,17 +129,19 @@
       {:id          (str id-pre "-form-control")
        :no-validate true
        :full-width  true}
-      (dissoc props :id :input-label :render-value :on-change :value :children))
+      (dissoc props :id :input-label :render-value :on-change :value :children :helper-text))
      [:> InputLabel
       {:class-name :form-select-input-label
-       :required required?}
+       :required   required?}
       input-label]
      [:> Select
       (merge
        {:id         (str id-pre "-select")
         :variant    "standard"
         :inputProps {:hidden true}}
-       (dissoc props :id :input-label :full-width :required :disabled))]]))
+       (dissoc props :id :input-label :full-width :required :disabled :helper-text))]
+     (when helper-text
+       [:> FormHelperText {:sx {:margin-left 0}} helper-text])]))
 
 ; ChoiceButton will be replaced with material Chip.
 (defn RawChoiceButton

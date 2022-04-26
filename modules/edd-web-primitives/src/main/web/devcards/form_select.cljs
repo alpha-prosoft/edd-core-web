@@ -4,6 +4,7 @@
    [cljsjs.react.dom]
    [reagent.core :as r]
    [devcards.core :refer-macros (defcard-rg)]
+   [clojure.string :as str]
 
    [web.devcards.utils :refer [apply-stiles]]
    [web.primitives.components :refer [RawFormSelect RawMenuItem]]))
@@ -21,14 +22,14 @@
   (fn [data-atom _]
     (apply-stiles
      [RawFormSelect
-      {:id (str ::form-select)
-       :children   (mapv
-                    #(r/as-element
-                      (RawMenuItem {:id (:id %) :key (:id %) :value (:id %)}
-                                   (str (:last-name %) " " (:name %)))) list-options)
+      {:id          (str ::form-select)
+       :children    (mapv
+                     #(r/as-element
+                       (RawMenuItem {:id (:id %) :key (:id %) :value (:id %)}
+                                    (str (:last-name %) " " (:name %)))) list-options)
        :input-label "Select name"
-       :value     (:selected @data-atom)
-       :on-change #(swap! data-atom merge {:selected (.. % -target -value)})}]))
+       :value       (:selected @data-atom)
+       :on-change   #(swap! data-atom merge {:selected (.. % -target -value)})}]))
   (r/atom {:selected ""}))
 
 (defcard-rg :select-required-input
@@ -36,13 +37,19 @@
   (fn [data-atom _]
     (apply-stiles
      [RawFormSelect
-      {:id (str ::form-select-required)
-       :children   (mapv
-                    #(r/as-element
-                      (RawMenuItem {:id (:id %) :key (:id %) :value (:id %)}
-                                   (str (:last-name %) " " (:name %)))) list-options)
-       :input-label "Select name"
-       :value     (:selected @data-atom)
-       :on-change #(swap! data-atom merge {:selected (.. % -target -value)})
-       :required true}]))
-  (r/atom {:selected ""}))
+      (merge
+       {:id          (str ::form-select-required)
+        :children    (mapv
+                      #(r/as-element
+                        (RawMenuItem {:id (:id %) :key (:id %) :value (:id %)}
+                                     (str (:last-name %) " " (:name %)))) list-options)
+        :input-label "Select name"
+        :value       (:selected @data-atom)
+        :on-change   #(swap! data-atom merge {:selected (.. % -target -value)})
+        :on-blur     #(swap! data-atom merge {:touched? true})
+        :required    true}
+       (when (and (str/blank? (:selected @data-atom)) (:touched? @data-atom))
+         {:error       true
+          :helper-text "Field is required"}))]))
+  (r/atom {:selected ""
+           :touched? false}))
