@@ -22,6 +22,7 @@
                                                    value (js->clj _value :keywordize-keys true)]
                                                (= item value)))}
                     (-> props
+                        (dissoc :error)
                         (dissoc :options)
                         (dissoc :FormHelperTextProps)
                         (dissoc :getOptionSelected)

@@ -76,8 +76,8 @@
                                       :callback    (get props :on-change
                                                         (fn [] (println "BLL")))})})])
          :label           left-label
-         :style           {:margin-left  4
-                           :margin-right -4}
+         :style           {:marginLeft  "4px"
+                           :marginRight "-4px"}
          :disabled        disabled
          :label-placement "start"}])
       :label           right-label

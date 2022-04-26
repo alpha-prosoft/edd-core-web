@@ -41,6 +41,8 @@
      :label               "Start typing"
      :FormHelperTextProps {:style {:text-align "center"}}
      :helper-text         "Helper text"
+     :required true
+     :error true
      :on-change           (fn [_ option] (print option))
      :get-option-label    (fn [option]
                             (get-in (js->clj option :keywordize-keys true) [:name] ""))}]))
