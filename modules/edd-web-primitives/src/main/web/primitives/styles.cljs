@@ -53,7 +53,7 @@
                     :MuiFormControlLabel
                     {:styleOverrides
                      {:root
-                      {:marginLeft "-3px"}}}
+                      {:margin-left "-3px"}}}
 
                     :MuiFormControl
                     {:styleOverrides
@@ -163,7 +163,7 @@
                     :MuiAppBar
                     {:styleOverrides
                      {:positionFixed
-                      {:marginLeft "2rem"}}}
+                      {:margin-left "2rem"}}}
 
                     :MuiAccordion
                     {:styleOverrides
