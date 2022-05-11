@@ -94,9 +94,9 @@
            :else ":app-bar placeholder")]]]
 
       [:> Grid {:item true }]
-      [:> Grid {:item true }
+      [:> Grid {:item true :container true}
        (util/placeholder ctx)]]]
-    [:> Grid {:container true :item true} "Loading"]))
+    [:> Grid {:container true :item true} "Loading..."]))
 
 (defn with-custom-styles
   [{:keys [styles]} component]
