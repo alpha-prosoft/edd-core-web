@@ -9,7 +9,8 @@
 (rf/reg-event-fx
  :initialize-login-db
  (fn [{:keys [db]} _]
-   {:db                          (merge db/default-db db)
+   {:db                          (merge db/default-db
+                                        (assoc-in db [::db/username] ""))
     :amplify-refresh-credentials {:on-success [::login-succeeded]}}))
 
 (rf/reg-event-fx

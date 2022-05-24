@@ -7,7 +7,7 @@
         :confirm-password-reset "New passwod"
         :confirm-reset-password "Confirm"
         :login                  "Login"
-        :username               "Username"
+        :username               "Username (e-mail)"
         :password               "Password"
         :logout                 "Logout"
         :register               "Register"
@@ -22,5 +22,6 @@
         :attempt-limit-exceeded "Attempt limit exceeded. Please wait 15 min. "
         :invalid-code           "Invalid code"
         :missing-username       "Missing username"
-        :missing-password       "Missing password"}})
+        :missing-password       "Missing password"
+        :unknown-error          "Something went wrong"}})
 

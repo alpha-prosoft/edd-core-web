@@ -7,7 +7,7 @@
         :confirm-password-reset "Neues Kenwort"
         :confirm-reset-password "Bestätigen"
         :login                  "Anmelden"
-        :username               "Benutzername"
+        :username               "Benutzername (e-mail)"
         :password               "Kennwort"
         :logout                 "Abmelden"
         :register               "Registrieren"

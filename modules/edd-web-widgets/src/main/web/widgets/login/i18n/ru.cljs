@@ -7,7 +7,7 @@
         :confirm-password-reset "Новый пароль"
         :confirm-reset-password "Подтвердить"
         :login                  "Войти"
-        :username               "Имя пользователя"
+        :username               "Имя пользователя (e-mail)"
         :password               "Пароль"
         :logout                 "Выйти"
         :register               "Регистрация"
