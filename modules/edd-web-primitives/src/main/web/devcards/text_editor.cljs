@@ -14,8 +14,8 @@
      [EddTextEditor
       {:placeholder  "Please type here..."
        :set-contents (:value @data-atom)
-       :editor-mode :edit-mode
-       :on-change (fn [x] (swap! data-atom merge {:draft x}))}]))
+       :editor-mode  :edit-mode
+       :on-change    (fn [x] (swap! data-atom merge {:draft x}))}]))
   (r/atom {:draft "" :value "Content"}))
 
 (defcard-rg :text-editor-with-action-buttons
@@ -24,15 +24,15 @@
     (apply-stiles
      [EddTextEditor
       {:placeholder  "Please type here..."
-       :on-save #(swap! data-atom merge {:value (:draft @data-atom)})
+       :on-save      #(swap! data-atom merge {:value (:draft @data-atom)})
        :set-contents (:value @data-atom)
-       :on-change (fn [x] (swap! data-atom merge {:draft x}))}]))
-  (r/atom {:draft "" :value "Content"}))
+       :on-change    (fn [x] (swap! data-atom merge {:draft x}))}]))
+  (r/atom {:draft "" :value "<a href='javascript:alert(1)'>Link with: javascript:alert(1)</a>"}))
 
 (defcard-rg :text-editor-disabled
   "## Text editor disabled"
   (apply-stiles
    [EddTextEditor
     {:placeholder  "Please type here..."
-     :disable true
+     :disable      true
      :set-contents "Content"}]))

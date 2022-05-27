@@ -1,13 +1,16 @@
 (ns web.primitives.text-editor.core
   (:require
-   ["suneditor-react" :default SunEditor]
+   ["suneditor-react/dist/SunEditor" :default SunEditor]
    ["@mui/material/index" :refer [Grid Button IconButton]]
    [re-frame.core :as rf]
    [reagent.core :as r]
-
+   [dompurify :default purify]
    [web.primitives.icons.core :refer [EditIcon]]
    [web.primitives.text-editor.utils :refer [sun-editor-button-list handle-on-paste handle-on-drop handle-on-save]]
    [web.primitives.text-editor.model :as model]))
+
+(defn sanitize-html [value]
+  (-> purify (.sanitize value)))
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [:> Grid {:container true :style {:position "relative"}}
@@ -20,7 +23,7 @@
                      :font-size "13px"
                      :overflow "hidden"}
              :class-name "sun-editor-editable"
-             :dangerouslySetInnerHTML {:__html (:set-contents props)}}]
+             :dangerouslySetInnerHTML {:__html (sanitize-html (:set-contents props))}}]
    [:> Grid {:item true :style {:position "absolute" :right 0}}
     [:> IconButton
      (merge
@@ -32,7 +35,7 @@
       (when (:id props) {:id       (str "edit-button-" (:id props))}))
      [EditIcon]]]])
 
-(defn- edit-mode [props set-read-only-mode]
+(defn- edit-mode [{:keys [on-change] :as props} set-read-only-mode]
   [:> Grid (merge
             {:container true}
             (when (:id props) {:id (str "editor-" (:id props))}))
@@ -44,7 +47,8 @@
                     :resizingBar false
                     :showPathLabel false}
       :enableToolbar (not (:disable props))}
-     props)]
+     props
+     {:on-change #(on-change (sanitize-html %))})]
    [:> Grid {:container true :style {:border "solid 1px #dadada"
                                      :border-top "none"
                                      :justify-content "flex-end"}}

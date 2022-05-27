@@ -3,6 +3,7 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :as dc]
+   [marked :as marked]
    [web.devcards.date-picker]
    [web.devcards.text-editor]
    [web.devcards.text-field]
@@ -45,6 +46,8 @@
    [web.devcards.swipeable-drawer]
    [web.devcards.formatting]
    [web.devcards.tree-view]))
+
+(js/goog.exportSymbol "DevcardsMarked" marked/marked)
 
 (defn ^:export init []
   (dc/start-devcard-ui!))

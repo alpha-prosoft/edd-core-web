@@ -67,7 +67,7 @@
           [:> Switch (merge
                       (utils/clean-switch-props props)
                       {:color      "secondary"
-                       :class-name :selector
+                       :class-name :Switch-With-Two-Values
                        :checked    (= right-value value)
                        :on-change  #(utils/handle-switcher-change
                                      {:left-value  left-value

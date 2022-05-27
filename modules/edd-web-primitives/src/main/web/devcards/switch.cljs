@@ -22,7 +22,7 @@
 
 (defcard-rg :switch-with-label-placement-start
   "## Switch with label placement on the start"
-  (apply-stiles [RawSwitch {:value false :label "Switch with label" :label-placement "start"}]))
+  (apply-stiles [RawSwitch {:value false :color "secondary" :label "Switch with label" :label-placement "start"}]))
 
 (defcard-rg :switch-with-two-variants
   "## Switch with two variants"

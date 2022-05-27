@@ -59,7 +59,7 @@
                     {:styleOverrides
                      {:root
                       {"& .form-select-input-label"
-                       {:marginLeft            "-14px"
+                       {:marginLeft             "-14px"
                         "&.MuiFormLabel-filled" {:top "9px"}
                         "&.Mui-focused"         {:top "9px"}}}}}
                     :MuiGridListTile
@@ -248,6 +248,21 @@
                     :MuiLink
                     {:styleOverrides
                      {:root {:cursor "pointer"}}}
+
+                    :MuiSwitch
+                    {:styleOverrides
+                     {:root
+                      {"&.Switch-With-Two-Values"
+                       {"& .MuiSwitch-colorSecondary"              {:color "#037080"}
+                        "& .MuiSwitch-colorSecondary + .MuiSwitch-track"
+                        {:background-color "#b3d4d8"
+                         :opacity          1}
+                        "& .MuiSwitch-colorSecondary.Mui-checked " {:color "#037080"}
+                        "& .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track"
+                        {:background-color "#b3d4d8"
+                         :opacity          1}}}
+                      :opacity             1
+                      "& .MuiSwitch-input" {:left "initial" :width "100%"}}}
 
                     :MuiMenuItem
                     {:styleOverrides

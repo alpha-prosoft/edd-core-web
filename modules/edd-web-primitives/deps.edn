@@ -18,7 +18,7 @@
          :dev
          {:extra-paths ["src/test/clj" "src/test/cljs" "src/test/resources"]
           :extra-deps
-                       {devcards/devcards {:mvn/version "0.2.6"
+                       {devcards/devcards {:mvn/version "0.2.7"
                                            :exclusions  [cljsjs/react-dom
                                                          cljsjs/react
                                                          cljsjs/react-dom-server]}}}
