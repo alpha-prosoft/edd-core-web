@@ -29,7 +29,8 @@
             ["@mui/material/Select" :default Select]
             ["@mui/material/InputLabel" :default InputLabel]
             ["@mui/material/MenuItem" :default MenuItem]
-            ["@mui/icons-material/Menu" :default MenuIcon]))
+            ["@mui/icons-material/Menu" :default MenuIcon]
+            [web.widgets.snackbar-alert.views :as snackbar-alert.views]))
 
 (defn menu-item
   [{:keys [classes]} item]
@@ -95,7 +96,8 @@
 
       [:> Grid {:item true }]
       [:> Grid {:item true :container true}
-       (util/placeholder ctx)]]]
+       (util/placeholder ctx)]
+      (snackbar-alert.views/revoke-alert)]]
     [:> Grid {:container true :item true} "Loading..."]))
 
 (defn with-custom-styles
