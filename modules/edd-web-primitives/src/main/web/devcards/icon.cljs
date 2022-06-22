@@ -22,7 +22,7 @@
      RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon
-     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon]]))
+     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon]]))
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -178,3 +178,5 @@
 (defcard-rg :block-icon "## Block Icon" [BlockIcon])
 
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
+
+(defcard-rg :download-icon "## Download Icon" [DownloadIcon])

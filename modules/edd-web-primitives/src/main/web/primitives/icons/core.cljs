@@ -67,6 +67,7 @@
    ["@mui/icons-material/ChevronRight" :default ChevronRight]
    ["@mui/icons-material/TableChart" :default TableChart]
    ["@mui/icons-material/Update" :default Update]
+   ["@mui/icons-material/Download" :default Download]
    [web.primitives.icons.utils :refer [handle-props]]))
 
 (defn AddIcon [props]
@@ -269,6 +270,9 @@
 
 (defn UpdateIcon [props]
   [:> Update props])
+
+(defn DownloadIcon [props]
+  [:> Download props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)
