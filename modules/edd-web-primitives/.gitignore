@@ -20,3 +20,4 @@ package-lock.json
 .m2/
 .clj-kondo/
 .lsp/
+/bck-package.json

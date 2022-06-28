@@ -47,7 +47,7 @@ RUN set -e &&\
     npx shadow-cljs -A:dev release devcards &&\
     cp -r resources/public/* /dist/s3/ &&\
     npx karma start karma.conf.js  --log-level debug --single-run &&\
-    clj -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.2"}}}' \
+    clj -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.5"}}}' \
                       -m cambada.jar \
                       --app-version "1.0.${BUILD_ID}" \
                       --app-artifact-id "${PROJECT_NAME}" \

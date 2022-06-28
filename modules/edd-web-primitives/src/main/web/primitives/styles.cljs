@@ -53,7 +53,7 @@
                     :MuiFormControlLabel
                     {:styleOverrides
                      {:root
-                      {:margin-left "-3px"}}}
+                      {:marginLeft "-3px"}}}
 
                     :MuiFormControl
                     {:styleOverrides
@@ -163,7 +163,7 @@
                     :MuiAppBar
                     {:styleOverrides
                      {:positionFixed
-                      {:margin-left "2rem"}}}
+                      {:marginLeft "2rem"}}}
 
                     :MuiAccordion
                     {:styleOverrides
@@ -255,11 +255,11 @@
                       {"&.Switch-With-Two-Values"
                        {"& .MuiSwitch-colorSecondary"              {:color "#037080"}
                         "& .MuiSwitch-colorSecondary + .MuiSwitch-track"
-                        {:background-color "#b3d4d8"
+                        {:backgroundColor "#b3d4d8"
                          :opacity          1}
                         "& .MuiSwitch-colorSecondary.Mui-checked " {:color "#037080"}
                         "& .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track"
-                        {:background-color "#b3d4d8"
+                        {:backgroundColor "#b3d4d8"
                          :opacity          1}}}
                       :opacity             1
                       "& .MuiSwitch-input" {:left "initial" :width "100%"}}}
