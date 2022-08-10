@@ -10,7 +10,7 @@
    [web.primitives.text-editor.model :as model]))
 
 (defn sanitize-html [value]
-  (-> purify (.sanitize value)))
+  (-> purify (.sanitize (if (= value "<p><br></p>") "" value))))
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [:> Grid {:container true :style {:position "relative"}}
