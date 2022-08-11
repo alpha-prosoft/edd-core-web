@@ -1,15 +1,26 @@
 (ns web.primitives.inputs.core
   (:require [re-frame.core :as rf]
             [reagent.core :as r]
-            ["@mui/material/index" :refer [FormControl FormLabel FormControlLabel
-                                           Select Switch Button InputAdornment
-                                           Fab Zoom
-                                           IconButton Checkbox RadioGroup Radio
-                                           MenuItem InputLabel FormHelperText]]
 
-            ["@mui/lab/LocalizationProvider" :default LocalizationProvider]
-            ["@mui/lab/DesktopDatePicker" :default DesktopDatePicker]
-            ["@mui/lab/AdapterDateFns" :default AdapterDateFns]
+            ["@mui/material/FormControl" :default FormControl]
+            ["@mui/material/FormLabel" :default FormLabel]
+            ["@mui/material/FormControlLabel" :default FormControlLabel]
+            ["@mui/material/Select" :default Select]
+            ["@mui/material/Switch" :default Switch]
+            ["@mui/material/Button" :default Button]
+            ["@mui/material/InputAdornment" :default InputAdornment]
+            ["@mui/material/Fab" :default Fab]
+            ["@mui/material/Zoom" :default Zoom]
+            ["@mui/material/IconButton" :default IconButton]
+            ["@mui/material/Checkbox" :default Checkbox]
+            ["@mui/material/RadioGroup" :default RadioGroup]
+            ["@mui/material/Radio" :default Radio]
+            ["@mui/material/MenuItem" :default MenuItem]
+            ["@mui/material/InputLabel" :default InputLabel]
+            ["@mui/material/FormHelperText" :default FormHelperText]
+
+            ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
+            ["@mui/x-date-pickers/index" :refer [LocalizationProvider  DesktopDatePicker]]
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]

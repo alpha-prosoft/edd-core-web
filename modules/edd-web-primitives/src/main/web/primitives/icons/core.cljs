@@ -351,19 +351,3 @@
      [:rect {:x "0", :y "7", :width "1", :height "5"}]
      [:rect {:x "0", :y "7", :width "4", :height "1"}]
      [:rect {:x "0", :y "12", :width "4", :height "1"}]]]])
-
-(defn Level1Icon [props]
-  [:svg (merge {:style {:width   "8px"
-                        :height  "8px"
-                        :viewbox "0 0 8 8"
-                        :version "1.1"
-                        :xlmns   "http://www.w3.org/2000/svg"}} props)
-   [:circle {:stroke "none" :stroke-width "1" :fill-rule "evenodd" :id "Badge" :fill "#808185" :cx "4" :cy "4" :r "4"}]])
-
-(defn Level2Icon [props]
-  [:svg (merge {:style {:width   "8px"
-                        :height  "8px"
-                        :viewbox "0 0 8 8"
-                        :version "1.1"
-                        :xlmns   "http://www.w3.org/2000/svg"}} props)
-   [:circle {:stroke "none" :stroke-width "1" :fill-rule "evenodd" :id "Badge" :fill "#AAABAD" :cx "4" :cy "4" :r "4"}]])
