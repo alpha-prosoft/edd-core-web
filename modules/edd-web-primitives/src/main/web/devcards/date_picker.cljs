@@ -18,7 +18,7 @@
                      :value                (:value @data-atom)
                      :invalid-date-message "Date is invalid"
                      :on-invalid-hook #(print "invalid date: " %)
-                     :on-change            (fn [x] (doall (print x)
+                     :on-change            (fn [x] (doall (print "-date- :" x)
                                                           (swap! data-atom merge {:value x})))}]))
   (r/atom {:value "2020-09-15"}))
 
@@ -57,6 +57,7 @@
                       :min-date  "2021-01-01"
                       :max-date  "2025-12-31"
                       :on-invalid-hook #(print "invalid date: " %)
+                      :invalid-date-message "Date should be within period from 01.01.2021 to 31.12.2025"
                       :label     "Please set required date"
                       :on-change (fn [x] (doall (print x)
                                                 (swap! data-atom merge {:value x})))})]))

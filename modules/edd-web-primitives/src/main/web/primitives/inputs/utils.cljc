@@ -97,23 +97,22 @@
 
 #?(:cljs
    (defn validate-date-min-max-date [{:keys [component-min-date component-max-date disablePast disable-past
-                                             set-date-input-invalid]} date-string]
-     (let [date (time-fmt/parse date-string)
-           invalid? (and (some? date-string)
-                         (or (t/before? date (time-fmt/parse component-min-date))
-                             (t/after? date (time-fmt/parse component-max-date))
-                             (and (or disablePast disable-past) (t/before? date (t/today-at-midnight)))))]
-       (set-date-input-invalid invalid?)
-       date-string)))
+                                             set-date-input-invalid]} date]
+     (let [date-invalid? (and
+                          (some? date)
+                          (or (t/before? date (time-fmt/parse component-min-date))
+                              (t/after? date (time-fmt/parse component-max-date))
+                              (and (or disablePast disable-past) (t/before? date (t/today-at-midnight)))))]
+       (set-date-input-invalid date-invalid?)
+       (when (not date-invalid?)
+         (time-fmt/unparse date-formatter date)))))
 
 #?(:cljs
    (defn date->string [{:keys [date required set-date-input-invalid] :as props}]
      (cond
        (nil? date) (doall (when required (set-date-input-invalid true)) nil)
        (false? (date? date)) (doall (set-date-input-invalid true) nil)
-       :else (validate-date-min-max-date props
-                                         (time-fmt/unparse date-formatter
-                                                           (t/to-default-time-zone date))))))
+       :else (validate-date-min-max-date props (t/to-default-time-zone date)))))
 
 #?(:cljs (defn handle-date-picker-date-change
            [{:keys [set-focused on-change]
