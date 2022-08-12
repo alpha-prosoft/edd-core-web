@@ -100,9 +100,9 @@
                                              set-date-input-invalid]} date]
      (let [date-invalid? (and
                           (some? date)
-                          (or (t/before? date (time-fmt/parse component-min-date))
-                              (t/after? date (time-fmt/parse component-max-date))
-                              (and (or disablePast disable-past) (t/before? date (t/today-at-midnight)))))]
+                          (or (t/before? date (time-fmt/parse-local-date component-min-date))
+                              (t/after? date (time-fmt/parse-local-date component-max-date))
+                              (and (or disablePast disable-past) (t/before? date (t/today)))))]
        (set-date-input-invalid date-invalid?)
        (when (not date-invalid?)
          (time-fmt/unparse date-formatter date)))))
