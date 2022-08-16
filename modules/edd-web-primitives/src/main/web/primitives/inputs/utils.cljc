@@ -106,13 +106,13 @@
        (set-date-input-invalid date-invalid?)
        (if (not date-invalid?)
          (time-fmt/unparse date-formatter date)
-         ""))))
+         (str date)))))
 
 #?(:cljs
    (defn date->string [{:keys [date required set-date-input-invalid] :as props}]
      (cond
-       (nil? date) (doall (when required (set-date-input-invalid true)) "")
-       (false? (date? date)) (doall (set-date-input-invalid true) "")
+       (nil? date) (doall (when required (set-date-input-invalid true)) nil)
+       (false? (date? date)) (doall (set-date-input-invalid true) (str date))
        :else (validate-date-min-max-date props (t/to-default-time-zone date)))))
 
 #?(:cljs (defn handle-date-picker-date-change
