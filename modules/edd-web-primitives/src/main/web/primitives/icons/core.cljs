@@ -68,6 +68,10 @@
    ["@mui/icons-material/TableChart" :default TableChart]
    ["@mui/icons-material/Update" :default Update]
    ["@mui/icons-material/Download" :default Download]
+   ["@mui/icons-material/ArrowDropDown" :default ArrowDropDown]
+   ["@mui/icons-material/ArrowDropDownCircle" :default ArrowDropDownCircle]
+   ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
+
    [web.primitives.icons.utils :refer [handle-props]]))
 
 (defn AddIcon [props]
@@ -273,6 +277,19 @@
 
 (defn DownloadIcon [props]
   [:> Download props])
+
+(defn ArrowDropDownCircleIcon [props]
+  [:> ArrowDropDownCircle props])
+
+(defn ArrowDropDownIcon [props]
+  [:> ArrowDropDown props])
+
+(defn ArrowDropUpCircleIcon [{:keys [style] :as props}]
+  [:> ArrowDropDownCircle (assoc props
+                                 :style (merge {:rotate "180deg"} style))])
+
+(defn ArrowDropUpIcon [props]
+  [:> ArrowDropUp props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)

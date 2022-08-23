@@ -4,6 +4,8 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
+   [web.devcards.utils :refer [apply-stiles]]
+
    [web.primitives.icons.core :refer
     [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon AdminPanelSettingsIcon AllColapseIcon
      AllExpandIcon ArrowDownwardIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon
@@ -22,7 +24,8 @@
      RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon
-     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon]]))
+     UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
+     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon]]))
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -176,3 +179,10 @@
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
 
 (defcard-rg :download-icon "## Download Icon" [DownloadIcon])
+
+(defcard-rg :arrow-drop-down-circle-icon "## Arrow Drop Down Circle Icon"
+  (apply-stiles [ArrowDropDownCircleIcon {:color "secondary"}]))
+
+(defcard-rg :arrow-drop-down-icon "## Arrow Drop Down Icon" [ArrowDropDownIcon])
+
+(defcard-rg :arrow-drop-up-icon "## Arrow Drop Up Icon" [ArrowDropUpIcon])
