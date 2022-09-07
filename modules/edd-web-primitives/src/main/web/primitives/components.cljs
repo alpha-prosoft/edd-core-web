@@ -75,6 +75,7 @@
 (def RawToolbar surfaces-core/RawToolbar)
 
 (def RawSlide utils-core/RawSlide)
+(def RawZoom utils-core/RawZoom)
 
 (def RawTextEditor text-editor-core/RawTextEditor)
 (def EddTextEditor text-editor-core/EddTextEditor)
