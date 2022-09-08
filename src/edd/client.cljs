@@ -31,9 +31,18 @@
   (let [config @(rf/subscribe [::subs/config])]
     (str "https://" (name service) "." (:HostedZoneName config) path)))
 
+(defn stage-for-realm [realm]
+  (let [clientRouting (get-in @(rf/subscribe [::subs/config]) [:clientRouting])]
+    (if (some? realm)
+      (or (-> clientRouting :realms realm)
+          (-> clientRouting :default))
+      (-> clientRouting :default))))
+
 (defn service-uri [service path]
-  (let [config @(rf/subscribe [::subs/config])]
-    (str "https://api." (:HostedZoneName config) "/private/prod/" (name service) path)))
+  (let [config @(rf/subscribe [::subs/config])
+        realm (-> @re-frame.db/app-db ::db/user :realm)
+        stage (stage-for-realm realm)]
+    (str "https://api." (:HostedZoneName config) "/private/prod/" (str stage "-" (name service)) path)))
 
 (defn add-user
   [req]
