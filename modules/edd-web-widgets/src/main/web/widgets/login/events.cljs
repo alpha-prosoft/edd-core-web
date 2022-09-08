@@ -4,7 +4,8 @@
    [web.widgets.login.db :as db]
    [web.widgets.login.core :as core]
    [clojure.string :as str]
-   [edd.db :as edd-db]))
+   [edd.db :as edd-db]
+   [edd.events :as edd-events]))
 
 (rf/reg-event-fx
  :initialize-login-db
@@ -37,7 +38,8 @@
  ::login-succeeded
  (fn [{:keys [db]} [_ auth]]
    {:db (assoc-in db [::edd-db/user] auth)
-    :fx [[:dispatch [::close-dialog]]]}))
+    :fx [[:dispatch [::close-dialog]]
+         [:dispatch [::edd-events/after-login]]]}))
 
 (defn request-code
   [db]

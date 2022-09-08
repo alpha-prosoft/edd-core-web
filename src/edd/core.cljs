@@ -7,9 +7,6 @@
    [edd.i18n :as i18n]
    [pushy.core :as pushy]))
 
-(defn- dispatch-route
-  [url])
-
 (defn mount-root
   [{:keys [body] :as ctx}]
   (pushy/start!

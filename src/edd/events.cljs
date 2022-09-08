@@ -5,17 +5,33 @@
    [bidi.bidi :as bidi]
    [edd.db :as db]))
 
-(rf/reg-event-db
+(rf/reg-event-fx
+ ::application-loaded
+ (fn [{:keys [db]} [_ {:keys [result]}]]
+   {:db       (assoc db ::db/application result)}))
+
+(rf/reg-event-fx
  ::initialize-db
- (fn [db [_ {:keys [selected-language show-language-switcher? config routes]
-             :or   {selected-language       :en
-                    show-language-switcher? false}}]]
-   (-> db/default-db
-       (merge db)
-       (assoc-in [::db/selected-language] selected-language)
-       (assoc-in [::db/show-language-switcher?] show-language-switcher?)
-       (assoc ::db/config config)
-       (assoc ::db/routes routes))))
+ (fn [{:keys [db]} [_ {:keys [selected-language show-language-switcher? config routes]
+                       :or   {selected-language       :en
+                              show-language-switcher? false}}]]
+
+   {:db (-> db/default-db
+            (merge db)
+            (assoc-in [::db/selected-language] selected-language)
+            (assoc-in [::db/show-language-switcher?] show-language-switcher?)
+            (assoc ::db/config config)
+            (assoc ::db/routes routes))}))
+
+(rf/reg-event-fx
+ ::after-login
+ (fn [{:keys [db]} _]
+   (let [config (::db/config db)]
+     {:fx [(when (get config :ApplicationId)
+             [:call {:on-success [::application-loaded]
+                     :service (get config :ApplicationServiceName)
+                     :query {:query-id :application->fetch-by-id
+                             :id (get config :ApplicationId)}}])]})))
 
 (rf/reg-event-fx
  ::set-active-panel

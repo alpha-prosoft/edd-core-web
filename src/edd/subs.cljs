@@ -62,3 +62,12 @@
  ::show-language-switcher?
  (fn [db]
    (get-in db [::db/show-language-switcher?])))
+
+(rf/reg-sub
+ ::get-application-roles
+ (fn [db]
+   (reduce
+    (fn [p v]
+      (assoc p v true))
+    {}
+    (get-in db [::db/application :attrs :my-roles]))))
