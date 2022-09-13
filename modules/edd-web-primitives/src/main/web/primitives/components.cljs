@@ -54,6 +54,7 @@
 (def RawRadioGroup inputs-core/RawRadioGroup)
 (def RawNumberField inputs-core/RawNumberField)
 (def RawPercentField inputs-core/RawPercentField)
+(def RawSlider inputs-core/RawSlider)
 
 (def RawAutocomplete lab-core/RawAutocomplete)
 (def RawAlert lab-core/RawAlert)

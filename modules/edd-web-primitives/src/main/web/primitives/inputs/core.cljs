@@ -18,6 +18,7 @@
             ["@mui/material/MenuItem" :default MenuItem]
             ["@mui/material/InputLabel" :default InputLabel]
             ["@mui/material/FormHelperText" :default FormHelperText]
+            ["@mui/material/Slider" :default Slider]
 
             ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
             ["@mui/x-date-pickers/index" :refer [LocalizationProvider  DesktopDatePicker]]
@@ -413,3 +414,6 @@
             {:default-value (if (and read-only contains-percent-or-letter?)
                               default-value
                               (formatting/format-percent-without-percentage-sign default-value))})]))
+
+(defn RawSlider [props]
+  [:> Slider props])

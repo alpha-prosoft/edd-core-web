@@ -19,7 +19,8 @@
                     :error     {:main  "#e61e33"
                                 :dark  "#cf030a"
                                 :light "#f7bbc1"}
-                    :grey      {:050 "#fbfbfb"
+                    :grey      {:main "#d5d5d6"
+                                :050 "#fbfbfb"
                                 :100 "#f8f8f8"
                                 :200 "#edeeee"
                                 :300 "#e9eaea"

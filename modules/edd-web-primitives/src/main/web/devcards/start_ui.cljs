@@ -46,7 +46,8 @@
    [web.devcards.swipeable-drawer]
    [web.devcards.formatting]
    [web.devcards.tree-view]
-   [web.devcards.zoom]))
+   [web.devcards.zoom]
+   [web.devcards.slider]))
 
 (js/goog.exportSymbol "DevcardsMarked" marked/marked)
 
