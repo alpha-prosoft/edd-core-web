@@ -20,6 +20,7 @@
    ["@mui/icons-material/Delete" :default Delete]
    ["@mui/icons-material/Dialpad" :default Dialpad]
    ["@mui/icons-material/DirectionsRun" :default DirectionsRun]
+   ["@mui/icons-material/Edit" :default Edit]
    ["@mui/icons-material/EmojiPeople" :default EmojiPeople]
    ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
    ["@mui/icons-material/ExpandLess" :default ExpandLess]
@@ -300,12 +301,7 @@
            :fill-rule "nonzero"}]])
 
 (defn EditIcon [props]
-  [:svg (handle-props props)
-   [:rect {:id "bounding-box-24" :fill "#FFFFFF" :opacity "0" :x "0" :y "0" :width "24" :height "24"}]
-   [:path {:d         "M16.7071068,3.29289322 L20.7071068,7.29289322 C21.0976311,7.68341751 21.0976311,8.31658249 20.7071068,8.70710678 L9.70710678,19.7071068 C9.56750624,19.8467073 9.38970726,19.9418625 9.19611614,19.9805807 L4.19611614,20.9805807 C3.496395,21.1205249 2.8794751,20.503605 3.01941932,19.8038839 L4.01941932,14.8038839 C4.05813755,14.6102927 4.15329267,14.4324938 4.29289322,14.2928932 L15.2928932,3.29289322 C15.6834175,2.90236893 16.3165825,2.90236893 16.7071068,3.29289322 Z M13.499444,7.914 L5.92120149,15.4930121 L5.27475488,18.7252451 L8.50698793,18.0787985 L16.085444,10.5 L13.499444,7.914 Z M16,5.41421356 L14.914444,6.5 L17.499444,9.085 L18.5857864,8 L16,5.41421356 Z"
-           :id        "edit"
-           :fill      "#2B2D33"
-           :fill-rule "nonzero"}]])
+  [:> Edit props])
 
 (defn ArrowLeftIcon [props]
   [:svg (handle-props props)

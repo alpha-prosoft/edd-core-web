@@ -186,3 +186,5 @@
 (defcard-rg :arrow-drop-down-icon "## Arrow Drop Down Icon" [ArrowDropDownIcon])
 
 (defcard-rg :arrow-drop-up-icon "## Arrow Drop Up Icon" [ArrowDropUpIcon])
+
+(defcard-rg :hierarchy-icon "## Hierarchy Icon" [HierarchyIcon {:style {:width "18px"}}])
