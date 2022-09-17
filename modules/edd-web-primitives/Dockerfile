@@ -3,7 +3,7 @@ ARG DOCKER_ORG
 ARG BUILD_ID
 ARG PROJECT_NAME=edd-web-primitives
 
-FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b1053
+FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest
 
 ENV PROJECT_NAME edd-web-primitives
 
@@ -38,6 +38,8 @@ RUN cp -r resources/public/* /dist/s3/
 RUN sed -i 's/version=1/version='${BUILD_ID}'/g' /dist/s3/index.html
 RUN ls -la /dist
 
+ENV CHROME_BIN /usr/bin/chromium-browser
+
 RUN set -e &&\
     npx shadow-cljs classpath &&\
     clojure -A:lint --lint src &&\
@@ -53,5 +55,7 @@ RUN set -e &&\
                       --app-artifact-id "${PROJECT_NAME}" \
                       --app-group-id "${ARTIFACT_ORG}" \
                       --copy-source \
-                      -o /dist/release-libs/; \
-                    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.${BUILD_ID}.jar.pom.xml"; \
+                      -o /dist/release-libs/ &&\
+    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.${BUILD_ID}.jar.pom.xml"
+
+
