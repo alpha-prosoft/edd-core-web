@@ -24,11 +24,10 @@
                      :or   {control-position :left elevation 0 disabled false}
                      :as   props} content]
   [:> Accordion
-   (merge
-    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
-     :elevation elevation
-     :style     (merge {:width "100%"} style)
-     :onChange  on-change})
+   {:expanded  (handle-on-expand-funk expanded? on-expand-func)
+    :elevation elevation
+    :style     (merge {:width "100%"} style)
+    :onChange  on-change}
 
    [:> AccordionSummary
     (merge {:style (merge {} summary-style)}
@@ -53,6 +52,18 @@
       (if (and expanded? (contains? props :header-expanded))
         (:header-expanded props)
         (:header props))]]]
+   (into [:> AccordionDetails
+          {:style (merge {:padding "0px"} details-style)}
+          content])])
+
+(defn RawHeadlessAccordion [{:keys [id expanded? elevation style details-style]
+                             :or   {expanded? true elevation 0 style {}}}
+                            content]
+  [:> Accordion {:id id
+                 :expanded expanded?
+                 :elevation elevation
+                 :style (merge {:width "100%"} style)}
+   [:> AccordionSummary {:style {:display "none"}}]
    (into [:> AccordionDetails
           {:style (merge {:padding "0px"} details-style)}
           content])])

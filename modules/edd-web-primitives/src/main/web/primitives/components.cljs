@@ -70,6 +70,7 @@
 
 (def RawAccordion surfaces-core/RawAccordion)
 (def EddAccordion surfaces-core/EddAccordion)
+(def RawHeadlessAccordion surfaces-core/RawHeadlessAccordion)
 (def RawCard surfaces-core/RawCard)
 (def RawClickAwayListener surfaces-core/RawClickAwayListener)
 (def RawAppBar surfaces-core/RawAppBar)
