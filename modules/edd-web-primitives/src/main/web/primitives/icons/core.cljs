@@ -72,6 +72,7 @@
    ["@mui/icons-material/ArrowDropDown" :default ArrowDropDown]
    ["@mui/icons-material/ArrowDropDownCircle" :default ArrowDropDownCircle]
    ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
+   ["@mui/icons-material/ContentCopy" :default ContentCopy]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -284,6 +285,9 @@
 
 (defn ArrowDropDownIcon [props]
   [:> ArrowDropDown props])
+
+(defn ContentCopyIcon [props]
+  [:> ContentCopy  props])
 
 (defn ArrowDropUpCircleIcon [{:keys [style] :as props}]
   [:> ArrowDropDownCircle (assoc props

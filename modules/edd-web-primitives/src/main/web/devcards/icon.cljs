@@ -25,7 +25,9 @@
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon
      UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
-     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon]]))
+     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon]]))
+
+(defcard-rg :content-copy-icon "## Content Copy Icon" [ContentCopyIcon])
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
