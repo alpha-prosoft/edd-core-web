@@ -29,4 +29,6 @@
     (rf/dispatch [::events/add-translation i18n/base-translations])
     (when translations
       (rf/dispatch [::events/add-translation translations]))
+    (doseq [widget-init (:widgets ctx [])]
+      (widget-init))
     (mount-root ctx)))

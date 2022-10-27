@@ -2,13 +2,12 @@
   (:require
    [re-frame.core :as rf]
    [web.widgets.login.db :as db]
-   [web.widgets.login.core :as core]
    [clojure.string :as str]
    [edd.db :as edd-db]
    [edd.events :as edd-events]))
 
 (rf/reg-event-fx
- :initialize-login-db
+ ::initialize-db
  (fn [{:keys [db]} _]
    {:db                          (merge db/default-db
                                         (assoc-in db [::db/username] ""))
@@ -180,5 +179,3 @@
  ::toggle-password-visibility
  (fn [db]
    (update-in db [::db/show-password?] not)))
-
-(core/init)

@@ -1,11 +1,12 @@
 (ns web.widgets.login.core
   (:require [re-frame.fx :as fx]
             [clojure.string :as str]
+            [web.widgets.login.events :as events]
             [re-frame.core :as rf]))
 
 (defn init
   []
-  (rf/dispatch [:initialize-login-db]))
+  (rf/dispatch [::events/initialize-db]))
 
 (defn get-config
   []

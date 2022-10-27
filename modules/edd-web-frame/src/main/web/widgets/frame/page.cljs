@@ -35,7 +35,8 @@
 (defn menu-item
   [{:keys [classes]} item]
   (let [lang @(rf/subscribe [::subs/selected-language])]
-    [:> Grid {:item true
+    [:> Grid {:on-click   #(rf/dispatch [::events/navigate item])
+              :item true
               :xs   12}
      [:> Button {:on-click   #(rf/dispatch [::events/navigate item])
                  :key        (:key item)
