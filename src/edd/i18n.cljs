@@ -1,6 +1,5 @@
 (ns edd.i18n
   (:require [re-frame.core :as rf]
-            [edd.db :as db]
             [edd.subs :as subs]))
 
 (def base-translations

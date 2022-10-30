@@ -2,7 +2,6 @@
   (:require
     [re-frame.core :as rf]
     ["@mui/material/Snackbar" :default Snackbar]
-    ["@mui/material/Grid" :default Grid]
     ["@mui/material/Alert" :default Alert]
     [web.widgets.snackbar-alert.subs :as subs]
     [web.widgets.snackbar-alert.events :as events]))

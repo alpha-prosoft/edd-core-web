@@ -10,31 +10,17 @@
             ["@mui/styles" :refer [withStyles]]
             ["@mui/material/AppBar" :default AppBar]
             ["@mui/material/Toolbar" :default Toolbar]
-            ["@mui/material/Typography" :default Typography]
             ["@mui/material/Button" :default Button]
             ["@mui/material/IconButton" :default IconButton]
             ["@mui/material/Drawer" :default Drawer]
-            ["@mui/material/List" :default List]
-            ["@mui/material/ListItem" :default ListItem]
-            ["@mui/material/ListItemText" :default ListItemText]
-            ["@mui/material/ListItemIcon" :default ListItemIcon]
-            ["@mui/material/ListSubheader" :default ListSubheader]
             ["@mui/material/Grid" :default Grid]
-            ["@mui/material/Collapse" :default Collapse]
-            ["@mui/icons-material/ChevronRight" :default ChevronRight]
-            ["@mui/icons-material/StarBorder" :default StarBorder]
             ["@mui/icons-material/KeyboardArrowRight" :default KeyboardArrowRightIcon]
-            ["@mui/material/FormControl" :default FormControl]
-            ["@mui/material/FormHelperText" :default FormHelperText]
-            ["@mui/material/Select" :default Select]
-            ["@mui/material/InputLabel" :default InputLabel]
-            ["@mui/material/MenuItem" :default MenuItem]
             ["@mui/icons-material/Menu" :default MenuIcon]
             [web.widgets.snackbar-alert.views :as snackbar-alert.views]))
 
 (defn menu-item
   [{:keys [classes]} item]
-  (let [lang @(rf/subscribe [::subs/selected-language])]
+  (let [_lang @(rf/subscribe [::subs/selected-language])]
     [:> Grid {:on-click   #(rf/dispatch [::events/navigate item])
               :item true
               :xs   12}
@@ -71,7 +57,7 @@
           menu))]])]])
 
 (defn page
-  [{:keys [classes panels app-bar] :as ctx}]
+  [{:keys [classes app-bar] :as ctx}]
 
   (if @(rf/subscribe [::subs/ready])
     [:div {:class-name (:root classes)}
@@ -109,8 +95,8 @@
        (styles theme)))) component))
 
 (defn body
-  [{:keys [theme] :as ctx}]
   "Initialize body with custom style"
+  [{:keys [theme] :as ctx}]
   [:> ThemeProvider {:theme (createTheme (clj->js theme))}
    [:> (with-custom-styles
          ctx
