@@ -2,6 +2,7 @@
   (:require
    [re-frame.core :as rf]
    [web.widgets.login.db :as db]
+   [web.widgets.login.core :as login-core]
    [clojure.string :as str]
    [edd.db :as edd-db]
    [edd.events :as edd-events]))
@@ -179,3 +180,14 @@
  ::toggle-password-visibility
  (fn [db]
    (update-in db [::db/show-password?] not)))
+
+(rf/reg-event-fx
+  ::check-credentials-and-proceed
+  (fn [{:keys [db]} [_ {:keys [on-success on-failure] :as props}]]
+    (let [logged? (some? (get-in db [::edd-db/user]))
+          auth (login-core/auth)]
+      (if logged?
+        {:disabled [on-success]}
+        (if (and (some? auth) (some? (:refresh-token auth)))
+          {:dispatch-later [{:ms 500 :dispatch [::check-credentials-and-proceed props]}]}
+          {:dispatch [on-failure]})))))

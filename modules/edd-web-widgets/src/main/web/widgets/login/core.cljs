@@ -191,16 +191,18 @@
                                 (rf/dispatch (conj on-failure
                                                    (match-error-message body))))))))))))
 
+(defn auth []
+  (let [auth-string (-> js/window
+                        (.-localStorage)
+                        (.getItem "auth"))]
+    (-> (.parse js/JSON auth-string)
+        (js->clj :keywordize-keys true))))
+
 (fx/reg-fx
  :amplify-refresh-credentials
  (fn [{:keys [on-success]}]
    (let [config (get-config)
-         auth-string (-> js/window
-                         (.-localStorage)
-                         (.getItem "auth"))
-         auth (-> (.parse js/JSON auth-string)
-                  (js->clj :keywordize-keys true))
-         refresh-token (:refresh-token auth)]
+         refresh-token (:refresh-token (auth))]
 
      (when refresh-token
        (-> (.fetch js/window (str "https://" (:domain config) "/oauth2/token")
