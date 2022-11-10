@@ -278,7 +278,8 @@
                  %
                  :on-success on-success
                  :on-failure on-failure
-                 :response-filter json/parse-custom-fields)))))
+                 :response-filter json/parse-custom-fields))
+        (.catch #(rf/dispatch (vec (concat on-failure [%])))))))
 
 (rf/reg-fx
  :call-n
