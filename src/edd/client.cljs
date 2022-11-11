@@ -21,8 +21,10 @@
   (-headers [_] headers))
 
 (defn mock-response [mock-func call-params]
-  (let [mock-result (mock-func call-params)]
-    (print mock-result)
+  (let [mock-result (mock-func call-params)
+        log-mocks? (g/get js/window "log-mocks?")]
+    (when log-mocks?
+      (print mock-result))
     (MockResponse. (:body mock-result) (:status mock-result) (MockHeaders. {"versionid" "mock-response"}))))
 
 (defn document-uri [service path]
@@ -142,21 +144,28 @@
    (println on-failure)
    {:dispatch [on-failure]}))
 
-(rf/reg-fx
-  :load
-  (fn [{:keys [ref service on-success on-failure]}]
-    (let [uri (document-uri :glms-content-svc (str "/load/" (name service) "/" ref))
-          mock-func-name (str "mock.load." (name service))
-          mock-func (g/get js/window mock-func-name)]
-      (if (some? mock-func)
-        (rf/dispatch (vec (concat on-success [(mock-func ref)])))
+(defn load [uri {:keys [on-success on-failure]}]
+  (-> (js/Promise.resolve
+       (clj->js
         (fetch uri
                {:method          :get
                 :timeout         50000
                 :response-format (json/custom-response-format {:keywords? true})
-                :headers         (make-get-headers)
-                :on-success      on-success
-                :on-failure      on-failure})))))
+                :headers         (make-get-headers)})))
+      (.then (fn [r] (.text r)))
+      (.then (fn [result]
+               (rf/dispatch (vec (concat on-success [result])))))
+      (.catch #(rf/dispatch (vec (concat on-failure [%]))))))
+
+(rf/reg-fx
+ :load
+ (fn [{:keys [ref service on-success] :as props}]
+   (let [mock-func-name (str "mock.load." (name service))
+         mock-func (g/get js/window mock-func-name)
+         uri (document-uri :glms-content-svc (str "/load/" (name service) "/" ref))]
+     (if (some? mock-func)
+       (rf/dispatch (vec (concat on-success [(mock-func ref)])))
+       (load uri props)))))
 
 (defn fetch-content
   [{:keys [data service]}]
