@@ -12,7 +12,7 @@
      BusinessIcon
      CallMadeIcon ChatBubbleOutlineIcon ChatIcon CheckCircleOutlineOutlinedIcon ChromeReaderModeIcon ClearIcon CloseIcon
      DeleteIcon DialpadIcon DirectionsRunIcon
-     EditIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon ExpandMoreIcon ExposureIcon
+     EditIcon UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon ExpandMoreIcon ExposureIcon
      FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon
      HelpOutlineIcon HomeIcon HomeOutlinedIcon
      InfoOutlinedIcon InfoIcon
@@ -111,6 +111,8 @@
 (defcard-rg :settings-icon "## Settings Icon" [SettingsIcon])
 
 (defcard-rg :edit-icon "## Edit Icon" [EditIcon])
+
+(defcard-rg :upload-icon "## Upload Icon" [UploadIcon])
 
 (defcard-rg :arrow-right-icon "## Arrow Right Icon" [ArrowRightIcon])
 

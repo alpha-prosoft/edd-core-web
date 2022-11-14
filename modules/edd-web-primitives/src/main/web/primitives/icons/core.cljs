@@ -73,6 +73,7 @@
    ["@mui/icons-material/ArrowDropDownCircle" :default ArrowDropDownCircle]
    ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
    ["@mui/icons-material/ContentCopy" :default ContentCopy]
+   ["@mui/icons-material/Upload" :default Upload]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -306,6 +307,9 @@
 
 (defn EditIcon [props]
   [:> Edit props])
+
+(defn UploadIcon [props]
+  [:> Upload props])
 
 (defn ArrowLeftIcon [props]
   [:svg (handle-props props)
