@@ -9,6 +9,7 @@
    ::error-message-visible   false
    ::error-message           ""
    ::form-type               :login
+   ::do-after-login          nil
    ::on-logout-hook          nil
    ::forgot-password-visible false
    ::dialog-visible          false

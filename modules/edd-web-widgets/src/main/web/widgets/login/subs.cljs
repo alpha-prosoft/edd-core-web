@@ -97,6 +97,11 @@
  (fn [db]
    (blank? (get-in db [::db/confirmation-code]))))
 
+(rf/reg-sub
+ ::init?
+ (fn [db]
+   (get-in db [::db/init?])))
+
 
 
 

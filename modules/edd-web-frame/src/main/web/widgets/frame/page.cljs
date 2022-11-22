@@ -81,7 +81,7 @@
            app-bar (app-bar)
            :else ":app-bar placeholder")]]]
 
-      [:> Grid {:item true }]
+      [:> Grid {:item true}]
       [:> Grid {:item true :container true}
        (util/placeholder ctx)]
       (snackbar-alert.views/revoke-alert)]]

@@ -59,9 +59,9 @@
             :spacing   2
             :sx        {:padding "0 16px 10px 0" :margin "-24px 0 0 0"}}
    (when (some #(= % form-type) [:login])
-     [:> Grid {:item true
-               :xs   12
-               :sm   12
+     [:> Grid {:item       true
+               :xs         12
+               :sm         12
                :text-align "end"}
       [:> Link {:sx        {:cursor "pointer"}
                 :key       "forgot-password"
@@ -234,17 +234,19 @@
     (tr :login)]])
 
 (defn LoginBar [{:keys [] :as params}]
-  (let [logged? (boolean @(rf/subscribe [::subs/user-name]))]
+  (let [logged? (boolean @(rf/subscribe [::subs/user-name]))
+        init? @(rf/subscribe [::subs/init?])]
     (rf/dispatch [::events/init params])
-    [:> Grid {:container       true
-              :justify-content :flex-end
-              :spacing         3}
-     (when logged?
-       (logout-button))
-     (when (false? logged?)
-       (register-button))
-     (when (false? logged?)
-       (login-button))]))
+    (when init?
+      [:> Grid {:container       true
+                :justify-content :flex-end
+                :spacing         3}
+       (when logged?
+         (logout-button))
+       (when (false? logged?)
+         (register-button))
+       (when (false? logged?)
+         (login-button))])))
 
 
 

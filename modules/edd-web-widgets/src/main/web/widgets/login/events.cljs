@@ -2,7 +2,6 @@
   (:require
    [re-frame.core :as rf]
    [web.widgets.login.db :as db]
-   [web.widgets.login.core :as login-core]
    [clojure.string :as str]
    [edd.db :as edd-db]
    [edd.events :as edd-events]))
@@ -10,9 +9,15 @@
 (rf/reg-event-fx
  ::initialize-db
  (fn [{:keys [db]} _]
-   {:db                          (merge db/default-db
-                                        (assoc-in db [::db/username] ""))
-    :amplify-refresh-credentials {:on-success [::login-succeeded]}}))
+   {:db (merge db/default-db
+               (assoc-in db [::db/username] ""))
+    :ensure-credentials {:on-success [::set-init? true]
+                         :on-failure [::set-init? true]}}))
+
+(rf/reg-event-db
+ ::set-init?
+ (fn [db [_ init?]]
+   (assoc-in db [::db/init?] init?)))
 
 (rf/reg-event-fx
  ::init
@@ -34,12 +39,18 @@
  (fn [db [_ value]]
    (assoc db ::db/password value)))
 
+(rf/reg-event-db
+ ::set-event-after-login
+ (fn [db [_ do-after-login]]
+   (assoc-in db [::db/do-after-login] do-after-login)))
+
 (rf/reg-event-fx
  ::login-succeeded
  (fn [{:keys [db]} [_ auth]]
-   {:db (assoc-in db [::edd-db/user] auth)
-    :fx [[:dispatch [::close-dialog]]
-         [:dispatch [::edd-events/after-login]]]}))
+   (let [do-after-login (get-in db [::db/do-after-login])]
+     {:db (assoc-in db [::edd-db/user] auth)
+      :fx [[:dispatch [::close-dialog]]
+           [:dispatch [::edd-events/load-application do-after-login]]]})))
 
 (defn request-code
   [db]
@@ -86,6 +97,12 @@
                            :code       (::db/confirmation-code db)
                            :on-success [::do-login]
                            :on-failure [::verification-failed]}]]}))
+
+(rf/reg-event-fx
+ ::login-and-proceed
+ (fn [{:keys [db]} [_ on-success]]
+   {:db       (assoc-in db [::db/do-after-login] on-success)
+    :dispatch [::open-dialog :login]}))
 
 (rf/reg-event-db
  ::open-dialog
@@ -180,14 +197,3 @@
  ::toggle-password-visibility
  (fn [db]
    (update-in db [::db/show-password?] not)))
-
-(rf/reg-event-fx
-  ::check-credentials-and-proceed
-  (fn [{:keys [db]} [_ {:keys [on-success on-failure] :as props}]]
-    (let [logged? (some? (get-in db [::edd-db/user]))
-          auth (login-core/auth)]
-      (if logged?
-        {:disabled [on-success]}
-        (if (and (some? auth) (some? (:refresh-token auth)))
-          {:dispatch-later [{:ms 500 :dispatch [::check-credentials-and-proceed props]}]}
-          {:dispatch [on-failure]})))))

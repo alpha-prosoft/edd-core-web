@@ -2,7 +2,8 @@
   (:require [re-frame.fx :as fx]
             [clojure.string :as str]
             [web.widgets.login.events :as events]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [edd.db :as edd-db]))
 
 (defn init
   []
@@ -198,36 +199,42 @@
     (-> (.parse js/JSON auth-string)
         (js->clj :keywordize-keys true))))
 
-(fx/reg-fx
- :amplify-refresh-credentials
- (fn [{:keys [on-success]}]
-   (let [config (get-config)
-         refresh-token (:refresh-token (auth))]
+(defn amplify-refresh-credentials [{:keys [on-success on-failure]}]
+  (let [config (get-config)
+        refresh-token (:refresh-token (auth))]
 
-     (when refresh-token
-       (-> (.fetch js/window (str "https://" (:domain config) "/oauth2/token")
-                   (clj->js {:method  "POST"
-                             :headers {"Content-Type" "application/x-www-form-urlencoded"}
-                             :body    (str
-                                       "grant_type=refresh_token&"
-                                       "client_id=" (:user-pool-web-client-id config) "&"
-                                       "refresh_token=" refresh-token)}))
-           (.then (fn [%]
-                    (let [status (.-status %)]
-                      (if (> status 299)
-                        (-> (.text %)
-                            (.then (fn []
+    (when refresh-token
+      (-> (.fetch js/window (str "https://" (:domain config) "/oauth2/token")
+                  (clj->js {:method  "POST"
+                            :headers {"Content-Type" "application/x-www-form-urlencoded"}
+                            :body    (str
+                                      "grant_type=refresh_token&"
+                                      "client_id=" (:user-pool-web-client-id config) "&"
+                                      "refresh_token=" refresh-token)}))
+          (.then (fn [%]
+                   (let [status (.-status %)]
+                     (if (> status 299)
+                       (-> (.text %)
+                           (.then (fn []
+                                    (doall
                                      (-> js/window
                                          (.-localStorage)
-                                         (.setItem "auth" "{}")))))
-                        (.json %)))))
-           (.then (fn [%]
-                    (let [response (-> %
-                                       (js->clj :keywordize-keys true)
-                                       (:id_token))
-                          auth {:id-token response}]
-                      (rf/dispatch (conj on-success
-                                         auth))))))))))
+                                         (.setItem "auth" "{}"))
+                                     (rf/dispatch (conj on-failure))))))
+                       (.json %)))))
+          (.then (fn [%]
+                   (let [response (-> %
+                                      (js->clj :keywordize-keys true)
+                                      (:id_token))
+                         auth {:id-token response}]
+                     (doall
+                      (rf/dispatch [::events/set-event-after-login on-success])
+                      (rf/dispatch [::events/login-succeeded auth])))))))))
+
+(fx/reg-fx
+ :amplify-refresh-credentials
+ (fn [props]
+   (amplify-refresh-credentials props)))
 
 (fx/reg-fx
  :amplify-forgot-password
@@ -321,3 +328,16 @@
    (-> js/window
        (.-localStorage)
        (.setItem "auth" "{}"))))
+
+(rf/reg-fx
+ :ensure-credentials
+ (fn [{:keys [on-success on-failure] :as props}]
+   (let [logged? (get-in @re-frame.db/app-db [::edd-db/user])
+         auth (auth)]
+     (if logged?
+       (rf/dispatch on-success)
+       (if (and (some? auth) (some? (:refresh-token auth)))
+         (amplify-refresh-credentials props)
+         (if (some? on-failure)
+           (rf/dispatch on-failure)
+           (rf/dispatch [::events/login-and-proceed on-success])))))))

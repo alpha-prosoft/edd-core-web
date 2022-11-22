@@ -1,10 +1,10 @@
 (ns web.widgets.snackbar-alert.views
   (:require
-    [re-frame.core :as rf]
-    ["@mui/material/Snackbar" :default Snackbar]
-    ["@mui/material/Alert" :default Alert]
-    [web.widgets.snackbar-alert.subs :as subs]
-    [web.widgets.snackbar-alert.events :as events]))
+   [re-frame.core :as rf]
+   ["@mui/material/Snackbar" :default Snackbar]
+   ["@mui/material/Alert" :default Alert]
+   [web.widgets.snackbar-alert.subs :as subs]
+   [web.widgets.snackbar-alert.events :as events]))
 
 (defn revoke-alert []
   (let [message @(rf/subscribe [::subs/message])
@@ -17,5 +17,5 @@
                     :on-close           #(rf/dispatch [::events/close])
                     :key                "snackbar-alert"
                     :auto-hide-duration auto-hide-duration}
-        [:> Alert {:severity severity}
-         message]])))
+       [:> Alert {:severity severity}
+        message]])))

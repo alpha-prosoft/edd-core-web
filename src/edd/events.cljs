@@ -7,8 +7,10 @@
 
 (rf/reg-event-fx
  ::application-loaded
- (fn [{:keys [db]} [_ {:keys [result]}]]
-   {:db       (assoc db ::db/application result)}))
+ (fn [{:keys [db]} [_ do-after-login {:keys [result]}]]
+   {:db (assoc db ::db/application result)
+    :fx [(when (some? do-after-login)
+           (conj [:dispatch] do-after-login))]}))
 
 (rf/reg-event-fx
  ::initialize-db
@@ -24,14 +26,14 @@
             (assoc ::db/routes routes))}))
 
 (rf/reg-event-fx
- ::after-login
- (fn [{:keys [db]} _]
+ ::load-application
+ (fn [{:keys [db]} [_ do-after-login]]
    (let [config (::db/config db)]
      {:fx [(when (get config :ApplicationId)
-             [:call {:on-success [::application-loaded]
-                     :service (get config :ApplicationServiceName)
-                     :query {:query-id :application->fetch-by-id
-                             :id (get config :ApplicationId)}}])]})))
+             [:call {:on-success [::application-loaded do-after-login]
+                     :service    (get config :ApplicationServiceName)
+                     :query      {:query-id :application->fetch-by-id
+                                  :id       (get config :ApplicationId)}}])]})))
 
 (rf/reg-event-fx
  ::set-active-panel
