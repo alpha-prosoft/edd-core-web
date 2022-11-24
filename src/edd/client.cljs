@@ -82,33 +82,30 @@
           uri
           (clj->js params)))
 
-(defn do-post
-  ([uri body-str {:keys [on-success on-failure retry] :as props} attempts]
-   (let [{:keys [timeout on-retry] :or {timeout 0}} retry]
-     (->
-      (js/Promise.resolve
-       (clj->js
-        (fetch uri
-               {:method          :post
-                :mode            :cors
-                :body            (.stringify js/JSON body-str)
-                :timeout         20000
-                :response-format (json/custom-response-format {:keywords? true})
-                :headers         (make-headers)
-                :on-success      on-success
-                :on-failure      on-failure})))
-      (.then (fn [r] r))
-      (.catch (fn [e] (let [attempt (dec attempts)]
-                        (if (neg? attempt)
-                          e
-                          (do
-                            (when (some? on-retry)
-                              (rf/dispatch (vec on-retry)))
-                            (js/setTimeout
-                             (fn [] (do-post uri body-str props attempt))
-                             timeout))))))))
-   ([uri body-str props]
-    (do-post uri body-str props 0))))
+(defn do-post [uri body-str {:keys [on-success on-failure retry] :as props} attempts]
+  (let [{:keys [timeout on-retry] :or {timeout 0}} retry]
+    (->
+     (js/Promise.resolve
+      (clj->js
+       (fetch uri
+              {:method          :post
+               :mode            :cors
+               :body            (.stringify js/JSON body-str)
+               :timeout         20000
+               :response-format (json/custom-response-format {:keywords? true})
+               :headers         (make-headers)
+               :on-success      on-success
+               :on-failure      on-failure})))
+     (.then (fn [r] r))
+     (.catch (fn [e] (let [attempt (dec attempts)]
+                       (if (neg? attempt)
+                         e
+                         (do
+                           (when (some? on-retry)
+                             (rf/dispatch (vec on-retry)))
+                           (js/setTimeout
+                            (fn [] (do-post uri body-str props attempt))
+                            timeout)))))))))
 
 (defn do-post-with-retry [uri body-str {:keys [retry] :as props}]
   (let [{:keys [attempts] :or {attempts 1}} retry]
