@@ -82,33 +82,122 @@
           uri
           (clj->js params)))
 
-(defn do-post [uri body-str {:keys [on-success on-failure retry] :as props} attempts]
-  (let [{:keys [timeout on-retry] :or {timeout 0}} retry]
+(defn resolve-call-hook [response]
+  (let [{:keys [item result]} response
+        {:keys [on-success on-failure]} item]
+    (if (and (some? response) (some? result))
+      (do (when on-success
+            (rf/dispatch (vec (concat on-success [response]))))
+          true)
+      (do (when on-failure
+            (rf/dispatch (vec (concat on-failure [response]))))
+          false))))
+
+(defn resolve-calls-hooks [event-body]
+  (doall
+   (mapv
+    (fn [it]
+      (let [{:keys [item result]} it
+            {:keys [on-success on-failure]} item]
+        (if (and
+             (some some? event-body)
+             result)
+          (do (when on-success
+                (rf/dispatch (vec (concat on-success [it]))))
+              true)
+          (do (when on-failure
+                (rf/dispatch (vec (concat on-failure [it]))))
+              false))))
+    event-body)))
+
+(defn handle-invalid-jwt []
+  (print "invalid token")
+  (rf/dispatch [::events/remove-user]))
+
+(defn handle-versioning-error [call]
+  (-> call
+      (assoc :error :wrong-version)
+      (dissoc :body)))
+
+(defn handle-error [call itm]
+  (-> call
+      (assoc :error (json/parse-custom-fields (:error itm)))
+      (dissoc :body)))
+
+(defn map-response-body [response]
+  (cond
+    (= ":invalid" (get-in response [:error :jwt])) (handle-invalid-jwt)
+    (= "Wrong version" (:error response)) (handle-versioning-error response)
+    (contains? response :error) {:error (json/parse-custom-fields (:error response))}
+    :else {:result (json/parse-custom-fields (:result response))}))
+
+(defn filter-results [values response-filter items bodies]
+  (vec
+   (map-indexed
+    (fn [idx itm]
+      (cond
+        (= ":invalid" (get-in itm [:error :jwt])) (handle-invalid-jwt)
+        (= "Wrong version" (:error itm)) (handle-versioning-error (get values idx))
+        (contains? itm :error) (handle-error (get values idx) itm)
+        :else (-> (get values idx)
+                  (assoc :result (:result itm))
+                  (#(if response-filter
+                      (response-filter %)
+                      %))
+                  (assoc :item (get items idx))
+                  (dissoc :body))))
+    (js->clj bodies :keywordize-keys true))))
+
+(defn calculate-default-timeout [total-attempts attempts-left]
+  (let [attempt (- total-attempts attempts-left)]
+    (* attempt attempt 3000)))
+
+(defn handle-response-and-return-succeed? [{:keys [body]} on-success on-failure]
+  (let [event-body (map-response-body body)]
+    (if (some? (:result event-body))
+      (do
+        (rf/dispatch (conj on-success event-body))
+        true)
+      (do
+        (rf/dispatch (conj on-failure event-body))
+        false))))
+
+(defn post-params [body-str]
+  {:method          :post
+   :mode            :cors
+   :body            (.stringify js/JSON body-str)
+   :timeout         31000
+   :response-format (json/custom-response-format {:keywords? true})
+   :headers         (make-headers)})
+
+(defn do-post [uri body-str {:keys [on-success on-failure retry] :as props} retry-attempts]
+  (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry]
     (->
      (js/Promise.resolve
       (clj->js
-       (fetch uri
-              {:method          :post
-               :mode            :cors
-               :body            (.stringify js/JSON body-str)
-               :timeout         20000
-               :response-format (json/custom-response-format {:keywords? true})
-               :headers         (make-headers)
-               :on-success      on-success
-               :on-failure      on-failure})))
-     (.then (fn [r] r))
-     (.catch (fn [e] (let [attempt (dec attempts)]
+       (fetch uri (post-params body-str))))
+     (.then (fn [r] (-> (js/Promise.resolve r)
+                        (.then (fn [r] {:status (.-status r)
+                                        :response r})))))
+     (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
+                        (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
+     (.then (fn [r] (handle-response-and-return-succeed? r on-success on-failure)))
+     (.catch (fn [e] (let [attempt (dec retry-attempts)
+                           timeout (or timeout
+                                       (calculate-default-timeout attempts attempt))]
                        (if (neg? attempt)
-                         e
+                         (do
+                           (rf/dispatch (conj on-failure (.toString e)))
+                           false)
                          (do
                            (when (some? on-retry)
-                             (rf/dispatch (vec on-retry)))
+                             (rf/dispatch on-retry))
                            (js/setTimeout
                             (fn [] (do-post uri body-str props attempt))
                             timeout)))))))))
 
 (defn do-post-with-retry [uri body-str {:keys [retry] :as props}]
-  (let [{:keys [attempts] :or {attempts 1}} retry]
+  (let [{:keys [attempts] :or {attempts 2}} retry]
     (do-post uri body-str props attempts)))
 
 (defn query
@@ -198,54 +287,6 @@
               :headers (make-put-headers)
               :body    data}))))
 
-(defn handle-invalid-jwt []
-  (print "invalid token")
-  (rf/dispatch [::events/remove-user]))
-
-(defn handle-versioning-error [call]
-  (-> call
-      (assoc :error :wrong-version)
-      (dissoc :body)))
-
-(defn handle-error [call itm]
-  (-> call
-      (assoc :error (json/parse-custom-fields (:error itm)))
-      (dissoc :body)))
-
-(defn resolve-calls-hooks [event-body]
-  (doall
-   (mapv
-    (fn [it]
-      (let [{:keys [item result]} it
-            {:keys [on-success on-failure]} item]
-        (if (and
-             (some some? event-body)
-             result)
-          (do (when on-success
-                (rf/dispatch (vec (concat on-success [it]))))
-              true)
-          (do (when on-failure
-                (rf/dispatch (vec (concat on-failure [it]))))
-              false))))
-    event-body)))
-
-(defn filter-results [values response-filter items bodies]
-  (vec
-   (map-indexed
-    (fn [idx itm]
-      (cond
-        (= ":invalid" (get-in itm [:error :jwt])) (handle-invalid-jwt)
-        (= "Wrong version" (:error itm)) (handle-versioning-error (get values idx))
-        (contains? itm :error) (handle-error (get values idx) itm)
-        :else (-> (get values idx)
-                  (assoc :result (:result itm))
-                  (#(if response-filter
-                      (response-filter %)
-                      %))
-                  (assoc :item (get items idx))
-                  (dissoc :body))))
-    (js->clj bodies :keywordize-keys true))))
-
 (defn handle-responses
   [items
    responses & {:keys [on-success on-failure response-filter]}]
@@ -297,13 +338,14 @@
 (defn call-n
   [items & {:keys [on-success on-failure]}]
   (let [requests (map call (filterv identity items))]
-    (-> (js/Promise.all (clj->js requests))
-        (.then #(handle-responses
-                 items
-                 %
-                 :on-success on-success
-                 :on-failure on-failure
-                 :response-filter json/parse-custom-fields))
+    (-> (js/Promise.all requests)
+        (.then #(js->clj %))
+        (.then (fn [items]
+                 (let [with-failures (filter #(not (true? %)) items)
+                       succeeded? (empty? with-failures)]
+                   (cond
+                     (and (some? on-failure) (not succeeded?)) (rf/dispatch on-failure)
+                     (and (some? on-success) succeeded?) (rf/dispatch on-success)))))
         (.catch #(rf/dispatch (vec (concat on-failure [%])))))))
 
 (rf/reg-fx
@@ -315,10 +357,8 @@
 
 (rf/reg-fx
  :call
- (fn [{:keys [on-success on-failure] :as data}]
-   (call-n [(dissoc data :on-success :on-failure)]
-           :on-success on-success
-           :on-failure on-failure)))
+ (fn [data]
+   (call-n [data])))
 
 (defonce timeouts (r/atom {}))
 
