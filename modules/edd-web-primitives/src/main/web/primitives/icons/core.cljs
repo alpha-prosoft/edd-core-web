@@ -74,6 +74,7 @@
    ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
    ["@mui/icons-material/ContentCopy" :default ContentCopy]
    ["@mui/icons-material/Upload" :default Upload]
+   ["@mui/icons-material/ManageSearch" :default ManageSearch]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -296,6 +297,9 @@
 
 (defn ArrowDropUpIcon [props]
   [:> ArrowDropUp props])
+
+(defn ManageSearchIcon [props]
+  [:> ManageSearch props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)

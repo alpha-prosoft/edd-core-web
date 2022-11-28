@@ -25,7 +25,7 @@
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon
      UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
-     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon]]))
+     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon ManageSearchIcon]]))
 
 (defcard-rg :content-copy-icon "## Content Copy Icon" [ContentCopyIcon])
 
@@ -183,6 +183,8 @@
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
 
 (defcard-rg :download-icon "## Download Icon" [DownloadIcon])
+
+(defcard-rg :manage-search-icon "## Manage Search Icon" [ManageSearchIcon])
 
 (defcard-rg :arrow-drop-down-circle-icon "## Arrow Drop Down Circle Icon"
   (apply-stiles [ArrowDropDownCircleIcon {:color "secondary"}]))
