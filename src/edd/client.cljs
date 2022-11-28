@@ -20,12 +20,14 @@
   (-status [_] status)
   (-headers [_] headers))
 
-(defn mock-response [mock-func call-params]
-  (let [mock-result (mock-func call-params)
+(defn mock-response [mock-func {:keys [query commands]}]
+  (let [mock-result (mock-func (or query commands))
         log-mocks? (g/get js/window "log-mocks?")]
     (when log-mocks?
       (print mock-result))
-    (MockResponse. (:body mock-result) (:status mock-result) (MockHeaders. {"versionid" "mock-response"}))))
+    (MockResponse. (:body mock-result)
+                   (:status mock-result)
+                   (MockHeaders. {"versionid" "mock-response"}))))
 
 (defn document-uri [service path]
   (let [config @(rf/subscribe [::subs/config])]
@@ -170,14 +172,44 @@
    :response-format (json/custom-response-format {:keywords? true})
    :headers         (make-headers)})
 
-(defn do-post [uri body-str {:keys [on-success on-failure retry] :as props} retry-attempts]
-  (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry]
+(defn get-mock-func [{:keys [query commands service]} mock-for]
+  (let [mock-func-name (case mock-for
+                         :query (str "mock." (name service) "." (name (:query-id query)))
+                         :commands (str "mock." (name service) "." (reduce str (map #(name (:cmd-id %)) commands))))]
+    (g/get js/window mock-func-name)))
+
+(defn get-uri [{:keys [query commands service]} mock-for]
+  (case mock-for
+    :query (service-uri service (str "/query"
+                                     "?dbg_service=" service
+                                     "&dbg_qid=" (:query-id query)))
+    :commands (service-uri service (str "/command"
+                                        "?dbg_service=" service
+                                        "&dbg_cmds=" (string/join "," (map :cmd-id commands))))))
+
+(defn get-body-str [{:keys [query commands]} mock-for]
+  (let [ref (case mock-for
+              :query {:request-id     (str "#" (random-uuid))
+                      :interaction-id utils/interaction-id
+                      :query          query}
+              :commands {:request-id     (str "#" (random-uuid))
+                         :interaction-id utils/interaction-id
+                         :commands       commands})]
+    (clj->js (json/encode-custom-fields (add-user ref)))))
+
+(defn do-post-with-retry [post-for {:keys [on-success on-failure retry] :as props} retry-attempts]
+  (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry
+        mock-func (get-mock-func props post-for)
+        uri (get-uri props post-for)
+        body-str (get-body-str props post-for)]
     (->
      (js/Promise.resolve
       (clj->js
-       (fetch uri (post-params body-str))))
+       (if (some? mock-func)
+         (mock-response mock-func props)
+         (fetch uri (post-params body-str)))))
      (.then (fn [r] (-> (js/Promise.resolve r)
-                        (.then (fn [r] {:status (.-status r)
+                        (.then (fn [r] {:status   (.-status r)
                                         :response r})))))
      (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
                         (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
@@ -193,50 +225,20 @@
                            (when (some? on-retry)
                              (rf/dispatch on-retry))
                            (js/setTimeout
-                            (fn [] (do-post uri body-str props attempt))
+                            (fn [] (do-post-with-retry post-for props attempt))
                             timeout)))))))))
 
-(defn do-post-with-retry [uri body-str {:keys [retry] :as props}]
+(defn do-post-for [post-for {:keys [retry] :as props}]
   (let [{:keys [attempts] :or {attempts 2}} retry]
-    (do-post uri body-str props attempts)))
-
-(defn query
-  [{:keys [query service] :as props}]
-  (let [uri (service-uri service (str "/query"
-                                      "?dbg_service=" service
-                                      "&dbg_qid=" (:query-id query)))
-        ref {:request-id     (str "#" (random-uuid))
-             :interaction-id utils/interaction-id
-             :query          query}
-        body-str (clj->js (json/encode-custom-fields (add-user ref)))
-        mock-func-name (str "mock." (name service) "." (name (:query-id query)))
-        mock-func (g/get js/window mock-func-name)]
-    (if (some? mock-func)
-      (mock-response mock-func query)
-      (do-post-with-retry uri body-str props))))
-
-(defn commands
-  [{:keys [commands service] :as props}]
-  (let [uri (service-uri service (str "/command"
-                                      "?dbg_service=" service
-                                      "&dbg_cmds=" (string/join "," (map :cmd-id commands))))
-        ref {:request-id     (str "#" (random-uuid))
-             :interaction-id utils/interaction-id
-             :commands       commands}
-        body-str (clj->js (json/encode-custom-fields (add-user ref)))
-        mock-func-name (str "mock." (name service) "." (reduce str (map #(name (:cmd-id %)) commands)))
-        mock-func (g/get js/window mock-func-name)]
-    (if (some? mock-func)
-      (mock-response mock-func commands)
-      (do-post-with-retry uri body-str props))))
+    (do-post-with-retry post-for props attempts)))
 
 (defn call [data]
   (cond
-    (:query data) (query data)
-    (:commands data) (commands data)
-    (:command data) (commands (assoc data
-                                     :commands
-                                     [(:command data)]))
+    (:query data) (do-post-for :query data)
+    (:commands data) (do-post-for :commands data)
+    (:command data) (do-post-for :commands (assoc data
+                                                  :commands
+                                                  [(:command data)]))
     :else nil))
 
 (rf/reg-event-fx
