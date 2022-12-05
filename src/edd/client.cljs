@@ -4,7 +4,6 @@
    [re-frame.core :as rf]
    [goog.object :as g]
    [edd.events :as events]
-   [edd.subs :as subs]
    [edd.json :as json]
    [edd.db :as db]
    [clojure.string :as string]
@@ -29,12 +28,15 @@
                    (:status mock-result)
                    (MockHeaders. {"versionid" "mock-response"}))))
 
+(defn get-config []
+  (-> @re-frame.db/app-db ::db/config))
+
 (defn document-uri [service path]
-  (let [config @(rf/subscribe [::subs/config])]
-    (str "https://" (name service) "." (:HostedZoneName config) path)))
+  (let [hosted-zone-name (-> (get-config) :HostedZoneName)]
+    (str "https://" (name service) "." hosted-zone-name path)))
 
 (defn stage-for-realm [realm]
-  (let [client-routing (get-in @(rf/subscribe [::subs/config]) [:client-routing])
+  (let [client-routing (-> (get-config) :client-routing)
         client-routing (update client-routing :default #(or % "prod"))]
     (if (some? realm)
       (or (-> client-routing :realms realm)
@@ -42,11 +44,11 @@
       (-> client-routing :default))))
 
 (defn service-uri [service path]
-  (let [config @(rf/subscribe [::subs/config])
+  (let [hosted-zone-name (-> (get-config) :HostedZoneName)
         realm (-> @re-frame.db/app-db ::db/user :realm)
         stage (stage-for-realm realm)]
     (str "https://api."
-         (:HostedZoneName config)
+         hosted-zone-name
          "/private/"
          (str stage)
          "/"
