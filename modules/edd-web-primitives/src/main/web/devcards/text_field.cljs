@@ -23,7 +23,7 @@
 
 (defcard-rg :text-field-with-prefix
   "## Text field with prefix"
-  (apply-stiles [RawTextField {:label "Label" :prefix "Prefix" :default-value "value"}]))
+  (apply-stiles [RawTextField {:label "Label" :prefix "Prefix" :default-value "value" :input-props {:sx {:color "#654654"}}}]))
 
 (defcard-rg :text-field-with-postfix
   "## Text field with postfix"
@@ -90,3 +90,7 @@
                                   :suffix "%"
                                   :read-only-with-underline true
                                   :default-value 0.2575}]))
+
+(defcard-rg :text-field-with-input-props
+  "## Text Field with input-props"
+  (apply-stiles [RawTextField {:label "Label" :default-value "value" :input-props {:sx {:color "#da2374"}}}]))

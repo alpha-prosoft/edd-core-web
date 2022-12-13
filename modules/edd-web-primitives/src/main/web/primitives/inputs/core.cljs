@@ -34,33 +34,32 @@
 (def read-only-underline {:border-bottom "1px solid #00000042"})
 
 (defn RawTextField
-  [{:keys [prefix suffix read-only read-only-with-underline]
+  [{:keys [prefix suffix read-only read-only-with-underline input-props]
     :or   {read-only                false
            read-only-with-underline false}
     :as   props}]
   [utils/adapted-text-field
    (merge {:full-width true :color "primary" :variant "standard"}
           (dissoc props :transform-func :read-only-with-underline)
-          (when
-           (or (some? (or prefix suffix)) read-only read-only-with-underline)
-            {:InputProps
-             (merge
-              (when read-only
-                {:disableUnderline true
-                 :readOnly         true})
+          {:InputProps
+           (merge
+            input-props
+            (when read-only
+              {:disableUnderline true
+               :readOnly         true})
 
-              (when read-only-with-underline
-                {:disableUnderline true
-                 :readOnly         true
-                 :style            read-only-underline})
+            (when read-only-with-underline
+              {:disableUnderline true
+               :readOnly         true
+               :style            read-only-underline})
 
-              (when (some? prefix)
-                {:startAdornment (r/as-element
-                                  [:> InputAdornment {:position "start"} prefix])})
+            (when (some? prefix)
+              {:startAdornment (r/as-element
+                                [:> InputAdornment {:position "start"} prefix])})
 
-              (when (some? suffix)
-                {:endAdornment (r/as-element
-                                [:> InputAdornment {:position "end"} suffix])}))})
+            (when (some? suffix)
+              {:endAdornment (r/as-element
+                              [:> InputAdornment {:position "end"} suffix])}))}
 
           {:on-change (fn [event] (utils/handle-input-change event
                                                              (get props :on-change
