@@ -77,6 +77,13 @@
                                  :default-value 1234
                                  :read-only-with-underline true}]))
 
+(defcard-rg :number-field-auto-focus
+  "## Number field with autoFocus"
+  (apply-stiles [RawNumberField {:label "Label"
+                                 :default-value 123400
+                                 :auto-focus true
+                                 :on-change (fn [event] (print "event: " event))}]))
+
 (defcard-rg :percent-field
   "## Percent field"
   (apply-stiles [RawPercentField {:label "Label"

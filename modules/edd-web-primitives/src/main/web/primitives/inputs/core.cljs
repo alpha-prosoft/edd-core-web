@@ -21,7 +21,7 @@
             ["@mui/material/Slider" :default Slider]
 
             ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
-            ["@mui/x-date-pickers/index" :refer [LocalizationProvider  DesktopDatePicker]]
+            ["@mui/x-date-pickers/index" :refer [LocalizationProvider DesktopDatePicker]]
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
@@ -336,15 +336,17 @@
         item)]))])
 
 (defn RawNumberField
-  [{:keys [prefix suffix read-only read-only-with-underline separator default-value amount-scaling]
+  [{:keys [prefix suffix read-only read-only-with-underline separator default-value amount-scaling
+           auto-focus]
     :or   {read-only                false
            read-only-with-underline false
-           amount-scaling           "full"}
+           amount-scaling           "full"
+           auto-focus               false}
     :as   props}]
   (let [contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
         formatting-func (get props :formatting-func)]
     [utils/adapted-text-field
-     (merge {:full-width true :color "primary" :variant "standard"}
+     (merge {:full-width true :color "primary" :variant "standard" :autoFocus auto-focus}
             (dissoc props :formatting-func :read-only-with-underline)
             (when
              (or (some? (or prefix suffix)) read-only read-only-with-underline)
@@ -381,13 +383,14 @@
                                   (formatting/format-number default-value amount-scaling))))})]))
 
 (defn RawPercentField
-  [{:keys [prefix suffix read-only read-only-with-underline default-value]
+  [{:keys [prefix suffix read-only read-only-with-underline default-value auto-focus]
     :or   {read-only                false
-           read-only-with-underline false}
+           read-only-with-underline false
+           auto-focus               false}
     :as   props}]
   (let [contains-percent-or-letter? (some? (re-matches #".*[A-Za-z\%].*" (str default-value)))]
     [utils/adapted-text-field
-     (merge {:full-width true :color "primary" :variant "standard"}
+     (merge {:full-width true :color "primary" :variant "standard" :autoFocus auto-focus}
             (dissoc props :transform-func :read-only-with-underline)
             {:InputProps
              (merge
