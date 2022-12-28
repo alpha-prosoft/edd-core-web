@@ -2,18 +2,23 @@
  :nrepl  {:port 3333}
  :builds {:app
           {:target     :browser
-           :output-dir "resources/public/js"
+           :output-dir "www/js"
            :asset-path "/js"
            :modules    {:main {:entries [projectname.core]}}
            :js-options {:entry-keys ["module" "browser" "main"]}
            :compiler-options
-                       {:infer-externs    :auto
-                        :closure-warnings {:global-this :off}}
+           {:infer-externs    :auto
+            :closure-warnings {:global-this :off}}
            :devtools   {:after-load   projectname.core/init
                         :http-root    "www"
                         :http-port    3000
                         :preloads     [devtools.preload
                                        day8.re-frame-10x.preload]}
+           :dev
+           {:compiler-options
+            {:closure-defines
+             {re-frame.trace.trace-enabled?        true
+              day8.re-frame.tracing.trace-enabled? true}}}
            :release    {:compiler-options {:optimizations :advanced}}}
           :devcards
           {:target     :browser

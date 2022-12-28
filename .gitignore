@@ -11,7 +11,6 @@ resources/public/js
 classest
 /package.json
 /package-lock.json
-
 .DS_Store
 /plugins/
 /platforms/
@@ -22,3 +21,6 @@ classest
 *~
 .lsp
 .nrepl-port
+tmp
+project*
+resources/project.zip

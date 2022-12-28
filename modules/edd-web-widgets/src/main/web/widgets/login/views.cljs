@@ -233,7 +233,10 @@
    [:> Button {:on-click #(rf/dispatch [::events/open-dialog :login])}
     (tr :login)]])
 
-(defn LoginBar [{:keys [] :as params}]
+(defn LoginBar [{:keys [enable-register login-provider]
+                 :or {enable-register true
+                      login-provider :username-password}
+                 :as params}]
   (let [logged? (boolean @(rf/subscribe [::subs/user-name]))
         init? @(rf/subscribe [::subs/init?])]
     (rf/dispatch [::events/init params])
@@ -243,7 +246,8 @@
                 :spacing         3}
        (when logged?
          (logout-button))
-       (when (false? logged?)
+       (when (and enable-register
+                  (false? logged?))
          (register-button))
        (when (false? logged?)
          (login-button))])))
