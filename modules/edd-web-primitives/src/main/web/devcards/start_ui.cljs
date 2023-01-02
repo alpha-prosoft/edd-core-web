@@ -47,7 +47,8 @@
    [web.devcards.formatting]
    [web.devcards.tree-view]
    [web.devcards.zoom]
-   [web.devcards.slider]))
+   [web.devcards.slider]
+   [web.devcards.chip]))
 
 (js/goog.exportSymbol "DevcardsMarked" marked/marked)
 

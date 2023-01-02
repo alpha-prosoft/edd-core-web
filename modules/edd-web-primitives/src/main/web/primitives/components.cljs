@@ -12,6 +12,7 @@
 
 (def RawGrid layout-core/RawGrid)
 (def RawBox layout-core/RawBox)
+(def RawStack layout-core/RawStack)
 
 (def RawBadge data-display-core/RawBadge)
 (def RawTooltip data-display-core/RawTooltip)
@@ -32,6 +33,7 @@
 (def RawTableRow data-display-core/RawTableRow)
 (def RawTableCell data-display-core/RawTableCell)
 (def RawAvatar data-display-core/RawAvatar)
+(def RawChip data-display-core/RawChip)
 
 (def RawDialog feedback-core/RawDialog)
 (def RawSnackbar feedback-core/RawSnackbar)

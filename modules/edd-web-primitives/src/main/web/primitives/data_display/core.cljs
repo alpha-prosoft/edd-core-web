@@ -4,7 +4,7 @@
                                   List ListItem ListItemText ListItemIcon ListSubheader
                                   Menu MenuItem MenuList
                                   Typography Tooltip
-                                  Table TableBody TableCell TableContainer TableHead TableRow]]))
+                                  Table TableBody TableCell TableContainer TableHead TableRow Chip]]))
 
 (defn RawBadge [{:keys [color]
                  :or   {color "primary"}
@@ -100,3 +100,6 @@
    [:> Avatar props content])
   ([props]
    [:> Avatar props]))
+
+(defn RawChip [props]
+  [:> Chip props])
