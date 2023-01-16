@@ -34,7 +34,7 @@
 (def read-only-underline {:border-bottom "1px solid #00000042"})
 
 (defn RawTextField
-  [{:keys [prefix suffix read-only read-only-with-underline input-props]
+  [{:keys [prefix suffix read-only read-only-with-underline input-props InputProps]
     :or   {read-only                false
            read-only-with-underline false}
     :as   props}]
@@ -44,6 +44,7 @@
           {:InputProps
            (merge
             input-props
+            InputProps
             (when read-only
               {:disableUnderline true
                :readOnly         true})
