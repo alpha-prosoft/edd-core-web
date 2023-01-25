@@ -166,6 +166,16 @@
         (rf/dispatch (conj on-failure event-body))
         false))))
 
+(defn handle-save-response-and-return-succeed? [{:keys [body]} on-success on-failure]
+  (let [{:keys [result]} (map-response-body body)]
+    (if (some? result)
+      (do
+        (rf/dispatch (conj on-success result))
+        true)
+      (do
+        (rf/dispatch (conj on-failure result))
+        false))))
+
 (defn post-params [body-str]
   {:method          :post
    :mode            :cors
@@ -173,6 +183,18 @@
    :timeout         31000
    :response-format (json/custom-response-format {:keywords? true})
    :headers         (make-headers)})
+
+(defn put-params [data]
+  {:mode    "cors"
+   :method  "PUT"
+   :headers (make-put-headers)
+   :body    data})
+
+(defn get-params []
+  {:method          :get
+   :timeout         50000
+   :response-format (json/custom-response-format {:keywords? true})
+   :headers         (make-get-headers)})
 
 (defn get-mock-func [{:keys [query commands service]} mock-for]
   (let [mock-func-name (case mock-for
@@ -255,41 +277,88 @@
    (println on-failure)
    {:dispatch [on-failure]}))
 
-(defn load [uri {:keys [on-success on-failure]}]
-  (-> (js/Promise.resolve
-       (clj->js
-        (fetch uri
-               {:method          :get
-                :timeout         50000
-                :response-format (json/custom-response-format {:keywords? true})
-                :headers         (make-get-headers)})))
-      (.then (fn [r] (.text r)))
-      (.then (fn [result]
-               (rf/dispatch (vec (concat on-success [result])))))
-      (.catch #(rf/dispatch (vec (concat on-failure [%]))))))
+(defn load-with-retry [uri
+                       {:keys [on-success on-failure retry]
+                        :as props}
+                       retry-attempts]
+  (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry]
+
+    (-> (js/Promise.resolve
+         (clj->js
+          (fetch uri (get-params))))
+        (.then (fn [r] (.text r)))
+        (.then (fn [result]
+                 (rf/dispatch (vec (concat on-success [result])))))
+        (.catch (fn [e] (let [attempt (dec retry-attempts)
+                              timeout (or timeout
+                                          (calculate-default-timeout attempts attempt))]
+                          (if (neg? attempt)
+                            (rf/dispatch (vec (concat on-failure [e])))
+                            (do
+                              (when (some? on-retry)
+                                (rf/dispatch on-retry))
+                              (js/setTimeout
+                               (fn [] (load-with-retry uri props attempt))
+                               timeout)))))))))
+
+(defn load [{:keys [ref service retry] :as props}]
+  (let [uri (document-uri :glms-content-svc (str "/load/" (name service) "/" ref))
+        {:keys [attempts] :or {attempts 2}} retry]
+    (load-with-retry uri props attempts)))
 
 (rf/reg-fx
  :load
  (fn [{:keys [ref service on-success] :as props}]
    (let [mock-func-name (str "mock.load." (name service))
-         mock-func (g/get js/window mock-func-name)
-         uri (document-uri :glms-content-svc (str "/load/" (name service) "/" ref))]
+         mock-func (g/get js/window mock-func-name)]
      (if (some? mock-func)
        (rf/dispatch (vec (concat on-success [(mock-func ref)])))
-       (load uri props)))))
+       (load props)))))
 
-(defn fetch-content
-  [{:keys [data service]}]
-  (let [uri (document-uri :glms-content-svc (str "/save/" (name service) "/" (random-uuid)))
+(defn save-content-with-retry [uri
+                               {:keys [data on-success on-failure retry]
+                                :as props}
+                               retry-attempts]
+  (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry]
+    (->
+     (js/Promise.resolve
+      (clj->js
+       (fetch uri (put-params data))))
+     (.then (fn [r] (-> (js/Promise.resolve r)
+                        (.then (fn [r] {:version-id (-> r
+                                                        (.-headers)
+                                                        (.get "versionid"))
+                                        :status   (.-status r)
+                                        :response r})))))
+     (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
+                        (.then (fn [body]
+                                 (let [{:keys [version-id]} r
+                                       body (js->clj body :keywordize-keys true)]
+                                   {:body (assoc-in body [:result :version-id] version-id)}))))))
+     (.then (fn [r] (handle-save-response-and-return-succeed? r on-success on-failure)))
+     (.catch (fn [e] (let [attempt (dec retry-attempts)
+                           timeout (or timeout
+                                       (calculate-default-timeout attempts attempt))]
+                       (if (neg? attempt)
+                         (do
+                           (rf/dispatch (conj on-failure (.toString e)))
+                           false)
+                         (do
+                           (when (some? on-retry)
+                             (rf/dispatch on-retry))
+                           (js/setTimeout
+                            (fn [] (save-content-with-retry uri props attempt))
+                            timeout)))))))))
+
+(defn save-content
+  [{:keys [data service retry] :as props}]
+  (let [{:keys [attempts] :or {attempts 2}} retry
+        uri (document-uri :glms-content-svc (str "/save/" (name service) "/" (random-uuid)))
         mock-func-name (str "mock.save." (name service))
         mock-func (g/get js/window mock-func-name)]
     (if (some? mock-func)
       (mock-response mock-func data)
-      (fetch uri
-             {:mode    "cors"
-              :method  "PUT"
-              :headers (make-put-headers)
-              :body    data}))))
+      (save-content-with-retry uri props attempts))))
 
 (defn handle-responses
   [items
@@ -311,18 +380,29 @@
 
 (defn save-n
   [items & {:keys [on-success on-failure]}]
-  (let [requests (map fetch-content items)]
-    (-> (js/Promise.all (clj->js requests))
-        (.then #(handle-responses
-                 items
-                 %
-                 :on-success on-success
-                 :on-failure on-failure
-                 :response-filter (fn [%]
-                                    (assoc %
-                                           :id
-                                           (get-in % [:result :id])))))
-        (.catch #(rf/dispatch (vec (concat on-failure [%])))))))
+  (let [requests (map save-content items)]
+    (-> (js/Promise.all requests)
+        (.then #(js->clj %))
+        (.then (fn [items]
+                 (let [with-failures (filter #(not (true? %)) items)
+                       succeeded? (empty? with-failures)]
+                   (cond
+                     (and (some? on-failure) (not succeeded?)) (rf/dispatch on-failure)
+                     (and (some? on-success) succeeded?) (rf/dispatch on-success)))))
+        (.catch #(rf/dispatch (vec (concat on-failure [%]))))
+
+      ;(js/Promise.all (clj->js requests))
+      ;  (.then #(handle-responses
+      ;           items
+      ;           %
+      ;           :on-success on-success
+      ;           :on-failure on-failure
+      ;           :response-filter (fn [%]
+      ;                              (assoc %
+      ;                                     :id
+      ;                                     (get-in % [:result :id])))))
+      ;  (.catch #(rf/dispatch (vec (concat on-failure [%]))))
+        )))
 
 (rf/reg-fx
  :save-n
