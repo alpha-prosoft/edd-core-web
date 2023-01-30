@@ -75,6 +75,7 @@
    ["@mui/icons-material/ContentCopy" :default ContentCopy]
    ["@mui/icons-material/Upload" :default Upload]
    ["@mui/icons-material/ManageSearch" :default ManageSearch]
+   ["@mui/icons-material/Logout" :default Logout]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -314,6 +315,9 @@
 
 (defn UploadIcon [props]
   [:> Upload props])
+
+(defn LogoutIcon [props]
+  [:> Logout props])
 
 (defn ArrowLeftIcon [props]
   [:svg (handle-props props)

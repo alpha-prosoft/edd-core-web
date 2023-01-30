@@ -23,7 +23,7 @@
      PersonIcon PersonSearchIcon PlaylistAddCheckIcon PlaylistAddIcon PublishIcon
      RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
-     TuneIcon
+     TuneIcon LogoutIcon
      UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
      ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon ManageSearchIcon]]))
 
@@ -194,3 +194,5 @@
 (defcard-rg :arrow-drop-up-icon "## Arrow Drop Up Icon" [ArrowDropUpIcon])
 
 (defcard-rg :hierarchy-icon "## Hierarchy Icon" [HierarchyIcon {:style {:width "18px"}}])
+
+(defcard-rg :logout-icon "## Logout Icon" [LogoutIcon])
