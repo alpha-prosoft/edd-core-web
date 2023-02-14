@@ -1,1 +1,1 @@
-FROM docker.io/alphaprosoft/alpha-web-img:latest:web
+FROM docker.io/alphaprosoft/web-cljs-img:latest

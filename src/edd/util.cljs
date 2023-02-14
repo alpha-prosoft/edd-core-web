@@ -4,8 +4,10 @@
    [edd.subs :as subs]))
 
 (defn placeholder
-  [{:keys [panels classes] :as _ctx}]
-  (let [panel @(rf/subscribe [::subs/active-panel])]
-    (if (contains? panels panel)
-      ((panel panels) classes)
+  [{:keys [pages classes] :as _ctx}]
+  (let [active-panel @(rf/subscribe [::subs/active-panel])]
+    (if (contains? pages active-panel)
+      (apply
+       (get-in pages [active-panel :panel])
+       [classes])
       [:h2 "Not found"])))

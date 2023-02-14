@@ -27,6 +27,8 @@ npm-debug*
 package-lock.json
 package.json
 resources/public/js
+
+www/js
 target
 .m2/
 .lsp

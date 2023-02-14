@@ -12,4 +12,5 @@
    ::languages               {}
    ::translations            {}
    ::config                  {}
-   ::routes                  {}})
+   ::routes                  {}
+   ::pages-init-events {}})

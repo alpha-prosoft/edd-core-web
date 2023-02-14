@@ -4,7 +4,7 @@
    [projectname.about.db :as db]))
 
 (re-frame/reg-event-db
- :initialize-about-db
+ ::init
  (fn [db [_ params]]
    (merge db/default-db
           (assoc db

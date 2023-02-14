@@ -14,7 +14,8 @@
 
 (rf/reg-event-fx
  ::initialize-db
- (fn [{:keys [db]} [_ {:keys [selected-language show-language-switcher? config routes]
+ (fn [{:keys [db]} [_ {:keys [selected-language show-language-switcher? config routes
+                              pages-init-events]
                        :or   {selected-language       :en
                               show-language-switcher? false}}]]
 
@@ -23,6 +24,7 @@
             (assoc-in [::db/selected-language] selected-language)
             (assoc-in [::db/show-language-switcher?] show-language-switcher?)
             (assoc ::db/config config)
+            (assoc ::db/pages-init-events pages-init-events)
             (assoc ::db/routes routes))}))
 
 (rf/reg-event-fx
@@ -67,6 +69,7 @@
  ::navigate
  (fn [{:keys [db]} [_ target & [params]]]
    (let [routes (::db/routes db)
+         pages-init-events (::db/pages-init-events db)
          url (::db/url db "/")
          new-url (if (keyword? target)
                    (bidi/path-for* routes target params)
@@ -82,7 +85,7 @@
                    #js {}
                    ""
                    new-url))
-     {:dispatch [(keyword (str "initialize-" (name handler) "-db"))
+     {:dispatch [(get pages-init-events handler)
                  route-params]
       :db       (assoc db ::db/drawer false
                        ::db/url new-url
