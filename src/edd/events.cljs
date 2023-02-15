@@ -14,8 +14,11 @@
 
 (rf/reg-event-fx
  ::initialize-db
- (fn [{:keys [db]} [_ {:keys [selected-language show-language-switcher? config routes
-                              pages-init-events]
+ (fn [{:keys [db]} [_ {:keys [selected-language
+                              show-language-switcher?
+                              config routes
+                              pages-init-events
+                              translations]
                        :or   {selected-language       :en
                               show-language-switcher? false}}]]
 
@@ -25,7 +28,8 @@
             (assoc-in [::db/show-language-switcher?] show-language-switcher?)
             (assoc ::db/config config)
             (assoc ::db/pages-init-events pages-init-events)
-            (assoc ::db/routes routes))}))
+            (assoc ::db/routes routes)
+            (assoc ::db/translations translations))}))
 
 (rf/reg-event-fx
  ::load-application
@@ -89,7 +93,7 @@
                  route-params]
       :db       (assoc db ::db/drawer false
                        ::db/url new-url
-                       ::db/active-panel handler)})))
+                       ::db/ative-panel handler)})))
 
 (rf/reg-event-db
  ::register-menu-item

@@ -8,9 +8,33 @@
 
   <body style="margin: 0">
     <div id="app"></div>
+    <!-- {{ "true" | default('-->
     <script src="/js/main.js?version=1"></script>
     <script>
-      projectname.core.init({"EnvironmentNameUpper" : "DEV01"});
+      // set locally in /etc/hosts web-samurai.dev01.local.example.com
+      env = window.location.host.split(".")[0]
+      console.info("Your env locally is: " + env)
+
+      configs = {
+        "dev01" : { 
+          "EnvironmentNameLower":"dev01",
+        },
+        "dev02" : {
+         "EnvironmentNameLower":"dev01",
+        }
+      }
+      window.eddconfig = configs[env]
+    </script>
+    <!-- ') }} -->
+    <!-- {{ "" | default('-' + '->', true) }}
+    <script src="/js/main.js?version={{ web_config["BuildId"] }}"></script>
+    <script>
+      window.eddconfig = {{ web_config | to_json }}
+    </script>
+    {{ "" | default('<!-' + '-', true) }} -->
+
+    <script>
+      projectname.core.init();
     </script>
   </body>
 

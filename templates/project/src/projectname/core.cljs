@@ -7,7 +7,7 @@
             [projectname.page :as page]))
 
 (defn ^:export init
-  [config]
+  [& [_config]]
   (core/init
    {:pages       {:home  home/main
                   :about about/main}

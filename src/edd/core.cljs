@@ -5,6 +5,8 @@
 
    [reagent.dom :as dom]
    [edd.i18n :as i18n]
+   [malli.core :as m]
+   [malli.error :as me]
    [pushy.core :as pushy]))
 
 (defn mount-root
@@ -17,10 +19,36 @@
    (body ctx)
    (.getElementById js/document "app")))
 
+(def CtxSchema
+  (m/schema
+   [:map
+    [:selected-language
+     {:optional true}
+     keyword?]
+    [:show-language-switcher?
+     {:optional true}
+     boolean?]
+    [:config
+     {:optional true}
+     [:map]]
+    [:routes
+     [:vector :any]]
+    [:languages
+     [:vector keyword?]]]))
+
 (defn init
   [{:keys [translations
            pages
-           panels] :as ctx}]
+           panels
+           config]
+    :or {config {}}
+    :as ctx}]
+  (when-not (m/validate CtxSchema ctx)
+    (throw (js/Error. (str "Ctx does not match schema: "
+                           (->> (m/explain CtxSchema ctx)
+                                me/humanize
+                                clj->js
+                                (.stringify js/JSON))))))
   (let [ctx (dissoc ctx :panels)
         pages (or pages
                   (reduce
@@ -43,7 +71,7 @@
         config  (merge (js->clj
                         (.-eddconfig js/window)
                         :keywordize-keys true)
-                       (:config ctx {}))
+                       config)
         translations (cond-> i18n/base-translations
                        translations (merge translations))
         ctx (assoc ctx
@@ -58,7 +86,8 @@
                                                        :show-language-switcher?
                                                        :config
                                                        :routes
-                                                       :pages-init-events])])
+                                                       :pages-init-events
+                                                       :translations])])
     (doseq [widget-init (:widgets ctx [])]
       (apply widget-init [ctx]))
     (mount-root ctx)))

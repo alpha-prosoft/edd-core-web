@@ -6,14 +6,18 @@
   {:language {:en "English"
               :de "Deutsch"}})
 
+(def TranslationSchema [:map
+                        []])
+
 (defn tr
   [key]
   (let [lang @(rf/subscribe [::subs/selected-language])
         prop (if (vector? key)
                key
-               [key])]
-    (get-in
-     @(rf/subscribe [::subs/translations])
-     (concat prop
-             [lang])
-     (str "tr (" key " " lang ")"))))
+               [key])
+        prop (vec
+              (concat [lang]
+                      prop))]
+    (get-in @(rf/subscribe [::subs/translations])
+            prop
+            (str "{tr " prop "}"))))

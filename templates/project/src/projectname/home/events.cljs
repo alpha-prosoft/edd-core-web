@@ -5,7 +5,7 @@
    [edd.events :as edd-events]))
 
 (rf/reg-event-db
- :initialize-home-db
+ ::init
  (fn [db _]
    (merge db db/default-db)))
 

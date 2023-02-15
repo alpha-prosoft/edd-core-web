@@ -2,19 +2,17 @@
   (:require [edd.i18n :as i18n]))
 
 (def translations
-  {:languages        {:en {:en "English"
-                           :de "Englisch"}
-                      :de {:en "German"
-                           :de "Deutsch"}}
-   :menu             {:home  {:en "Home"
-                              :de "Home"}
-                      :about {:en "About"
-                              :de "Úber uns"}}
-   :language         {:en "Language"
-                      :de "Sprache"}
-   :about            {:en "About"
-                      :de "Űber uns"}
-   :home             {:en "Home"
-                      :de "Home"}
-   :increments-count {:en "Current count: "
-                      :de "Bis jetzt: "}})
+  {:en {:language-name    "English"
+        :menu             {:home  "Home"
+                           :about  "About"}
+        :language         "Language"
+        :about            "About"
+        :home             "Home"
+        :increments-count "Current count: "}
+   :de {:language-name    "English"
+        :menu             {:home  "Home"
+                           :about "Úber uns"}
+        :language         "Sprache"
+        :about            "Űber uns"
+        :home             "Home"
+        :increments-count "Bis jetzt: "}})
