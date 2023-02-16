@@ -6,7 +6,7 @@
             [edd.db :as edd-db]))
 
 (defn init
-  [& [ctx]]
+  [{:keys [config]}]
   (rf/dispatch [::events/initialize-db]))
 
 (defn get-config

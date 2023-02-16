@@ -2,8 +2,7 @@
   (:require
    [re-frame.core :as rf]
    [edd.events :as events]
-
-   [reagent.dom :as dom]
+   [reagent.dom.client :as dom]
    [edd.i18n :as i18n]
    [malli.core :as m]
    [malli.error :as me]
@@ -15,9 +14,11 @@
    (pushy/pushy #(rf/dispatch [::events/navigate %])
                 (fn [url] url)))
 
-  (dom/render
-   (body ctx)
-   (.getElementById js/document "app")))
+  (let [root (dom/create-root
+              (.getElementById js/document "app"))]
+    (dom/render
+     root
+     (body ctx))))
 
 (def CtxSchema
   (m/schema

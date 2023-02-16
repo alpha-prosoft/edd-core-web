@@ -93,7 +93,7 @@
                  route-params]
       :db       (assoc db ::db/drawer false
                        ::db/url new-url
-                       ::db/ative-panel handler)})))
+                       ::db/active-panel handler)})))
 
 (rf/reg-event-db
  ::register-menu-item
