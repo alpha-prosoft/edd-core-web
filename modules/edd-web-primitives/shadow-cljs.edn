@@ -9,8 +9,8 @@
    :js-options
    {:resolve
     {"devcards-marked" {:target :npm :require "marked"}
-     "devcards-syntax-highlighter"
-     {:target :npm :require "highlight.js"}}
+     "devcards-syntax-highlighter" {:target :npm :require "highlight.js/lib/core"}
+     "highlight.js" {:target :npm :require "highlight.js/lib/core"}}
     :entry-keys ["module" "browser" "main"]}
    :compiler-options
    {:infer-externs    :auto

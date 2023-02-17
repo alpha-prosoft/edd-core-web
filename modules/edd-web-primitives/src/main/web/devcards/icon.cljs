@@ -20,8 +20,8 @@
      LaunchIcon LinkIcon LinkOffIcon LogoIcon HierarchyIcon
      MarkunreadMailboxIcon MenuIcon MonetizationOnIcon MoreHorizIcon MoreVertIcon
      NoteAddIcon NoteOutlinedIcon NotificationsNoneIcon
-     PersonIcon PersonSearchIcon PlaylistAddCheckIcon PlaylistAddIcon PublishIcon
-     RefreshIcon RemoveIcon ReportProblemIcon
+     PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon PlaylistAddCheckIcon PlaylistAddIcon
+     PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon LogoutIcon
      UnfoldLessIcon UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
@@ -95,7 +95,11 @@
 
 (defcard-rg :star-border-icon "## Star Border Icon" [StarBorderIcon])
 
+(defcard-rg :person-icon "## People Icon" [PeopleIcon])
+
 (defcard-rg :person-icon "## Person Icon" [PersonIcon])
+
+(defcard-rg :person-icon "## PictureAsPdf Icon" [PictureAsPdfIcon])
 
 (defcard-rg :info-icon "## Info Icon" [InfoIcon])
 

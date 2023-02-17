@@ -48,8 +48,10 @@
    ["@mui/icons-material/NoteAdd" :default NoteAdd]
    ["@mui/icons-material/NoteOutlined" :default NoteOutlined]
    ["@mui/icons-material/NotificationsNone" :default NotificationsNone]
+   ["@mui/icons-material/People" :default People]
    ["@mui/icons-material/Person" :default Person]
    ["@mui/icons-material/PersonSearch" :default PersonSearch]
+   ["@mui/icons-material/PictureAsPdf" :default PictureAsPdf]
    ["@mui/icons-material/PlaylistAdd" :default PlaylistAdd]
    ["@mui/icons-material/PlaylistAddCheck" :default PlaylistAddCheck]
    ["@mui/icons-material/Publish" :default Publish]
@@ -187,8 +189,14 @@
 (defn DirectionsRunIcon [props]
   [:> DirectionsRun props])
 
+(defn PeopleIcon [props]
+  [:> People props])
+
 (defn PersonIcon [props]
   [:> Person props])
+
+(defn PictureAsPdfIcon [props]
+  [:> PictureAsPdf props])
 
 (defn InfoIcon [props]
   [:> Info props])
