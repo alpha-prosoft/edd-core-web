@@ -432,17 +432,17 @@
                      (and (some? on-success) succeeded?) (rf/dispatch on-success)))))
         (.catch #(rf/dispatch (vec (concat on-failure [%])))))))
 
-(rf/reg-fx
- :call-n
- (fn [{:keys [items on-success on-failure]}]
-   (call-n items
-           :on-success on-success
-           :on-failure on-failure)))
+(rf/reg-fx :call-n
+           (fn [& args]
+             (.warn js/console "DEPRICATED: use namespaces call-n")
+             (apply call-n args)))
+(rf/reg-fx ::call-n call-n)
 
-(rf/reg-fx
- :call
- (fn [data]
-   (call-n [data])))
+(rf/reg-fx :call
+           (fn [data]
+               (.warn js/console "DEPRICATED: use namespaces call-n")
+             (call-n [data])))
+(rf/reg-fx ::call (fn [data] (call-n [data])))
 
 (defonce timeouts (r/atom {}))
 

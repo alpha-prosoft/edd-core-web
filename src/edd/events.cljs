@@ -31,15 +31,7 @@
             (assoc ::db/routes routes)
             (assoc ::db/translations translations))}))
 
-(rf/reg-event-fx
- ::load-application
- (fn [{:keys [db]} [_ do-after-login]]
-   (let [config (::db/config db)]
-     {:fx [(when (get config :ApplicationId)
-             [:call {:on-success [::application-loaded do-after-login]
-                     :service    (get config :ApplicationServiceName)
-                     :query      {:query-id :application->fetch-by-id
-                                  :id       (get config :ApplicationId)}}])]})))
+
 
 (rf/reg-event-fx
  ::set-active-panel

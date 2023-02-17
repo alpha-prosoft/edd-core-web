@@ -8,17 +8,17 @@
    [malli.error :as me]
    [pushy.core :as pushy]))
 
+(defonce root (dom/create-root
+              (.getElementById js/document "app")))
 (defn mount-root
   [{:keys [body] :as ctx}]
   (pushy/start!
    (pushy/pushy #(rf/dispatch [::events/navigate %])
                 (fn [url] url)))
 
-  (let [root (dom/create-root
-              (.getElementById js/document "app"))]
-    (dom/render
+  (dom/render
      root
-     (body ctx))))
+     (body ctx)))
 
 (def CtxSchema
   (m/schema

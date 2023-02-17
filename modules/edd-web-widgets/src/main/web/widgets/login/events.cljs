@@ -4,7 +4,7 @@
    [web.widgets.login.db :as db]
    [clojure.string :as str]
    [edd.db :as edd-db]
-   [edd.events :as edd-events]))
+   [edd.client :as client]))
 
 (rf/reg-event-fx
  ::initialize-db
@@ -45,12 +45,22 @@
    (assoc-in db [::db/do-after-login] do-after-login)))
 
 (rf/reg-event-fx
+ ::load-application
+ (fn [{:keys [db]} [_ do-after-login]]
+   (let [config (::db/config db)]
+     {:fx [(when (get config :ApplicationId
+                      [::client/call {:on-success [::application-loaded do-after-login]
+                                      :service    (get config :ApplicationServiceName)
+                                      :query      {:query-id :application->fetch-by-id
+                                                   :id       (get config :ApplicationId)}}]))]})))
+
+(rf/reg-event-fx
  ::login-succeeded
  (fn [{:keys [db]} [_ auth]]
    (let [do-after-login (get-in db [::db/do-after-login])]
      {:db (assoc-in db [::edd-db/user] auth)
       :fx [[:dispatch [::close-dialog]]
-           [:dispatch [::edd-events/load-application do-after-login]]]})))
+           [:dispatch [::load-application do-after-login]]]})))
 
 (defn request-code
   [db]
