@@ -7,8 +7,6 @@
             [edd.i18n :refer [tr]]
             [clojure.walk :refer [keywordize-keys]]
             ["@mui/material/styles" :refer [createTheme, ThemeProvider]]
-            ["@mui/styles" :refer [withStyles]]
-            ["@mui/material/Menu" :default Menu]
             ["@mui/material/AppBar" :default AppBar]
             ["@mui/material/Toolbar" :default Toolbar]
             ["@mui/material/Button" :default Button]
@@ -88,23 +86,14 @@
       (snackbar-alert.views/revoke-alert)]]
     [:> Grid {:container true :item true} "Loading..."]))
 
-(defn with-custom-styles
-  [{:keys [styles]} component]
-  ((withStyles
-    (fn [theme]
-      (clj->js
-       (styles theme)))) component))
-
 (defn body
   "Initialize body with custom style"
   [{:keys [theme] :as ctx}]
   [:> ThemeProvider {:theme (createTheme (clj->js theme))}
-   [:> (with-custom-styles
-         ctx
-         (r/reactify-component
-          (fn [props]
-            (page
-             (assoc
-              ctx
-              :classes (keywordize-keys
-                        (:classes (js->clj props))))))))]])
+   [:> (r/reactify-component
+        (fn [props]
+          (page
+           (assoc
+            ctx
+            :classes (keywordize-keys
+                      (:classes (js->clj props)))))))]])
