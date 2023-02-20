@@ -7,6 +7,7 @@
    [edd.json :as json]
    [edd.db :as db]
    [clojure.string :as string]
+   [re-frame.db :as re-frame-db]
    [edd.client-utils :as utils]))
 
 (deftype MockHeaders [headers]
@@ -29,7 +30,7 @@
                    (MockHeaders. {"versionid" "mock-response"}))))
 
 (defn get-config []
-  (-> @re-frame.db/app-db ::db/config))
+  (-> @re-frame-db/app-db ::db/config))
 
 (defn document-uri [service path]
   (let [hosted-zone-name (-> (get-config) :HostedZoneName)]
@@ -45,7 +46,7 @@
 
 (defn service-uri [service path]
   (let [hosted-zone-name (-> (get-config) :HostedZoneName)
-        realm (-> @re-frame.db/app-db ::db/user :realm)
+        realm (-> @re-frame-db/app-db ::db/user :realm)
         stage (stage-for-realm realm)]
     (str "https://api."
          hosted-zone-name
@@ -56,27 +57,27 @@
 
 (defn add-user
   [req]
-  (let [db @re-frame.db/app-db]
+  (let [db @re-frame-db/app-db]
     (assoc req
            :user
            {:selected-role (get-in db [::db/user :selected-role])})))
 
 (defn make-headers
   []
-  (let [db @re-frame.db/app-db]
+  (let [db @re-frame-db/app-db]
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"
      "Content-Type"    "application/json"}))
 
 (defn make-get-headers
   []
-  (let [db @re-frame.db/app-db]
+  (let [db @re-frame-db/app-db]
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"}))
 
 (defn make-put-headers
   []
-  (let [db @re-frame.db/app-db]
+  (let [db @re-frame-db/app-db]
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"}))
 
@@ -420,7 +421,7 @@
            :on-failure on-failure)))
 
 (defn call-n
-  [items & {:keys [on-success on-failure]}]
+  [{:keys [items on-success on-failure]}]
   (let [requests (map call (filterv identity items))]
     (-> (js/Promise.all requests)
         (.then #(js->clj %))
@@ -434,15 +435,15 @@
 
 (rf/reg-fx :call-n
            (fn [& args]
-             (.warn js/console "DEPRICATED: use namespaces call-n")
+             (.warn js/console "DEPRICATED: use namespaced call-n (:require [edd.client :as client]) ::client/call-n")
              (apply call-n args)))
 (rf/reg-fx ::call-n call-n)
 
 (rf/reg-fx :call
            (fn [data]
-               (.warn js/console "DEPRICATED: use namespaces call-n")
-             (call-n [data])))
-(rf/reg-fx ::call (fn [data] (call-n [data])))
+             (.warn js/console "DEPRICATED: use namespaced call-n (:require [edd.client :as client]) ::client/call")
+             (call-n {:items [data]})))
+(rf/reg-fx ::call (fn [data] (call-n {:items [data]})))
 
 (defonce timeouts (r/atom {}))
 

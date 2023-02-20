@@ -13,4 +13,5 @@
    ::on-logout-hook          nil
    ::forgot-password-visible false
    ::dialog-visible          false
+   ::interrupted-event nil
    ::show-password?          false})

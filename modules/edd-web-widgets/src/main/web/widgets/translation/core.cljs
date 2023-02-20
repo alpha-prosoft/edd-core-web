@@ -4,15 +4,15 @@
   [keys]
   (str "ERR: " (str keys) " doesn't exist in lang map"))
 
-(defn lang-keyword [lang]
-  (cond
-    (nil? lang) :en
-    (keyword? lang) lang
-    :else (keyword lang)))
-
 (defn translate
-  [lang lang-map k & ks]
-  (get-in
-   lang-map
-   (into [(lang-keyword lang) k] ks)
-   (error-label (into [k] ks))))
+  [lang lang-map & ks]
+  (let [lang (or lang
+                 :en)
+        lang (keyword lang)
+        path (into [lang] ks)]
+    (get-in
+     lang-map
+     path
+     (error-label (.stringify js/JSON
+                              (clj->js
+                               path))))))

@@ -8,6 +8,7 @@
             [clojure.walk :refer [keywordize-keys]]
             ["@mui/material/styles" :refer [createTheme, ThemeProvider]]
             ["@mui/styles" :refer [withStyles]]
+            ["@mui/material/Menu" :default Menu]
             ["@mui/material/AppBar" :default AppBar]
             ["@mui/material/Toolbar" :default Toolbar]
             ["@mui/material/Button" :default Button]

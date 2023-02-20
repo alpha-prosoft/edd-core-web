@@ -2,7 +2,9 @@
   (:require [re-frame.fx :as fx]
             [clojure.string :as str]
             [web.widgets.login.events :as events]
+            [web.widgets.login.db :as db]
             [re-frame.core :as rf]
+            [re-frame.db :as re-frame-db]
             [edd.db :as edd-db]))
 
 (defn init
@@ -199,11 +201,12 @@
     (-> (.parse js/JSON auth-string)
         (js->clj :keywordize-keys true))))
 
-(defn amplify-refresh-credentials [{:keys [on-success on-failure]}]
+(defn amplify-refresh-credentials
+  []
   (let [config (get-config)
         refresh-token (:refresh-token (auth))]
 
-    (when refresh-token
+    (if refresh-token
       (-> (.fetch js/window (str "https://" (:domain config) "/oauth2/token")
                   (clj->js {:method  "POST"
                             :headers {"Content-Type" "application/x-www-form-urlencoded"}
@@ -220,21 +223,22 @@
                                      (-> js/window
                                          (.-localStorage)
                                          (.setItem "auth" "{}"))
-                                     (rf/dispatch (conj on-failure))))))
+                                     (rf/dispatch [::events/open-dialog :login])))))
                        (.json %)))))
           (.then (fn [%]
                    (let [response (-> %
                                       (js->clj :keywordize-keys true)
                                       (:id_token))
-                         auth {:id-token response}]
-                     (doall
-                      (rf/dispatch [::events/set-event-after-login on-success])
-                      (rf/dispatch [::events/login-succeeded auth])))))))))
+                         auth {:id-token response}
+                         interrupted-event (get @re-frame-db/app-db ::db/interrupted-event)]
+                     (when interrupted-event
+                       (rf/dispatch [::events/login-succeeded auth]))))))
+      (rf/dispatch [::events/open-dialog :login]))))
 
 (fx/reg-fx
  :amplify-refresh-credentials
- (fn [props]
-   (amplify-refresh-credentials props)))
+ (fn []
+   (amplify-refresh-credentials)))
 
 (fx/reg-fx
  :amplify-forgot-password
@@ -329,15 +333,22 @@
        (.-localStorage)
        (.setItem "auth" "{}"))))
 
-(rf/reg-fx
- :ensure-credentials
- (fn [{:keys [on-success on-failure] :as props}]
-   (let [logged? (get-in @re-frame.db/app-db [::edd-db/user])
-         auth (auth)]
-     (if logged?
-       (rf/dispatch on-success)
-       (if (and (some? auth) (some? (:refresh-token auth)))
-         (amplify-refresh-credentials props)
-         (if (some? on-failure)
-           (rf/dispatch on-failure)
-           (rf/dispatch [::events/login-and-proceed on-success])))))))
+
+(def ensure-credentials
+  (rf/->interceptor
+   :id     :ensure-credentials
+   :before (fn [context]
+             (let [user (get-in context [:coeffects :db ::edd-db/user])]
+               (if user
+                 (update-in context [:coeffects :db] #(dissoc % ::db/interrupted-event))
+                 (-> context
+                     (assoc-in  [:coeffects :db ::db/interrupted-event]
+                                (get-in context [:coeffects :event]))))))
+   :after (fn [context]
+            (let [user (get-in context [:coeffects :db ::edd-db/user])
+                  coeffects-db (get-in context [:coeffects :db])
+                  context (if user
+                            context
+                            (assoc-in context [:effects] {:db coeffects-db
+                                                          :amplify-refresh-credentials []}))]
+              context))))

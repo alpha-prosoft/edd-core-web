@@ -4,15 +4,16 @@
    [web.widgets.login.db :as db]
    [clojure.string :as str]
    [edd.db :as edd-db]
+   [edd.events :as edd-events]
    [edd.client :as client]))
 
 (rf/reg-event-fx
  ::initialize-db
  (fn [{:keys [db]} _]
    {:db (merge db/default-db
-               (assoc-in db [::db/username] ""))
-    :ensure-credentials {:on-success [::set-init? true]
-                         :on-failure [::set-init? true]}}))
+               (-> db
+                   (assoc-in [::db/username] nil)
+                   (assoc-in [::db/init?] true)))}))
 
 (rf/reg-event-db
  ::set-init?
@@ -47,20 +48,44 @@
 (rf/reg-event-fx
  ::load-application
  (fn [{:keys [db]} [_ do-after-login]]
-   (let [config (::db/config db)]
-     {:fx [(when (get config :ApplicationId
-                      [::client/call {:on-success [::application-loaded do-after-login]
-                                      :service    (get config :ApplicationServiceName)
-                                      :query      {:query-id :application->fetch-by-id
-                                                   :id       (get config :ApplicationId)}}]))]})))
+   (let [config (::edd-db/config db)]
+     {:fx [[::client/call {:on-success [::edd-events/application-loaded do-after-login]
+                           :service    (get config :ApplicationServiceName)
+                           :query      {:query-id :application->fetch-by-id
+                                        :id       (get config :ApplicationId)}}]]})))
+
+
+
+(defn close-dialog
+  [db]
+  (-> db
+      (assoc ::db/dialog-visible false
+             ::db/username ""
+             ::db/password ""
+             ::db/error-message-visible false
+             ::db/error-message ""
+             ::db/confirmation-visible false
+             ::db/confirmation-code "")))
+
+(rf/reg-event-db
+ ::close-dialog
+ (fn [db _]
+   (close-dialog db)))
+
+(defn login-suceeded
+  [db auth]
+  (-> (assoc-in db [::edd-db/user] auth)
+      close-dialog))
 
 (rf/reg-event-fx
  ::login-succeeded
  (fn [{:keys [db]} [_ auth]]
-   (let [do-after-login (get-in db [::db/do-after-login])]
-     {:db (assoc-in db [::edd-db/user] auth)
-      :fx [[:dispatch [::close-dialog]]
-           [:dispatch [::load-application do-after-login]]]})))
+   (let [do-after-login (get-in db [::db/interrupted-event])
+         config (::edd-db/config db)]
+     {:db (login-suceeded db auth)
+      :fx [(cond
+             (get config :ApplicationId) [:dispatch [::load-application do-after-login]]
+             do-after-login [:dispatch do-after-login])]})))
 
 (defn request-code
   [db]
@@ -120,17 +145,6 @@
    (-> db
        (assoc ::db/form-type form-type)
        (assoc ::db/dialog-visible true))))
-
-(rf/reg-event-db
- ::close-dialog
- (fn [db _]
-   (assoc db ::db/dialog-visible false
-          ::db/username ""
-          ::db/password ""
-          ::db/error-message-visible false
-          ::db/error-message ""
-          ::db/confirmation-visible false
-          ::db/confirmation-code "")))
 
 (rf/reg-event-db
  ::register-success
