@@ -171,8 +171,9 @@
   (let [{:keys [result]} (map-response-body body)]
     (if (some? result)
       (do
-        (rf/dispatch (conj on-success result))
-        true)
+        (when on-success
+          (rf/dispatch (conj on-success result)))
+        (:result body))
       (do
         (rf/dispatch (conj on-failure result))
         false))))
@@ -385,11 +386,16 @@
     (-> (js/Promise.all requests)
         (.then #(js->clj %))
         (.then (fn [items]
-                 (let [with-failures (filter #(not (true? %)) items)
-                       succeeded? (empty? with-failures)]
+                 (let [with-failures (filter nil? items)
+                       succeeded? (not
+                                   (seq with-failures))]
                    (cond
-                     (and (some? on-failure) (not succeeded?)) (rf/dispatch on-failure)
-                     (and (some? on-success) succeeded?) (rf/dispatch on-success)))))
+                     (and on-failure
+                          (not succeeded?)) (rf/dispatch on-failure)
+                     (and on-success
+                          succeeded?) (rf/dispatch (-> on-success
+                                                       (conj items)
+                                                       vec))))))
         (.catch #(rf/dispatch (vec (concat on-failure [%]))))
 
       ;(js/Promise.all (clj->js requests))
