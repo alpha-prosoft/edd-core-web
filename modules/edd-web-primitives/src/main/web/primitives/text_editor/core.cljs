@@ -24,16 +24,23 @@
                      :overflow "hidden"}
              :class-name "sun-editor-editable"
              :dangerouslySetInnerHTML {:__html (sanitize-html (:set-contents props))}}]
-   [:> Grid {:item true :style {:position "absolute" :right 0}}
-    [:> IconButton
-     (merge
-      {:on-click set-edit-mode-funk
-       :style    (merge
-                  {:padding 0}
-                  (when (true? (:disable props)) {:opacity 0.5}))
-       :disabled (:disable props)}
-      (when (:id props) {:id       (str "edit-button-" (:id props))}))
-     [EditIcon]]]])
+   (let [edit-icon-position (:edit-icon-position props)]
+     [:> Grid {:item true
+               :style
+               (merge
+                {:position "absolute"}
+                (if (contains? #{:left :right} edit-icon-position)
+                  {edit-icon-position 0}
+                  {:right 0}))}
+      [:> IconButton
+       (merge
+        {:on-click set-edit-mode-funk
+         :style    (merge
+                    {:padding 0}
+                    (when (true? (:disable props)) {:opacity 0.5}))
+         :disabled (:disable props)}
+        (when (:id props) {:id       (str "edit-button-" (:id props))}))
+       [EditIcon]]])])
 
 (defn- edit-mode [{:keys [on-change] :as props} set-read-only-mode]
   [:> Grid (merge

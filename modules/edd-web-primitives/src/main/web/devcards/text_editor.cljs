@@ -29,6 +29,18 @@
        :on-change    (fn [x] (swap! data-atom merge {:draft x}))}]))
   (r/atom {:draft "" :value "<a href='javascript:alert(1)'>Link with: javascript:alert(1)</a>"}))
 
+(defcard-rg :text-editor-with-action-buttons-edit-icon-left
+  "## Text editor with action buttons and edit button on the left side"
+  (fn [data-atom _]
+    (apply-stiles
+     [EddTextEditor
+      {:placeholder  "Please type here..."
+       :on-save      #(swap! data-atom merge {:value (:draft @data-atom)})
+       :set-contents (:value @data-atom)
+       :on-change    (fn [x] (swap! data-atom merge {:draft x}))
+       :edit-icon-position :left}]))
+  (r/atom {:draft "" :value "<a href='javascript:alert(1)'>Link with: javascript:alert(1)</a>"}))
+
 (defcard-rg :text-editor-disabled
   "## Text editor disabled"
   (apply-stiles
