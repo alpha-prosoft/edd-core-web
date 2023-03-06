@@ -23,5 +23,9 @@
         :invalid-code           "Invalid code"
         :missing-username       "Missing username"
         :missing-password       "Missing password"
-        :unknown-error          "Something went wrong"}})
+        :unknown-error          "Something went wrong"
+        :password-requirements {:upper-case "Password should contain at least one character in upper case"
+                                :lower-case "Password should contain at least one character in lower case"
+                                :number "Password should contain at leas one number"
+                                :length "Password should ne at least 8 characters long"}}})
 

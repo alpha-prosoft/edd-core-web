@@ -17,6 +17,8 @@
             ["@mui/material/IconButton" :default IconButton]
             ["@mui/material/InputAdornment" :default InputAdornment]
             ["@mui/material/Link" :default Link]
+            ["@mui/material/Checkbox" :default Checkbox]
+            ["@mui/material/FormControlLabel" :default FormControlLabel]
             [reagent.core :as r]))
 
 (defn login-on-key-enter [event]
@@ -155,7 +157,7 @@
                  :type          "input"
                  :fullWidth     true
                  :tab-index     0
-                 :onKeyUp       #(login-on-key-enter %)}])
+                 :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}])
 
 (defn password-visibility-icon-button [show-password?]
   (r/as-element [:> InputAdornment {:position "end"}
@@ -166,7 +168,7 @@
                     [:> VisibilityOff {}]
                     [:> Visibility {}])]]))
 
-(defn password []
+(defn password-field []
   (let [show-password? @(rf/subscribe [::subs/show-password?])]
     [:> TextField {:key           "password"
                    :margin        "dense"
@@ -177,7 +179,7 @@
                    :InputProps    {:endAdornment (password-visibility-icon-button show-password?)}
                    :fullWidth     true
                    :tab-index     1
-                   :onKeyUp       #(login-on-key-enter %)}]))
+                   :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
 
 (defn confirm-login []
   [:> TextField {:key           "confirm-login"
@@ -187,7 +189,28 @@
                  :on-change     #(rf/dispatch [::events/confirmation-code-change (-> % .-target .-value)])
                  :type          "input"
                  :fullWidth     true
-                 :onKeyUp       #(login-on-key-enter %)}])
+                 :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}])
+
+(defn checkbox [label checked?]
+  [:> FormControlLabel {:label label
+                        :control (r/as-element
+                                  [:> Checkbox {:checked checked?
+                                                :color "success"}])}])
+
+(defn password-checks []
+  (let [{:keys [missing-upper-case?
+                missing-lower-case?
+                missing-number?
+                missing-length-8?]} @(rf/subscribe [::subs/password-invalid-explanation])]
+    [:> Grid {:container true}
+     [:> Grid {:item true :xs 12}
+      (checkbox (tr :password-requirements :upper-case) (not missing-upper-case?))]
+     [:> Grid {:item true :xs 12}
+      (checkbox (tr :password-requirements :lower-case) (not missing-lower-case?))]
+     [:> Grid {:item true :xs 12}
+      (checkbox (tr :password-requirements :number) (not missing-number?))]
+     [:> Grid {:item true :xs 12}
+      (checkbox (tr :password-requirements :length) (not missing-length-8?))]]))
 
 (defn login-dialog []
   (let [form-type @(rf/subscribe [::subs/form-type])
@@ -206,7 +229,13 @@
           (username)])
 
        (when (some #(= % form-type) [:register :login :confirm-password-reset])
-         [:> Grid {:item true} (password)])
+         [:> Grid {:item true} (password-field)])
+
+       (when (some #(= % form-type) [:register :confirm-password-reset])
+         [:> Grid {:item true}
+          [:> Grid {:container true}
+           [:> Grid {:item true}
+            (password-checks)]]])
 
        (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
          [:> Grid {:item true} (confirm-login)])
@@ -234,9 +263,9 @@
     (tr :login)]])
 
 (defn LoginBar [{:keys [enable-register login-provider]
-                 :or {enable-register true
-                      login-provider :username-password}
-                 :as params}]
+                 :or   {enable-register true
+                        login-provider  :username-password}
+                 :as   params}]
   (let [logged? (boolean @(rf/subscribe [::subs/user-name]))
         init? @(rf/subscribe [::subs/init?])]
     (rf/dispatch [::events/init params])

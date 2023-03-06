@@ -17,3 +17,12 @@
 (defn json-parser [& params]
   (-> (apply ajax-json/read-json-native params)
       (parse-fields)))
+
+(defn validate-email [email]
+  (re-matches #".+\@.+\..+" (str email)))
+
+(defn validate-password [password]
+  {:missing-upper-case? (nil? (re-seq #"[A-Z]" password))
+   :missing-lower-case? (nil? (re-seq #"[a-z]" password))
+   :missing-number?     (nil? (re-seq #"[0-9]" password))
+   :missing-length-8?   (< (count password) 8)})

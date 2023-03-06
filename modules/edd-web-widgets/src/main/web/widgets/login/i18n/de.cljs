@@ -22,4 +22,8 @@
         :attempt-limit-exceeded "Versuchslimit überschritten. Bitte warten Sie 15 min."
         :invalid-code           "Ungültige code"
         :missing-username       "Fehlender Benutzername"
-        :missing-password       "Fehlender Kennwort"}})
+        :missing-password       "Fehlender Kennwort"
+        :password-requirements {:upper-case "Das Passwort sollte mindestens ein Zeichen in Großbuchstaben enthalten"
+                                :lower-case "Das Passwort sollte mindestens ein Zeichen in Kleinbuchstaben enthalten"
+                                :number "Das Passwort sollte mindestens eine Zahl enthalten"
+                                :length "Das Passwort sollte mindestens 8 Zeichen lang sein"}}})

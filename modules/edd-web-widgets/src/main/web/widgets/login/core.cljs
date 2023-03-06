@@ -333,7 +333,6 @@
        (.-localStorage)
        (.setItem "auth" "{}"))))
 
-
 (def ensure-credentials
   (rf/->interceptor
    :id     :ensure-credentials

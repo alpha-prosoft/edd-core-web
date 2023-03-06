@@ -5,7 +5,7 @@
    [re-frame.core :as rf]
    [clojure.string :refer [blank?]]
    [goog.crypt.base64 :as b64]
-   [web.widgets.login.utils :refer [json-parser]]))
+   [web.widgets.login.utils :as utils]))
 
 (rf/reg-sub
  :init-login-db
@@ -40,7 +40,7 @@
                   (second
                    (clojure.string/split (:id-token user) #"\.")))]
      (when
-      (some? user) (-> (json-parser false true decoded)
+      (some? user) (-> (utils/json-parser false true decoded)
                        (:email))))))
 
 (rf/reg-sub
@@ -73,24 +73,23 @@
  (fn [db]
    (::db/show-password? db)))
 
-(defn validate-email [email]
-  (re-matches #".+\@.+\..+" (str email)))
-
 (rf/reg-sub
  ::username-invalid?
  (fn [db]
    (let [username (get-in db [::db/username] "")]
-     (nil? (validate-email username)))))
+     (nil? (utils/validate-email username)))))
 
 (rf/reg-sub
  ::password-invalid?
  (fn [db]
    (let [password (str (get-in db [::db/password]))]
-     (or
-      (nil? (re-seq #"[A-Z]" password))
-      (nil? (re-seq #"[a-z]" password))
-      (nil? (re-seq #"[0-9]" password))
-      (< (count password) 8)))))
+     (some true? (vals (utils/validate-password password))))))
+
+(rf/reg-sub
+ ::password-invalid-explanation
+ (fn [db]
+   (let [password (get-in db [::db/password] "")]
+     (utils/validate-password password))))
 
 (rf/reg-sub
  ::confirmation-code-empty?

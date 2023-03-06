@@ -5,7 +5,9 @@
    [clojure.string :as str]
    [edd.db :as edd-db]
    [edd.events :as edd-events]
-   [edd.client :as client]))
+   [edd.client :as client]
+   [clojure.string :refer [blank?]]
+   [web.widgets.login.utils :as utils]))
 
 (rf/reg-event-fx
  ::initialize-db
@@ -53,8 +55,6 @@
                            :service    (get config :ApplicationServiceName)
                            :query      {:query-id :application->fetch-by-id
                                         :id       (get config :ApplicationId)}}]]})))
-
-
 
 (defn close-dialog
   [db]
@@ -221,3 +221,32 @@
  ::toggle-password-visibility
  (fn [db]
    (update-in db [::db/show-password?] not)))
+
+(rf/reg-event-fx
+ ::login-on-key-enter
+ (fn [{:keys [db]} [_ event]]
+   (let [key-enter? (= (.-key event) "Enter")
+         form-type (get-in db [::db/form-type])
+         username (get-in db [::db/username] "")
+         username-invalid? (nil? (utils/validate-email username))
+         password (str (get-in db [::db/password] ""))
+         password-invalid? (some true? (vals (utils/validate-password password)))
+         confirmation-code-empty? (blank? (get-in db [::db/confirmation-code]))]
+     (cond
+       (false? key-enter?) {}
+       (and (= form-type :login)
+            (not username-invalid?)
+            (not password-invalid?))
+       {:dispatch [::do-login]}
+       (and (= form-type :register)
+            (not username-invalid?)
+            (not password-invalid?))
+       {:dispatch [::do-register]}
+       (and (= form-type :confirm-password-reset)
+            (not password-invalid?)
+            (not confirmation-code-empty?))
+       {:dispatch [::confirm-reset-password]}
+       (and (= form-type :forgot-password)
+            (not username-invalid?))
+       {:dispatch [::reset-password]}
+       :else {}))))
