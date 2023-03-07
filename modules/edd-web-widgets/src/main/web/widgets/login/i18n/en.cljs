@@ -27,5 +27,5 @@
         :password-requirements {:upper-case "Password should contain at least one character in upper case"
                                 :lower-case "Password should contain at least one character in lower case"
                                 :number "Password should contain at leas one number"
-                                :length "Password should ne at least 8 characters long"}}})
+                                :length "Password should be at least 8 characters long"}}})
 

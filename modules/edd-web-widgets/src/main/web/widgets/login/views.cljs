@@ -17,8 +17,9 @@
             ["@mui/material/IconButton" :default IconButton]
             ["@mui/material/InputAdornment" :default InputAdornment]
             ["@mui/material/Link" :default Link]
-            ["@mui/material/Checkbox" :default Checkbox]
-            ["@mui/material/FormControlLabel" :default FormControlLabel]
+            ["@mui/material/Typography" :default Typography]
+            ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
+            ["@mui/icons-material/TaskAlt" :default TaskAlt]
             [reagent.core :as r]))
 
 (defn login-on-key-enter [event]
@@ -191,26 +192,30 @@
                  :fullWidth     true
                  :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}])
 
-(defn checkbox [label checked?]
-  [:> FormControlLabel {:label label
-                        :control (r/as-element
-                                  [:> Checkbox {:checked checked?
-                                                :color "success"}])}])
+(defn password-requirement [label checked?]
+  [:> Grid {:container true :spacing 1 :align-items "center"}
+   [:> Grid {:item true}
+    (if checked?
+      [:> TaskAlt {:color "success"}]
+      [:> ErrorOutline {:color "warning"}])]
+   [:> Grid {:item true :xs true}
+    [:> Typography {:variant "subtitle2"}
+     label]]])
 
 (defn password-checks []
   (let [{:keys [missing-upper-case?
                 missing-lower-case?
                 missing-number?
                 missing-length-8?]} @(rf/subscribe [::subs/password-invalid-explanation])]
-    [:> Grid {:container true}
+    [:> Grid {:container true :spacing 2}
      [:> Grid {:item true :xs 12}
-      (checkbox (tr :password-requirements :upper-case) (not missing-upper-case?))]
+      (password-requirement (tr :password-requirements :upper-case) (not missing-upper-case?))]
      [:> Grid {:item true :xs 12}
-      (checkbox (tr :password-requirements :lower-case) (not missing-lower-case?))]
+      (password-requirement (tr :password-requirements :lower-case) (not missing-lower-case?))]
      [:> Grid {:item true :xs 12}
-      (checkbox (tr :password-requirements :number) (not missing-number?))]
+      (password-requirement (tr :password-requirements :number) (not missing-number?))]
      [:> Grid {:item true :xs 12}
-      (checkbox (tr :password-requirements :length) (not missing-length-8?))]]))
+      (password-requirement (tr :password-requirements :length) (not missing-length-8?))]]))
 
 (defn login-dialog []
   (let [form-type @(rf/subscribe [::subs/form-type])
