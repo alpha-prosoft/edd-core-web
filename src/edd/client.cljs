@@ -37,7 +37,7 @@
     (str "https://" (name service) "." hosted-zone-name path)))
 
 (defn stage-for-realm [realm]
-  (let [client-routing (-> (get-config) :client-routing)
+  (let [client-routing (-> (get-config) :clientRouting)
         client-routing (update client-routing :default #(or % "prod"))]
     (if (some? realm)
       (or (-> client-routing :realms realm)
