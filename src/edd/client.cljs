@@ -1,14 +1,14 @@
 (ns edd.client
   (:require
-   [reagent.core :as r]
-   [re-frame.core :as rf]
-   [goog.object :as g]
-   [edd.events :as events]
-   [edd.json :as json]
-   [edd.db :as db]
-   [clojure.string :as string]
-   [re-frame.db :as re-frame-db]
-   [edd.client-utils :as utils]))
+    [reagent.core :as r]
+    [re-frame.core :as rf]
+    [goog.object :as g]
+    [edd.events :as events]
+    [edd.json :as json]
+    [edd.db :as db]
+    [clojure.string :as string]
+    [re-frame.db :as re-frame-db]
+    [edd.client-utils :as utils]))
 
 (deftype MockHeaders [headers]
   Object
@@ -59,8 +59,8 @@
   [req]
   (let [db @re-frame-db/app-db]
     (assoc req
-           :user
-           {:selected-role (get-in db [::db/user :selected-role])})))
+      :user
+      {:selected-role (get-in db [::db/user :selected-role])})))
 
 (defn make-headers
   []
@@ -100,20 +100,20 @@
 
 (defn resolve-calls-hooks [event-body]
   (doall
-   (mapv
-    (fn [it]
-      (let [{:keys [item result]} it
-            {:keys [on-success on-failure]} item]
-        (if (and
-             (some some? event-body)
-             result)
-          (do (when on-success
-                (rf/dispatch (vec (concat on-success [it]))))
-              true)
-          (do (when on-failure
-                (rf/dispatch (vec (concat on-failure [it]))))
-              false))))
-    event-body)))
+    (mapv
+      (fn [it]
+        (let [{:keys [item result]} it
+              {:keys [on-success on-failure]} item]
+          (if (and
+                (some some? event-body)
+                result)
+            (do (when on-success
+                  (rf/dispatch (vec (concat on-success [it]))))
+                true)
+            (do (when on-failure
+                  (rf/dispatch (vec (concat on-failure [it]))))
+                false))))
+      event-body)))
 
 (defn handle-invalid-jwt []
   (print "invalid token")
@@ -138,26 +138,35 @@
 
 (defn filter-results [values response-filter items bodies]
   (vec
-   (map-indexed
-    (fn [idx itm]
-      (cond
-        (= ":invalid" (get-in itm [:error :jwt])) (handle-invalid-jwt)
-        (= "Wrong version" (:error itm)) (handle-versioning-error (get values idx))
-        (contains? itm :error) (handle-error (get values idx) itm)
-        :else (-> (get values idx)
-                  (assoc :result (:result itm))
-                  (#(if response-filter
-                      (response-filter %)
-                      %))
-                  (assoc :item (get items idx))
-                  (dissoc :body))))
-    (js->clj bodies :keywordize-keys true))))
+    (map-indexed
+      (fn [idx itm]
+        (cond
+          (= ":invalid" (get-in itm [:error :jwt])) (handle-invalid-jwt)
+          (= "Wrong version" (:error itm)) (handle-versioning-error (get values idx))
+          (contains? itm :error) (handle-error (get values idx) itm)
+          :else (-> (get values idx)
+                    (assoc :result (:result itm))
+                    (#(if response-filter
+                        (response-filter %)
+                        %))
+                    (assoc :item (get items idx))
+                    (dissoc :body))))
+      (js->clj bodies :keywordize-keys true))))
 
 (defn calculate-default-timeout [total-attempts attempts-left]
   (let [attempt (- total-attempts attempts-left)]
     (* attempt attempt 3000)))
 
-(defn handle-response-and-return-succeed? [{:keys [body]} on-success on-failure]
+(defn handle-exception [{:keys [body status] :as r} attempt]
+  (let [event-body (map-response-body body)]
+    (if (and
+          (not (neg? attempt))
+          (or (< 499 status)
+              (contains? event-body :ecxeption)))
+      (throw (js/Error. r))
+      r)))
+
+(defn handle-response-and-return-succeed? [{:keys [body] :as r} on-success on-failure]
   (let [event-body (map-response-body body)]
     (if (some? (:result event-body))
       (do
@@ -227,32 +236,33 @@
   (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry
         mock-func (get-mock-func props post-for)
         uri (get-uri props post-for)
-        body-str (get-body-str props post-for)]
+        body-str (get-body-str props post-for)
+        attempt (dec retry-attempts)]
     (->
-     (js/Promise.resolve
-      (clj->js
-       (if (some? mock-func)
-         (mock-response mock-func props)
-         (fetch uri (post-params body-str)))))
-     (.then (fn [r] (-> (js/Promise.resolve r)
-                        (.then (fn [r] {:status   (.-status r)
-                                        :response r})))))
-     (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
-                        (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
-     (.then (fn [r] (handle-response-and-return-succeed? r on-success on-failure)))
-     (.catch (fn [e] (let [attempt (dec retry-attempts)
-                           timeout (or timeout
-                                       (calculate-default-timeout attempts attempt))]
-                       (if (neg? attempt)
-                         (do
-                           (rf/dispatch (conj on-failure (.toString e)))
-                           false)
-                         (do
-                           (when (some? on-retry)
-                             (rf/dispatch on-retry))
-                           (js/setTimeout
-                            (fn [] (do-post-with-retry post-for props attempt))
-                            timeout)))))))))
+      (js/Promise.resolve
+        (clj->js
+          (if (some? mock-func)
+            (mock-response mock-func props)
+            (fetch uri (post-params body-str)))))
+      (.then (fn [r] (-> (js/Promise.resolve r)
+                         (.then (fn [r] {:status   (.-status r)
+                                         :response r})))))
+      (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
+                         (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
+      (.then (fn [r] (handle-exception r attempt)))
+      (.then (fn [r] (handle-response-and-return-succeed? r on-success on-failure)))
+      (.catch (fn [e] (let [timeout (or timeout
+                                        (calculate-default-timeout attempts attempt))]
+                        (if (neg? attempt)
+                          (do
+                            (rf/dispatch (conj on-failure (.toString e)))
+                            false)
+                          (do
+                            (when (some? on-retry)
+                              (rf/dispatch on-retry))
+                            (js/setTimeout
+                              (fn [] (do-post-with-retry post-for props attempt))
+                              timeout)))))))))
 
 (defn do-post-for [post-for {:keys [retry] :as props}]
   (let [{:keys [attempts] :or {attempts 2}} retry]
@@ -263,31 +273,31 @@
     (:query data) (do-post-for :query data)
     (:commands data) (do-post-for :commands data)
     (:command data) (do-post-for :commands (assoc data
-                                                  :commands
-                                                  [(:command data)]))
+                                             :commands
+                                             [(:command data)]))
     :else nil))
 
 (rf/reg-event-fx
- ::save-success
- (fn [_ [_ on-success result]]
-   {:dispatch (conj on-success {:version-id (:version-id result)
-                                :id         (get-in result [:body :result :id])})}))
+  ::save-success
+  (fn [_ [_ on-success result]]
+    {:dispatch (conj on-success {:version-id (:version-id result)
+                                 :id         (get-in result [:body :result :id])})}))
 
 (rf/reg-event-fx
- ::save-failure
- (fn [_ [_ on-failure]]
-   (println on-failure)
-   {:dispatch [on-failure]}))
+  ::save-failure
+  (fn [_ [_ on-failure]]
+    (println on-failure)
+    {:dispatch [on-failure]}))
 
 (defn load-with-retry [uri
                        {:keys [on-success on-failure retry]
-                        :as props}
+                        :as   props}
                        retry-attempts]
   (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry]
 
     (-> (js/Promise.resolve
-         (clj->js
-          (fetch uri (get-params))))
+          (clj->js
+            (fetch uri (get-params))))
         (.then (fn [r] (.text r)))
         (.then (fn [result]
                  (rf/dispatch (vec (concat on-success [result])))))
@@ -300,8 +310,8 @@
                               (when (some? on-retry)
                                 (rf/dispatch on-retry))
                               (js/setTimeout
-                               (fn [] (load-with-retry uri props attempt))
-                               timeout)))))))))
+                                (fn [] (load-with-retry uri props attempt))
+                                timeout)))))))))
 
 (defn load [{:keys [ref service retry] :as props}]
   (let [uri (document-uri :glms-content-svc (str "/load/" (name service) "/" ref))
@@ -309,48 +319,48 @@
     (load-with-retry uri props attempts)))
 
 (rf/reg-fx
- :load
- (fn [{:keys [ref service on-success] :as props}]
-   (let [mock-func-name (str "mock.load." (name service))
-         mock-func (g/get js/window mock-func-name)]
-     (if (some? mock-func)
-       (rf/dispatch (vec (concat on-success [(mock-func ref)])))
-       (load props)))))
+  :load
+  (fn [{:keys [ref service on-success] :as props}]
+    (let [mock-func-name (str "mock.load." (name service))
+          mock-func (g/get js/window mock-func-name)]
+      (if (some? mock-func)
+        (rf/dispatch (vec (concat on-success [(mock-func ref)])))
+        (load props)))))
 
 (defn save-content-with-retry [uri
                                {:keys [data on-success on-failure retry]
-                                :as props}
+                                :as   props}
                                retry-attempts]
   (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry]
     (->
-     (js/Promise.resolve
-      (clj->js
-       (fetch uri (put-params data))))
-     (.then (fn [r] (-> (js/Promise.resolve r)
-                        (.then (fn [r] {:version-id (-> r
-                                                        (.-headers)
-                                                        (.get "versionid"))
-                                        :status   (.-status r)
-                                        :response r})))))
-     (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
-                        (.then (fn [body]
-                                 (let [{:keys [version-id]} r
-                                       body (js->clj body :keywordize-keys true)]
-                                   {:body (assoc-in body [:result :version-id] version-id)}))))))
-     (.then (fn [r] (handle-save-response-and-return-succeed? r on-success on-failure)))
-     (.catch (fn [e] (let [attempt (dec retry-attempts)
-                           timeout (or timeout
-                                       (calculate-default-timeout attempts attempt))]
-                       (if (neg? attempt)
-                         (do
-                           (rf/dispatch (conj on-failure (.toString e)))
-                           false)
-                         (do
-                           (when (some? on-retry)
-                             (rf/dispatch on-retry))
-                           (js/setTimeout
-                            (fn [] (save-content-with-retry uri props attempt))
-                            timeout)))))))))
+      (js/Promise.resolve
+        (clj->js
+          (fetch uri (put-params data))))
+      (.then (fn [r] (-> (js/Promise.resolve r)
+                         (.then (fn [r] {:version-id (-> r
+                                                         (.-headers)
+                                                         (.get "versionid"))
+                                         :status     (.-status r)
+                                         :response   r})))))
+      (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
+                         (.then (fn [body]
+                                  (let [{:keys [version-id]} r
+                                        body (js->clj body :keywordize-keys true)]
+                                    {:body (assoc-in body [:result :version-id] version-id)}))))))
+      (.then (fn [r] (handle-save-response-and-return-succeed? r on-success on-failure)))
+      (.catch (fn [e] (let [attempt (dec retry-attempts)
+                            timeout (or timeout
+                                        (calculate-default-timeout attempts attempt))]
+                        (if (neg? attempt)
+                          (do
+                            (rf/dispatch (conj on-failure (.toString e)))
+                            false)
+                          (do
+                            (when (some? on-retry)
+                              (rf/dispatch on-retry))
+                            (js/setTimeout
+                              (fn [] (save-content-with-retry uri props attempt))
+                              timeout)))))))))
 
 (defn save-content
   [{:keys [data service retry] :as props}]
@@ -368,10 +378,10 @@
   (let [values (utils/map-responses responses)]
     (if-not (utils/failed? values)
       (-> (js/Promise.all
-           (clj->js
-            (map
-             #(:body %)
-             values)))
+            (clj->js
+              (map
+                #(:body %)
+                values)))
           (.then (fn [bodies]
                    (let [event-body (filter-results values response-filter items bodies)
                          successes (resolve-calls-hooks event-body)]
@@ -388,7 +398,7 @@
         (.then (fn [items]
                  (let [with-failures (filter nil? items)
                        succeeded? (not
-                                   (seq with-failures))]
+                                    (seq with-failures))]
                    (cond
                      (and on-failure
                           (not succeeded?)) (rf/dispatch on-failure)
@@ -396,35 +406,22 @@
                           succeeded?) (rf/dispatch (-> on-success
                                                        (conj items)
                                                        vec))))))
-        (.catch #(rf/dispatch (vec (concat on-failure [%]))))
-
-      ;(js/Promise.all (clj->js requests))
-      ;  (.then #(handle-responses
-      ;           items
-      ;           %
-      ;           :on-success on-success
-      ;           :on-failure on-failure
-      ;           :response-filter (fn [%]
-      ;                              (assoc %
-      ;                                     :id
-      ;                                     (get-in % [:result :id])))))
-      ;  (.catch #(rf/dispatch (vec (concat on-failure [%]))))
-        )))
+        (.catch #(rf/dispatch (vec (concat on-failure [%])))))))
 
 (rf/reg-fx
- :save-n
- (fn [{:keys [items on-success on-failure]}]
-   (save-n items
-           :on-success on-success
-           :on-failure on-failure)))
+  :save-n
+  (fn [{:keys [items on-success on-failure]}]
+    (save-n items
+            :on-success on-success
+            :on-failure on-failure)))
 
 (rf/reg-fx
- :save
- (fn [{:keys [data service on-success on-failure]}]
-   (save-n [{:data    data
-             :service service}]
-           :on-success on-success
-           :on-failure on-failure)))
+  :save
+  (fn [{:keys [data service on-success on-failure]}]
+    (save-n [{:data    data
+              :service service}]
+            :on-success on-success
+            :on-failure on-failure)))
 
 (defn call-n
   [{:keys [items on-success on-failure]}]
@@ -454,36 +451,36 @@
 (defonce timeouts (r/atom {}))
 
 (rf/reg-fx
- :timeout
- (fn [{:keys [id event time]}]
-   (when-some [existing (get @timeouts id)]
-     (js/clearTimeout existing)
-     (swap! timeouts dissoc id))
-   (when (some? event)
-     (swap! timeouts assoc id
-            (js/setTimeout
-             (fn []
-               (comp
-                (swap! timeouts dissoc id)
-                (rf/dispatch event)))
-             time)))))
+  :timeout
+  (fn [{:keys [id event time]}]
+    (when-some [existing (get @timeouts id)]
+      (js/clearTimeout existing)
+      (swap! timeouts dissoc id))
+    (when (some? event)
+      (swap! timeouts assoc id
+             (js/setTimeout
+               (fn []
+                 (comp
+                   (swap! timeouts dissoc id)
+                   (rf/dispatch event)))
+               time)))))
 
 (rf/reg-fx
- :cancel-timeout
- (fn [{:keys [id]}]
-   (when-some [existing (get @timeouts id)]
-     (js/clearTimeout existing)
-     (swap! timeouts dissoc id))))
+  :cancel-timeout
+  (fn [{:keys [id]}]
+    (when-some [existing (get @timeouts id)]
+      (js/clearTimeout existing)
+      (swap! timeouts dissoc id))))
 
 (defn after-timeout [id event]
   (if
-   (get @timeouts id)
+    (get @timeouts id)
     (js/setTimeout
-     (fn [] (after-timeout id event))
-     100)
+      (fn [] (after-timeout id event))
+      100)
     (rf/dispatch event)))
 
 (rf/reg-fx
- :after-timeout
- (fn [{:keys [id event]}]
-   (after-timeout id event)))
+  :after-timeout
+  (fn [{:keys [id event]}]
+    (after-timeout id event)))
