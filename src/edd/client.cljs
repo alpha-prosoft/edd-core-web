@@ -133,7 +133,7 @@
   (cond
     (= ":invalid" (get-in response [:error :jwt])) (handle-invalid-jwt)
     (= "Wrong version" (:error response)) (handle-versioning-error response)
-    (contains? response :error) {:error (json/parse-custom-fields (:error response))}
+    (contains? response :error) (json/parse-custom-fields response)
     :else {:result (json/parse-custom-fields (:result response))}))
 
 (defn filter-results [values response-filter items bodies]
@@ -158,11 +158,12 @@
     (* attempt attempt 3000)))
 
 (defn handle-exception [{:keys [body status] :as r} attempt]
-  (let [event-body (map-response-body body)]
-    (if (and
-          (not (neg? attempt))
-          (or (< 499 status)
-              (contains? event-body :ecxeption)))
+  (let [event-body (map-response-body body)
+        throw-exception? (and
+                           (not (neg? attempt))
+                           (or (< 499 status)
+                               (contains? event-body :ecxeption)))]
+    (if throw-exception?
       (throw (js/Error. r))
       r)))
 
