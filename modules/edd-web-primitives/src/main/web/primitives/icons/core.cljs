@@ -11,6 +11,7 @@
    ["@mui/icons-material/Block" :default Block]
    ["@mui/icons-material/Business" :default Business]
    ["@mui/icons-material/CallMade" :default CallMade]
+   ["@mui/icons-material/Cached" :default Cached]
    ["@mui/icons-material/Chat" :default Chat]
    ["@mui/icons-material/ChatBubbleOutline" :default ChatBubbleOutline]
    ["@mui/icons-material/CheckCircleOutlineOutlined" :default CheckCircleOutlineOutlined]
@@ -143,6 +144,9 @@
 
 (defn CallMadeIcon [props]
   [:> CallMade props])
+
+(defn CachedIcon [props]
+  [:> Cached props])
 
 (defn DialpadIcon [props]
   [:> Dialpad props])
