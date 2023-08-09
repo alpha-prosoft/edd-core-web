@@ -20,7 +20,7 @@
      PublishIcon RefreshIcon RemoveIcon ReportProblemIcon SaveIcon SearchIcon SettingsIcon ShareIcon
      StarBorderIcon StarIcon SubdirectoryArrowRightIcon TuneIcon LogoutIcon UnfoldLessIcon
      UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
-     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon ManageSearchIcon]]))
+     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon ManageSearchIcon GetAppIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
@@ -197,3 +197,5 @@
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
 
 (defcard-rg :upload-icon "## Upload Icon" [UploadIcon])
+
+(defcard-rg :get-app-icon-icon "## GetApp Icon" [GetAppIcon])

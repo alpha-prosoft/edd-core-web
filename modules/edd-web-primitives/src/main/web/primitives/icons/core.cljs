@@ -79,6 +79,7 @@
    ["@mui/icons-material/Upload" :default Upload]
    ["@mui/icons-material/ManageSearch" :default ManageSearch]
    ["@mui/icons-material/Logout" :default Logout]
+   ["@mui/icons-material/GetApp" :default GetApp]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -313,6 +314,9 @@
 
 (defn ManageSearchIcon [props]
   [:> ManageSearch props])
+
+(defn GetAppIcon [props]
+  [:> GetApp props])
 
 (defn SettingsIcon [props]
   [:svg (handle-props props)
