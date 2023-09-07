@@ -161,6 +161,7 @@
   (let [event-body (map-response-body body)
         throw-exception? (and
                            (not (neg? attempt))
+                           (not (contains? event-body :error))
                            (or (< 499 status)
                                (contains? event-body :ecxeption)))]
     (if throw-exception?
