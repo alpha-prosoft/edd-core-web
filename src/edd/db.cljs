@@ -13,4 +13,5 @@
    ::translations            {}
    ::config                  {}
    ::routes                  {}
-   ::pages-init-events {}})
+   ::pages-init-events {}
+   ::record-call-failure-func nil})

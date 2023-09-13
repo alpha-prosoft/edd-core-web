@@ -32,6 +32,9 @@
 (defn get-config []
   (-> @re-frame-db/app-db ::db/config))
 
+(defn get-record-call-failure-func []
+  (-> @re-frame-db/app-db ::db/record-call-failure-func))
+
 (defn document-uri [service path]
   (let [hosted-zone-name (-> (get-config) :HostedZoneName)]
     (str "https://" (name service) "." hosted-zone-name path)))
@@ -239,7 +242,8 @@
         mock-func (get-mock-func props post-for)
         uri (get-uri props post-for)
         body-str (get-body-str props post-for)
-        attempt (dec retry-attempts)]
+        attempt (dec retry-attempts)
+        record-call-failure-func (get-record-call-failure-func)]
     (->
       (js/Promise.resolve
         (clj->js
@@ -257,6 +261,8 @@
                                         (calculate-default-timeout attempts attempt))]
                         (if (neg? attempt)
                           (do
+                            (when (some? record-call-failure-func)
+                              (record-call-failure-func (.toString e) body-str))
                             (rf/dispatch (conj on-failure (.toString e)))
                             false)
                           (do
