@@ -8,19 +8,20 @@
 
    [web.primitives.icons.core :refer
     [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon AdminPanelSettingsIcon
-     AllColapseIcon AllExpandIcon ArrowDownwardIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon
-     AssignmentIndIcon BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon
-     CheckCircleOutlineOutlinedIcon ChromeReaderModeIcon ClearIcon CloseIcon DeleteIcon DialpadIcon
-     DirectionsRunIcon EditIcon UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon
-     ExpandLessIcon ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon
-     ForwardIcon HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon KeyboardTabIcon
-     LaunchIcon LinkIcon LinkOffIcon LogoIcon HierarchyIcon MarkunreadMailboxIcon MenuIcon
-     MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon NoteOutlinedIcon NotificationsNoneIcon
-     PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon PlaylistAddCheckIcon PlaylistAddIcon
-     PublishIcon RefreshIcon RemoveIcon ReportProblemIcon SaveIcon SearchIcon SettingsIcon ShareIcon
-     StarBorderIcon StarIcon SubdirectoryArrowRightIcon TuneIcon LogoutIcon UnfoldLessIcon
-     UnfoldMoreIcon ChevronRightIcon TableChartIcon BlockIcon UpdateIcon DownloadIcon
-     ArrowDropDownCircleIcon ArrowDropDownIcon ArrowDropUpIcon ContentCopyIcon ManageSearchIcon GetAppIcon]]))
+     AllColapseIcon AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon ArrowDropDownIcon
+     ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
+     BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon
+     CheckCircleOutlineOutlinedIcon ChevronRightIcon ChromeReaderModeIcon ClearIcon CloseIcon
+     ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
+     UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon
+     ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon GetAppIcon
+     HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon KeyboardTabIcon LaunchIcon
+     LinkIcon LinkOffIcon LogoIcon HierarchyIcon ManageSearchIcon MarkunreadMailboxIcon MenuIcon
+     MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon NoteOutlinedIcon
+     NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon
+     PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
+     SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
+     TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
@@ -86,6 +87,8 @@
 
 (defcard-rg :download-icon "## Download Icon" [DownloadIcon])
 
+(defcard-rg :do-not-touch-icon "## DoNotTouch Icon" [DoNotTouchIcon])
+
 (defcard-rg :edit-icon "## Edit Icon" [EditIcon])
 
 (defcard-rg :emoji-people-icon "## Emoji People Icon" [EmojiPeopleIcon])
@@ -107,6 +110,8 @@
 (defcard-rg :format-align-left-outlined-icon "## Format Align Left Outlined Icon" [FormatAlignLeftOutlinedIcon])
 
 (defcard-rg :forward-icon "## Forward Icon" [ForwardIcon])
+
+(defcard-rg :get-app-icon-icon "## GetApp Icon" [GetAppIcon])
 
 (defcard-rg :help-outline-icon "## Help Outline Icon" [HelpOutlineIcon])
 
@@ -197,5 +202,3 @@
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
 
 (defcard-rg :upload-icon "## Upload Icon" [UploadIcon])
-
-(defcard-rg :get-app-icon-icon "## GetApp Icon" [GetAppIcon])

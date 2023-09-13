@@ -6,6 +6,9 @@
    ["@mui/icons-material/Add" :default Add]
    ["@mui/icons-material/AdminPanelSettings" :default AdminPanelSettings]
    ["@mui/icons-material/ArrowDownward" :default ArrowDownward]
+   ["@mui/icons-material/ArrowDropDown" :default ArrowDropDown]
+   ["@mui/icons-material/ArrowDropDownCircle" :default ArrowDropDownCircle]
+   ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
    ["@mui/icons-material/ArrowUpward" :default ArrowUpward]
    ["@mui/icons-material/AssignmentInd" :default AssignmentInd]
    ["@mui/icons-material/Block" :default Block]
@@ -18,9 +21,12 @@
    ["@mui/icons-material/ChromeReaderMode" :default ChromeReaderMode]
    ["@mui/icons-material/Clear" :default Clear]
    ["@mui/icons-material/Close" :default Close]
+   ["@mui/icons-material/ContentCopy" :default ContentCopy]
    ["@mui/icons-material/Delete" :default Delete]
    ["@mui/icons-material/Dialpad" :default Dialpad]
    ["@mui/icons-material/DirectionsRun" :default DirectionsRun]
+   ["@mui/icons-material/DoNotTouch" :default DoNotTouch]
+   ["@mui/icons-material/Download" :default Download]
    ["@mui/icons-material/Edit" :default Edit]
    ["@mui/icons-material/EmojiPeople" :default EmojiPeople]
    ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
@@ -32,6 +38,7 @@
    ["@mui/icons-material/FindInPage" :default FindInPage]
    ["@mui/icons-material/FormatAlignLeftOutlined" :default FormatAlignLeftOutlined]
    ["@mui/icons-material/Forward" :default Forward]
+   ["@mui/icons-material/GetApp" :default GetApp]
    ["@mui/icons-material/HelpOutline" :default HelpOutline]
    ["@mui/icons-material/Home" :default Home]
    ["@mui/icons-material/HomeOutlined" :default HomeOutlined]
@@ -41,6 +48,8 @@
    ["@mui/icons-material/Launch" :default Launch]
    ["@mui/icons-material/Link" :default Link]
    ["@mui/icons-material/LinkOff" :default LinkOff]
+   ["@mui/icons-material/Logout" :default Logout]
+   ["@mui/icons-material/ManageSearch" :default ManageSearch]
    ["@mui/icons-material/MarkunreadMailbox" :default MarkunreadMailbox]
    ["@mui/icons-material/Menu" :default Menu]
    ["@mui/icons-material/MonetizationOn" :default MonetizationOn]
@@ -71,20 +80,15 @@
    ["@mui/icons-material/ChevronRight" :default ChevronRight]
    ["@mui/icons-material/TableChart" :default TableChart]
    ["@mui/icons-material/Update" :default Update]
-   ["@mui/icons-material/Download" :default Download]
-   ["@mui/icons-material/ArrowDropDown" :default ArrowDropDown]
-   ["@mui/icons-material/ArrowDropDownCircle" :default ArrowDropDownCircle]
-   ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
-   ["@mui/icons-material/ContentCopy" :default ContentCopy]
    ["@mui/icons-material/Upload" :default Upload]
-   ["@mui/icons-material/ManageSearch" :default ManageSearch]
-   ["@mui/icons-material/Logout" :default Logout]
-   ["@mui/icons-material/GetApp" :default GetApp]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
 (defn AddIcon [props]
   [:> Add props])
+
+(defn DoNotTouchIcon [props]
+  [:> DoNotTouch props])
 
 (defn SaveIcon [props]
   [:> Save props])
