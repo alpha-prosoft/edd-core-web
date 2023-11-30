@@ -13,6 +13,7 @@
    ["@mui/icons-material/AssignmentInd" :default AssignmentInd]
    ["@mui/icons-material/Block" :default Block]
    ["@mui/icons-material/Business" :default Business]
+   ["@mui/icons-material/Calculate" :default Calculate]
    ["@mui/icons-material/CallMade" :default CallMade]
    ["@mui/icons-material/Cached" :default Cached]
    ["@mui/icons-material/Chat" :default Chat]
@@ -95,6 +96,9 @@
 
 (defn DeleteIcon [props]
   [:> Delete props])
+
+(defn CalculateIcon [props]
+  [:> Calculate props])
 
 (defn ClearIcon [props]
   [:> Clear props])

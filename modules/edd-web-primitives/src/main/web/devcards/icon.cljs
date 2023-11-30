@@ -7,10 +7,10 @@
    [web.devcards.utils :refer [apply-stiles]]
 
    [web.primitives.icons.core :refer
-    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon AdminPanelSettingsIcon
+    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon  AdminPanelSettingsIcon
      AllColapseIcon AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon ArrowDropDownIcon
      ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
-     BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon
+     BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon CalculateIcon
      CheckCircleOutlineOutlinedIcon ChevronRightIcon ChromeReaderModeIcon ClearIcon CloseIcon
      ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
      UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon
@@ -59,6 +59,8 @@
 (defcard-rg :business-icon "## Business Icon" [BusinessIcon])
 
 (defcard-rg :call-made-icon "## Cached Icon" [CachedIcon])
+
+(defcard-rg :calculate-icon "## Calculate Icon" [CalculateIcon])
 
 (defcard-rg :call-made-icon "## Call Made Icon" [CallMadeIcon])
 
