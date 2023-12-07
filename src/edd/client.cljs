@@ -242,46 +242,50 @@
                          :commands       commands})]
     (clj->js (json/encode-custom-fields (add-user ref)))))
 
-(defn do-post-with-retry [post-for {:keys [on-success on-failure retry] :as props} retry-attempts]
-  (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry
-        mock-func (get-mock-func props post-for)
-        uri (get-uri props post-for)
-        body-str (get-body-str props post-for)
-        attempt (dec retry-attempts)
-        record-call-failure-func (get-record-call-failure-func)
-        record-call-func (get-record-call-func)
-        start-time (system-time)]
-    (->
-     (js/Promise.resolve
-      (clj->js
-       (if (some? mock-func)
-         (mock-response mock-func props)
-         (fetch uri (post-params body-str)))))
-     (.then (fn [r] (-> (js/Promise.resolve r)
-                        (.then (fn [r] {:status   (.-status r)
-                                        :response r})))))
-     (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
-                        (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
-     (.then (fn [r] (do
-                      (when (some? record-call-func)
-                        (record-call-func {:took (.toFixed (- (system-time) start-time) timeout-rounding)
-                                           :request body-str}))
-                      (handle-exception r attempt))))
-     (.then (fn [r] (handle-response-and-return-succeed? r on-success on-failure)))
-     (.catch (fn [e] (let [timeout (or timeout
-                                       (calculate-default-timeout attempts attempt))]
-                       (if (neg? attempt)
-                         (do
-                           (when (some? record-call-failure-func)
-                             (record-call-failure-func (.toString e) body-str))
-                           (rf/dispatch (conj on-failure (.toString e)))
-                           false)
-                         (do
-                           (when (some? on-retry)
-                             (rf/dispatch on-retry))
-                           (js/setTimeout
-                            (fn [] (do-post-with-retry post-for props attempt))
-                            timeout)))))))))
+(defn do-post-with-retry
+  ([post-for props retry-attempts]
+   (let [body-str (get-body-str props post-for)]
+     (do-post-with-retry post-for props retry-attempts body-str)))
+
+  ([post-for {:keys [on-success on-failure retry] :as props} retry-attempts body-str]
+   (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry
+         mock-func (get-mock-func props post-for)
+         uri (get-uri props post-for)
+         attempt (dec retry-attempts)
+         record-call-failure-func (get-record-call-failure-func)
+         record-call-func (get-record-call-func)
+         start-time (system-time)]
+     (->
+      (js/Promise.resolve
+       (clj->js
+        (if (some? mock-func)
+          (mock-response mock-func props)
+          (fetch uri (post-params body-str)))))
+      (.then (fn [r] (-> (js/Promise.resolve r)
+                         (.then (fn [r] {:status   (.-status r)
+                                         :response r})))))
+      (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
+                         (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
+      (.then (fn [r] (do
+                       (when (some? record-call-func)
+                         (record-call-func {:took    (.toFixed (- (system-time) start-time) timeout-rounding)
+                                            :request body-str}))
+                       (handle-exception r attempt))))
+      (.then (fn [r] (handle-response-and-return-succeed? r on-success on-failure)))
+      (.catch (fn [e] (let [timeout (or timeout
+                                        (calculate-default-timeout attempts attempt))]
+                        (if (neg? attempt)
+                          (do
+                            (when (some? record-call-failure-func)
+                              (record-call-failure-func (.toString e) body-str))
+                            (rf/dispatch (conj on-failure (.toString e)))
+                            false)
+                          (do
+                            (when (some? on-retry)
+                              (rf/dispatch on-retry))
+                            (js/setTimeout
+                             (fn [] (do-post-with-retry post-for props attempt body-str))
+                             timeout))))))))))
 
 (defn do-post-for [post-for {:keys [retry] :as props}]
   (let [{:keys [attempts] :or {attempts 2}} retry]
