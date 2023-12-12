@@ -1,14 +1,14 @@
 (ns edd.client
   (:require
-    [reagent.core :as r]
-    [re-frame.core :as rf]
-    [goog.object :as g]
-    [edd.events :as events]
-    [edd.json :as json]
-    [edd.db :as db]
-    [clojure.string :as string]
-    [re-frame.db :as re-frame-db]
-    [edd.client-utils :as utils]))
+   [reagent.core :as r]
+   [re-frame.core :as rf]
+   [goog.object :as g]
+   [edd.events :as events]
+   [edd.json :as json]
+   [edd.db :as db]
+   [clojure.string :as string]
+   [re-frame.db :as re-frame-db]
+   [edd.client-utils :as utils]))
 
 (def timeout-rounding 0)
 
@@ -268,8 +268,12 @@
                          (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
       (.then (fn [r] (do
                        (when (some? record-call-func)
-                         (record-call-func {:took    (.toFixed (- (system-time) start-time) timeout-rounding)
-                                            :request body-str}))
+                         (record-call-func
+                          (name post-for)
+                          {:took     (.toFixed (- (system-time) start-time) timeout-rounding)
+                           :request  body-str
+                           :response (select-keys (:body r)
+                                                  [:invocation-id :request-id :interaction-id])}))
                        (handle-exception r attempt))))
       (.then (fn [r] (handle-response-and-return-succeed? r on-success on-failure)))
       (.catch (fn [e] (let [timeout (or timeout
@@ -326,9 +330,11 @@
         (.then (fn [result]
                  (do
                    (when (some? record-call-func)
-                     (record-call-func {:uri uri
-                                        :took (.toFixed (- (system-time) start-time) timeout-rounding)
-                                        :function "load"}))
+                     (record-call-func
+                      "load"
+                      {:uri      uri
+                       :took     (.toFixed (- (system-time) start-time) timeout-rounding)
+                       :function "load"}))
                    (rf/dispatch (vec (concat on-success [result]))))))
         (.catch (fn [e] (let [attempt (dec retry-attempts)
                               timeout (or timeout
@@ -381,9 +387,11 @@
      (.then (fn [r]
               (do
                 (when (some? record-call-func)
-                  (record-call-func {:uri uri
-                                     :took (.toFixed (- (system-time) start-time) timeout-rounding)
-                                     :function "save-content"}))
+                  (record-call-func
+                   "save"
+                   {:uri      uri
+                    :took     (.toFixed (- (system-time) start-time) timeout-rounding)
+                    :function "save-content"}))
                 (handle-save-response-and-return-succeed? r on-success on-failure))))
      (.catch (fn [e] (let [attempt (dec retry-attempts)
                            timeout (or timeout
