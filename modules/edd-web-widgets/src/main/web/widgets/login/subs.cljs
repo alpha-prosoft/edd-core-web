@@ -33,15 +33,12 @@
    (::db/form-type db)))
 
 (rf/reg-sub
- ::user-name
- (fn [db]
-   (let [user (get-in db [::edd-db/user])
-         decoded (b64/decodeString
-                  (second
-                   (clojure.string/split (:id-token user) #"\.")))]
-     (when
-      (some? user) (-> (utils/json-parser false true decoded)
-                       (:email))))))
+  ::user-name
+  (fn [db]
+    (let [user (get-in db [::edd-db/user])]
+      (when
+        (some? user)
+        (utils/decode-user-name (:id-token user))))))
 
 (rf/reg-sub
  ::user

@@ -26,3 +26,11 @@
    :missing-lower-case? (nil? (re-seq #"[a-z]" password))
    :missing-number?     (nil? (re-seq #"[0-9]" password))
    :missing-length-8?   (< (count password) 8)})
+
+(defn decode-user-name [id-token]
+  (let [decoded (b64/decodeString
+                  (second
+                    (clojure.string/split id-token #"\.")))]
+    (when (some? id-token)
+      (-> (json-parser false true decoded)
+          (:email)))))
