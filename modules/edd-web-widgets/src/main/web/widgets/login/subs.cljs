@@ -4,7 +4,6 @@
    [web.widgets.login.db :as db]
    [re-frame.core :as rf]
    [clojure.string :refer [blank?]]
-   [goog.crypt.base64 :as b64]
    [web.widgets.login.utils :as utils]))
 
 (rf/reg-sub

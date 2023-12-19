@@ -2,6 +2,7 @@
   (:require
    [clojure.walk :refer [postwalk]]
    [ajax.json :as ajax-json]
+   [goog.crypt.base64 :as b64]
    [clojure.string :as str]))
 
 (defn parse-fields [e]
