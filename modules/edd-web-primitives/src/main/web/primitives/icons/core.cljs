@@ -82,6 +82,10 @@
    ["@mui/icons-material/TableChart" :default TableChart]
    ["@mui/icons-material/Update" :default Update]
    ["@mui/icons-material/Upload" :default Upload]
+   ["@mui/icons-material/Summarize" :default Summarize]
+   ["@mui/icons-material/Troubleshoot" :default Troubleshoot]
+   ["@mui/icons-material/Insights" :default Insights]
+   ["@mui/icons-material/Handyman" :default Handyman]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -333,6 +337,18 @@
            :id        "settings"
            :fill      "#2B2D33"
            :fill-rule "nonzero"}]])
+
+(defn SummarizeIcon [props]
+  [:> Summarize props])
+
+(defn TroubleshootIcon [props]
+  [:> Troubleshoot props])
+
+(defn InsightsIcon [props]
+  [:> Insights props])
+
+(defn HandymanIcon [props]
+  [:> Handyman props])
 
 (defn EditIcon [props]
   [:> Edit props])

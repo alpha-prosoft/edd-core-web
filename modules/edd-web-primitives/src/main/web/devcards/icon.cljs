@@ -21,7 +21,8 @@
      NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon
      PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
-     TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon]]))
+     TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon
+     SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
@@ -204,3 +205,11 @@
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
 
 (defcard-rg :upload-icon "## Upload Icon" [UploadIcon])
+
+(defcard-rg :summarize-icon "## Summarize Icon" [SummarizeIcon])
+
+(defcard-rg :troubleshoot-icon "## Troubleshoot Icon" [TroubleshootIcon])
+
+(defcard-rg :insights-icon "## Insights Icon" [InsightsIcon])
+
+(defcard-rg :handyman-icon "## HandymanIcon" [HandymanIcon])
