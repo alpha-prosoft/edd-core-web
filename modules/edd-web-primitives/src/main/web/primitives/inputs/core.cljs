@@ -171,11 +171,12 @@
    (:label props)])
 
 (defn RawDatePicker
-  [{:keys [id value label required error helper-text
+  [{:keys [id value label required error helper-text variant
            set-touched set-focused invalid? invalid-date-message
            minDate maxDate min-date max-date]
     :or   {id                   ::date-picker
            required             false
+           variant "standard"
            set-touched          (fn [] (print "set-touched"))
            invalid-date-message "Invalid date"}
     :as   props}]
@@ -187,28 +188,28 @@
      [:> DesktopDatePicker
       (merge
        props
-       {:input-format           "dd.MM.yyyy"
+       {:format           "dd.MM.yyyy"
         :allowSameDateSelection true
-        :mask                   "__.__.____"
         :label                  label
+        :mask                   "__.__.____"
         :clearable              true
         :clear-text             "Clear"
-        :value                  value
+        :value (if (and (not invalid?)
+                        (string/blank? value))
+                 nil
+                 (js/Date.parse value))
         :minDate                (js/Date.parse component-min-date)
         :maxDate                (js/Date.parse component-max-date)
-        :renderInput            (fn [p]
-                                  (r/as-element
-                                   [RawTextField
-                                    (merge
-                                     (utils/jsx->clj p)
-                                     {:helper-text helper-text
-                                      :id          id
-                                      :required    required
-                                      :error       error
-                                      :on-blur     #(comp (set-touched) (set-focused false))}
-                                     (when invalid?
-                                       {:error       true
-                                        :helper-text invalid-date-message}))]))
+        :error       error
+        :slotProps {:textField
+                    (merge
+                     {:id          id
+                      :helper-text helper-text
+                      :variant     variant
+                      :required    required
+                      :on-blur              #(comp (set-touched) (set-focused false))}
+                     (when invalid?
+                       {:helper-text invalid-date-message}))}
         :on-close               #(comp (set-touched) (set-focused false))
         :on-change              #(utils/handle-date-picker-date-change
                                   (merge

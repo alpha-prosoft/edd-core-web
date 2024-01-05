@@ -125,7 +125,7 @@
    (not focused?)
    (or
     date-input-invalid?
-    (and required (nil? value)))))
+    (and required (str/blank? value)))))
 
 (defn clean-switch-props [props]
   (->

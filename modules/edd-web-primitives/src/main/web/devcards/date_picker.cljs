@@ -15,6 +15,7 @@
   (fn [data-atom _]
     (apply-stiles
      [EddDatePicker {:id                   (str ::date-picker)
+                     :label "Date picker"
                      :value                (:value @data-atom)
                      :invalid-date-message "Date is invalid"
                      :on-invalid-hook #(print "invalid date: " %)
