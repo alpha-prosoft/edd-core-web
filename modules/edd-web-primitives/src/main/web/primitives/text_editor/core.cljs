@@ -1,6 +1,6 @@
 (ns web.primitives.text-editor.core
   (:require
-   ["suneditor-react/dist/SunEditor" :default SunEditor]
+   ["suneditor-react/dist" :default SunEditor]
    ["@mui/material/index" :refer [Grid Button IconButton]]
    [re-frame.core :as rf]
    [reagent.core :as r]
