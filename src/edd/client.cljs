@@ -40,6 +40,9 @@
 (defn get-record-call-func []
   (-> @re-frame-db/app-db ::db/record-call-func))
 
+(defn get-handle-expired-jwt-func []
+  (-> @re-frame-db/app-db ::db/on-expired-jwt-func))
+
 (defn document-uri [service path]
   (let [hosted-zone-name (-> (get-config) :HostedZoneName)]
     (str "https://" (name service) "." hosted-zone-name path)))
@@ -126,6 +129,9 @@
 (defn handle-invalid-jwt []
   (print "invalid token")
   (rf/dispatch [::events/remove-user]))
+
+(defn jwt-expired? [{:keys [status]}]
+  (= status 401))
 
 (defn handle-versioning-error [call]
   (-> call
@@ -266,6 +272,14 @@
                                          :response r})))))
       (.then (fn [r] (-> (js/Promise.resolve (-> r :response .json))
                          (.then (fn [body] (merge r {:body (js->clj body :keywordize-keys true)}))))))
+      (.then (fn [r] (let [expired? (jwt-expired? r)
+                           handle-expired-jwt-func (get-handle-expired-jwt-func)]
+                       (if (and expired?
+                                (some? handle-expired-jwt-func))
+                         (do
+                           (handle-expired-jwt-func)
+                           (do-post-with-retry post-for props (inc attempt) body-str))
+                         r))))
       (.then (fn [r] (do
                        (when (some? record-call-func)
                          (record-call-func

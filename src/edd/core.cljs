@@ -88,7 +88,10 @@
                                                        :config
                                                        :routes
                                                        :pages-init-events
-                                                       :translations])])
+                                                       :translations
+                                                       :record-call-failure-func
+                                                       :record-call-func
+                                                       :on-expired-jwt-func])])
     (doseq [widget-init (:widgets ctx [])]
       (apply widget-init [ctx]))
     (mount-root ctx)))

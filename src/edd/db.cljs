@@ -1,17 +1,19 @@
 (ns edd.db)
 
 (def default-db
-  {::user                    nil
-   ::active-panel            :home
-   ::drawer                  false
-   ::ready                   true
-   ::selected-language       :en
-   ::show-language-switcher? true
-   ::menu-items              {}
-   ::menu-expanded           {}
-   ::languages               {}
-   ::translations            {}
-   ::config                  {}
-   ::routes                  {}
-   ::pages-init-events {}
-   ::record-call-failure-func nil})
+  {::user                     nil
+   ::active-panel             :home
+   ::drawer                   false
+   ::ready                    true
+   ::selected-language        :en
+   ::show-language-switcher?  true
+   ::menu-items               {}
+   ::menu-expanded            {}
+   ::languages                {}
+   ::translations             {}
+   ::config                   {}
+   ::routes                   {}
+   ::pages-init-events        {}
+   ::record-call-failure-func nil
+   ::record-call-func         nil
+   ::on-expired-jwt-func      nil})

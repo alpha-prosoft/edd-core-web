@@ -18,7 +18,10 @@
                               show-language-switcher?
                               config routes
                               pages-init-events
-                              translations]
+                              translations
+                              record-call-failure-func
+                              record-call-func
+                              on-expired-jwt-func]
                        :or   {selected-language       :en
                               show-language-switcher? false}}]]
 
@@ -29,7 +32,10 @@
             (assoc ::db/config config)
             (assoc ::db/pages-init-events pages-init-events)
             (assoc ::db/routes routes)
-            (assoc ::db/translations translations))}))
+            (assoc ::db/translations translations)
+            (assoc ::db/record-call-failure-func record-call-failure-func)
+            (assoc ::db/record-call-func record-call-func)
+            (assoc ::db/on-expired-jwt-func on-expired-jwt-func))}))
 
 
 
