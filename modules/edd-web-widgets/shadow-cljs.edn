@@ -4,19 +4,36 @@
                      :output-dir "resources/public/js"
                      :asset-path "/js"
                      :modules    {:main {:entries [web.devcards.start-ui]}}
-                     :js-options {:entry-keys ["module" "browser" "main"]}
+                     :js-options
+                     {:resolve
+                      {"devcards-marked"
+                       {:target :npm :require "marked"}
+
+                       "devcards-syntax-highlighter"
+                       {:target :npm :require "highlight.js/lib/core"}
+
+                       "highlight.js"
+                       {:target :npm :require "highlight.js/lib/core"}}
+
+                      :entry-keys
+                      ["module" "browser" "main"]}
                      :compiler-options
-                                 {:infer-externs    :auto
-                                  :closure-warnings {:global-this :off}
-                                  :closure-defines  {"re_frame.trace.trace_enabled_QMARK_"        true
-                                                     "day8.re_frame.tracing.trace_enabled_QMARK_" true}}
-                     :devtools   {:infer-externs    :auto
-                                  :http-port        3001
-                                  :http-root        "resources/public"
-                                  :http-handler     shadow.http.push-state/handle
-                                  :push-state/index "index.html"
-                                  :preloads   [devtools.preload day8.re-frame-10x.preload]
-                                  :after-load       web.devcards.start-ui/init}
+                     {:infer-externs    :auto
+                      :closure-warnings {:global-this :off}
+
+                      :closure-defines
+                      {"re_frame.trace.trace_enabled_QMARK_"        true
+                       "day8.re_frame.tracing.trace_enabled_QMARK_" true}}
+
+                     :devtools
+                     {:infer-externs    :auto
+                      :http-port        3009
+                      :http-root        "resources/public"
+                      :http-handler     shadow.http.push-state/handle
+                      :push-state/index "index.html"
+                      :preloads   [devtools.preload day8.re-frame-10x.preload]
+                      :after-load       web.devcards.start-ui/init}
+
                      :dev        {:compiler-options {:devcards true}}
                      :release    {:compiler-options {:devcards true
                                                      :infer-externs :auto

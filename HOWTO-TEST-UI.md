@@ -197,7 +197,7 @@ catalog and for QA.
               :contained} "button"])
 ```
 
-2) You need to **require** your namespace in **start_ui.cljs***
+2) You need to **require** your namespace in **start-ui.cljs***
 
 ```clojurescript
 (ns glmsweb.start-ui
