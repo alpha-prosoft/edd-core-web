@@ -12,7 +12,7 @@
      ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
      BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon CalculateIcon
      CheckCircleOutlineOutlinedIcon ChevronRightIcon ChromeReaderModeIcon ClearIcon CloseIcon
-     ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
+     ContentCopyIcon DataThresholdingIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
      UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon
      ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon GetAppIcon
      HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon KeyboardTabIcon LaunchIcon
@@ -81,6 +81,8 @@
 (defcard-rg :close-icon "## Close Icon" [CloseIcon])
 
 (defcard-rg :content-copy-icon "## Content Copy Icon" [ContentCopyIcon])
+
+(defcard-rg :data-threshold-icon "## Data Threshold Icon" [DataThresholdingIcon])
 
 (defcard-rg :delete-icon "## Delete Icon" [DeleteIcon])
 

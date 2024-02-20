@@ -23,6 +23,7 @@
    ["@mui/icons-material/Clear" :default Clear]
    ["@mui/icons-material/Close" :default Close]
    ["@mui/icons-material/ContentCopy" :default ContentCopy]
+   ["@mui/icons-material/DataThresholding" :default DataThresholding]
    ["@mui/icons-material/Delete" :default Delete]
    ["@mui/icons-material/Dialpad" :default Dialpad]
    ["@mui/icons-material/DirectionsRun" :default DirectionsRun]
@@ -160,6 +161,9 @@
 
 (defn CachedIcon [props]
   [:> Cached props])
+
+(defn DataThresholdingIcon [props]
+  [:> DataThresholding props])
 
 (defn DialpadIcon [props]
   [:> Dialpad props])
