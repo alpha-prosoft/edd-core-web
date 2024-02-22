@@ -23,7 +23,6 @@
    ["@mui/icons-material/Clear" :default Clear]
    ["@mui/icons-material/Close" :default Close]
    ["@mui/icons-material/ContentCopy" :default ContentCopy]
-   ["@mui/icons-material/DataThresholding" :default DataThresholding]
    ["@mui/icons-material/Delete" :default Delete]
    ["@mui/icons-material/Dialpad" :default Dialpad]
    ["@mui/icons-material/DirectionsRun" :default DirectionsRun]
@@ -67,6 +66,7 @@
    ["@mui/icons-material/PlaylistAdd" :default PlaylistAdd]
    ["@mui/icons-material/PlaylistAddCheck" :default PlaylistAddCheck]
    ["@mui/icons-material/Publish" :default Publish]
+   ["@mui/icons-material/QueryStats" :default QueryStats]
    ["@mui/icons-material/Refresh" :default Refresh]
    ["@mui/icons-material/Remove" :default Remove]
    ["@mui/icons-material/ReportProblemOutlined" :default ReportProblemOutlined]
@@ -161,9 +161,6 @@
 
 (defn CachedIcon [props]
   [:> Cached props])
-
-(defn DataThresholdingIcon [props]
-  [:> DataThresholding props])
 
 (defn DialpadIcon [props]
   [:> Dialpad props])
@@ -263,6 +260,9 @@
 
 (defn PublishIcon [props]
   [:> Publish props])
+
+(defn QueryStatsIcon [props]
+  [:> QueryStats props])
 
 (defn HomeIcon [props]
   [:> Home props])

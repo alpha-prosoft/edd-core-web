@@ -12,12 +12,12 @@
      ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
      BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon CalculateIcon
      CheckCircleOutlineOutlinedIcon ChevronRightIcon ChromeReaderModeIcon ClearIcon CloseIcon
-     ContentCopyIcon DataThresholdingIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
+     ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
      UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon
      ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon GetAppIcon
      HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon KeyboardTabIcon LaunchIcon
      LinkIcon LinkOffIcon LogoIcon HierarchyIcon ManageSearchIcon MarkunreadMailboxIcon MenuIcon
-     MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon NoteOutlinedIcon
+     MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon NoteOutlinedIcon QueryStatsIcon
      NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon
      PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
@@ -81,8 +81,6 @@
 (defcard-rg :close-icon "## Close Icon" [CloseIcon])
 
 (defcard-rg :content-copy-icon "## Content Copy Icon" [ContentCopyIcon])
-
-(defcard-rg :data-threshold-icon "## Data Threshold Icon" [DataThresholdingIcon])
 
 (defcard-rg :delete-icon "## Delete Icon" [DeleteIcon])
 
@@ -175,6 +173,8 @@
 (defcard-rg :playlist-add-check-icon "## Playlist Add Check Icon" [PlaylistAddCheckIcon])
 
 (defcard-rg :publish-icon "## Publish Icon" [PublishIcon])
+
+(defcard-rg :query-stats-icon "## QueryStats Icon" [QueryStatsIcon])
 
 (defcard-rg :refresh-icon "## Refresh Icon" [RefreshIcon])
 
