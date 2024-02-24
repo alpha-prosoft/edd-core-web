@@ -55,7 +55,6 @@
                          :on-drag-over (.. (get-root-props) -onDragOver)
                          :on-drag-leave (.. (get-root-props) -onDragLeave)
                          :on-drop (.. (get-root-props) -onDrop)}
-             _ (.log js/console (get-input-props))
              input-props {:id (str key "-field")
                           :ref (.. (get-input-props) -ref)
                           :accept (.. (get-input-props) -accept)

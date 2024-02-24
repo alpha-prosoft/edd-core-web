@@ -202,38 +202,39 @@
         (js->clj :keywordize-keys true))))
 
 (defn amplify-refresh-credentials
-  []
-  (let [config (get-config)
-        refresh-token (:refresh-token (auth))]
+  ([{:keys [do-post-with-retry post-for attempt body-str] :as interrupted-call}]
+   (let [config (get-config)
+         refresh-token (:refresh-token (auth))]
 
-    (if refresh-token
-      (-> (.fetch js/window (str "https://" (:domain config) "/oauth2/token")
-                  (clj->js {:method  "POST"
-                            :headers {"Content-Type" "application/x-www-form-urlencoded"}
-                            :body    (str
-                                      "grant_type=refresh_token&"
-                                      "client_id=" (:user-pool-web-client-id config) "&"
-                                      "refresh_token=" refresh-token)}))
-          (.then (fn [%]
-                   (let [status (.-status %)]
-                     (if (> status 299)
-                       (-> (.text %)
-                           (.then (fn []
-                                    (doall
-                                     (-> js/window
-                                         (.-localStorage)
-                                         (.setItem "auth" "{}"))
-                                     (rf/dispatch [::events/open-dialog :login])))))
-                       (.json %)))))
-          (.then (fn [%]
-                   (let [response (-> %
-                                      (js->clj :keywordize-keys true)
-                                      (:id_token))
-                         auth {:id-token response}
-                         interrupted-event (get @re-frame-db/app-db ::db/interrupted-event)]
-                     (when interrupted-event
-                       (rf/dispatch [::events/login-succeeded auth]))))))
-      (rf/dispatch [::events/open-dialog :login]))))
+     (if refresh-token
+       (-> (.fetch js/window (str "https://" (:domain config) "/oauth2/token")
+                   (clj->js {:method  "POST"
+                             :headers {"Content-Type" "application/x-www-form-urlencoded"}
+                             :body    (str
+                                       "grant_type=refresh_token&"
+                                       "client_id=" (:user-pool-web-client-id config) "&"
+                                       "refresh_token=" refresh-token)}))
+           (.then (fn [%]
+                    (let [status (.-status %)]
+                      (if (> status 299)
+                        (-> (.text %)
+                            (.then (fn []
+                                     (doall
+                                      (-> js/window
+                                          (.-localStorage)
+                                          (.setItem "auth" "{}"))
+                                      (rf/dispatch [::events/open-dialog :login])))))
+                        (.json %)))))
+           (.then (fn [%]
+                    (let [response (-> %
+                                       (js->clj :keywordize-keys true)
+                                       (:id_token))
+                          auth {:id-token response}]
+                      (rf/dispatch [::events/login-succeeded auth]))))
+           (.then (when (some? interrupted-call)
+                    (do-post-with-retry post-for attempt body-str))))
+       (rf/dispatch [::events/open-dialog :login]))))
+  ([] (amplify-refresh-credentials nil)))
 
 (fx/reg-fx
  :amplify-refresh-credentials

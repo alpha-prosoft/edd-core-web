@@ -276,9 +276,11 @@
                            handle-expired-jwt-func (get-handle-expired-jwt-func)]
                        (if (and expired?
                                 (some? handle-expired-jwt-func))
-                         (do
-                           (handle-expired-jwt-func)
-                           (do-post-with-retry post-for props (inc attempt) body-str))
+                         (handle-expired-jwt-func {:do-post-with-retry do-post-with-retry
+                                                   :post-for post-for
+                                                   :props post-for
+                                                   :attempt attempt
+                                                   :body-str body-str})
                          r))))
       (.then (fn [r] (do
                        (when (some? record-call-func)
