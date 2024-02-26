@@ -56,35 +56,48 @@
           menu))]])]])
 
 (defn page
-  [{:keys [classes app-bar] :as ctx}]
+  [{:keys [app-bar
+           page-config] :as ctx}]
 
   (if @(rf/subscribe [::subs/ready])
-    [:div {:class-name (:root classes)}
-     @(rf/subscribe [::subs/ready])
-     (drawer ctx)
-     [:> Grid {:container  true
-               :spacing 1}
-      [:> Grid {:item       true
-                :xs         12}
-       [:> AppBar {:class-name (:app-bar classes)
-                   :color      :secondary
-                   :position   "static"}
+    (let [{:keys [xs
+                  md]
+           :or {xs 12
+                md 6}}
+          page-config]
+      [:> Grid {:container  true
+                :spacing 1
+                :justify-content "center"}
+       [:> Grid {:item       true
+                 :xs xs
+                 :md md}
+        [:> AppBar {:color      :secondary
+                    :position   "static"}
 
-        [:> Toolbar
-         [:> IconButton {:edge     "start"
-                         :bel      "Menu"
-                         :on-click #(rf/dispatch [::events/toggle-drawer])}
-          [:> MenuIcon]]
+         [:> Toolbar
+          [:> IconButton {:edge     "start"
+                          :bel      "Menu"
+                          :on-click #(rf/dispatch [::events/toggle-drawer])}
+           [:> MenuIcon]]
 
-         (cond
-           app-bar (app-bar)
-           :else ":app-bar placeholder")]]]
+          (cond
+            app-bar (app-bar)
+            :else ":app-bar placeholder")]]]
 
-      [:> Grid {:item true}]
-      [:> Grid {:item true :container true}
-       (util/placeholder ctx)]
-      (snackbar-alert.views/revoke-alert)]]
-    [:> Grid {:container true :item true} "Loading..."]))
+       [:> Grid {:item true
+                 :xs 12}]
+       [:> Grid {:item true
+                 :xs xs
+                 :md md}
+        (util/placeholder ctx)]
+       (snackbar-alert.views/revoke-alert)
+       (drawer ctx)])
+    [:> Grid {:container  true
+              :justify-content "center"}
+     [:> Grid {:item true
+               :xs 6
+               :md 12}
+      "Loading..."]]))
 
 (defn body
   "Initialize body with custom style"
