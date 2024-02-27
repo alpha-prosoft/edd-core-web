@@ -57,6 +57,15 @@
              :xs   12}
     button]])
 
+(defn cacnelbutton []
+  [:> Button {:full-width true
+              :variant    "outlined"
+              :key        "cancel"
+              :on-click   #(rf/dispatch [::events/close-dialog])
+              :color      "secondary"
+              :tab-index  4}
+   (tr :cancel)])
+
 (defn login-dialog-actions [form-type]
   [:> Grid {:container true
             :spacing   2
@@ -77,14 +86,12 @@
              :xs   12}
     [:> Grid {:container true
               :spacing   2}
-     [:> Grid {:item true :sm true :xs 12}
-      [:> Button {:full-width true
-                  :variant    "outlined"
-                  :key        "cancel"
-                  :on-click   #(rf/dispatch [::events/close-dialog])
-                  :color      "secondary"
-                  :tab-index  4}
-       (tr :cancel)]]
+     [:> Grid {:item true
+               :sm true
+               :xs 12
+               :sx {:display {:xs "none"
+                              :md "block"}}}
+      (cacnelbutton)]
 
      (when (some #(= % form-type) [:login])
        [:> Grid {:item true :sm true :xs 12}
@@ -146,7 +153,13 @@
                     :disabled   @(rf/subscribe [::subs/username-invalid?])
                     :on-click   #(rf/dispatch [::events/reset-password])
                     :color      "secondary"}
-         (tr :reset-password)]])]]])
+         (tr :reset-password)]])
+     [:> Grid {:item true
+               :sm true
+               :xs 12
+               :sx {:display {:xs "block"
+                              :md "none"}}}
+      (cacnelbutton)]]]])
 
 (defn username []
   [:> TextField {:key           "username"
