@@ -388,7 +388,9 @@
     (->
      (js/Promise.resolve
       (clj->js
-       (fetch uri (put-params data))))
+       (fetch uri (assoc-in (put-params data)
+                            [:headers "Content-Type"]
+                            "application/octet-stream"))))
      (.then (fn [r] (-> (js/Promise.resolve r)
                         (.then (fn [r] {:version-id (-> r
                                                         (.-headers)
