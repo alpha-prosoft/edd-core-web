@@ -4,7 +4,6 @@
             [web.widgets.login.events :as events]
             [web.widgets.login.db :as db]
             [re-frame.core :as rf]
-            [re-frame.db :as re-frame-db]
             [edd.db :as edd-db]))
 
 (defn init

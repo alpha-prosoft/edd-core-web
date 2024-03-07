@@ -1,7 +1,8 @@
 {:paths ["src/main"]
  :deps  {edd/edd-core-web                     {:local/root "../../"}
          cljs-ajax/cljs-ajax                  {:mvn/version "0.8.4"}
-         com.andrewmcveigh/cljs-time          {:mvn/version "0.5.2"}}
+         com.andrewmcveigh/cljs-time          {:mvn/version "0.5.2"}
+         thheller/shadow-cljs                 {:mvn/version "2.26.5"}}
  :aliases
  {:lint
   {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.12.10"}}

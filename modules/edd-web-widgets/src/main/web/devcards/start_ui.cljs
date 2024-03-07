@@ -7,7 +7,9 @@
    [web.devcards.login]
    [web.devcards.translation]
    [web.devcards.upload]
-   [web.devcards.snackbar-alert]))
+   [web.devcards.snackbar-alert]
+   [web.devcards.confirmation-dialog]
+   [web.devcards.content-switcher]))
 
 (js/goog.exportSymbol "DevcardsMarked" marked/marked)
 

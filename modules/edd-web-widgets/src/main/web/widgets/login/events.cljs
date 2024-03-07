@@ -6,7 +6,6 @@
    [edd.db :as edd-db]
    [edd.events :as edd-events]
    [edd.client :as client]
-   [clojure.string :refer [blank?]]
    [web.widgets.login.utils :as utils]))
 
 (rf/reg-event-fx
@@ -231,7 +230,7 @@
          username-invalid? (nil? (utils/validate-email username))
          password (str (get-in db [::db/password] ""))
          password-invalid? (some true? (vals (utils/validate-password password)))
-         confirmation-code-empty? (blank? (get-in db [::db/confirmation-code]))]
+         confirmation-code-empty? (str/blank? (get-in db [::db/confirmation-code]))]
      (cond
        (false? key-enter?) {}
        (and (= form-type :login)
