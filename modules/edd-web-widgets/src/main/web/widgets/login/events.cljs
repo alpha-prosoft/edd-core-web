@@ -50,11 +50,20 @@
  ::load-application
  (fn [{:keys [db]} [_ do-after-login]]
    (let [config (::edd-db/config db)
-         application-nam]
+         application-name (get config :ApplicationName)
+         application-id (get config :ApplicationId)]
+     (.info js/console (str "App name: " application-name))
      {:fx [[::client/call {:on-success [::edd-events/application-loaded do-after-login]
                            :service    (get config :ApplicationServiceName)
-                           :query      {:query-id :application->fetch-by-id
-                                        :id       (get config :ApplicationId)}}]]})))
+                           :query      (cond
+
+                                         application-name
+                                         {:query-id :application->fetch-by-name
+                                          :name (get config :ApplicationName)}
+
+                                         application-id
+                                         {:query-id :application->fetch-by-id
+                                          :id (get config :ApplicationId)})}]]})))
 
 (defn close-dialog
   [db]

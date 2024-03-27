@@ -8,7 +8,10 @@
 (rf/reg-event-fx
  ::application-loaded
  (fn [{:keys [db]} [_ do-after-login {:keys [result]}]]
-   {:db (assoc db ::db/application result)
+   {:db (-> db
+            (assoc ::db/application result)
+            (assoc-in [::db/config :ApplicationId]
+                      (:id result)))
     :fx [(when (some? do-after-login)
            (conj [:dispatch] do-after-login))]}))
 
@@ -76,21 +79,25 @@
                        :path)
                    target)
 
+         {:keys [path-params query-params data]}
+         (if (keyword? target)
+           {:data {:name (name target)}
+            :query-patams {}
+            :path-params (or params {})}
+           (reitit/match-by-path router target))
+
+         handler
+         (-> data
+             :name
+             keyword)
+
          _ (.log js/console "Navigation"
                  (clj->js
                   {:params params
                    :target target
                    :route (reitit/match-by-path router target)
-                   :name (reitit/match-by-name router target params)}))
-
-         {:keys [path-params query-params data]}
-         (if (keyword? target)
-           {:handler      target
-            :route-params (or params {})}
-           (reitit/match-by-path router target))
-
-         handler
-         (:name data)
+                   :name (reitit/match-by-name router target params)
+                   :handler handler}))
 
          route-params
          (merge {}
