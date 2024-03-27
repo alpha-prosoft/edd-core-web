@@ -2,7 +2,7 @@
   (:import goog.history.Html5History)
   (:require
    [re-frame.core :as rf]
-   [bidi.bidi :as bidi]
+   [reitit.frontend :as reitit]
    [edd.db :as db]))
 
 (rf/reg-event-fx
@@ -31,13 +31,11 @@
             (assoc-in [::db/show-language-switcher?] show-language-switcher?)
             (assoc ::db/config config)
             (assoc ::db/pages-init-events pages-init-events)
-            (assoc ::db/routes routes)
+            (assoc ::db/routes (reitit/router routes))
             (assoc ::db/translations translations)
             (assoc ::db/record-call-failure-func record-call-failure-func)
             (assoc ::db/record-call-func record-call-func)
             (assoc ::db/on-expired-jwt-func on-expired-jwt-func))}))
-
-
 
 (rf/reg-event-fx
  ::set-active-panel
@@ -70,23 +68,39 @@
 (rf/reg-event-fx
  ::navigate
  (fn [{:keys [db]} [_ target & [params]]]
-   (let [routes (::db/routes db)
+   (let [router (::db/routes db)
          pages-init-events (::db/pages-init-events db)
          url (::db/url db "/")
          new-url (if (keyword? target)
-                   (bidi/path-for* routes target params)
+                   (-> (reitit/match-by-name router target params)
+                       :path)
                    target)
-         {:keys [handler route-params]} (if (keyword? target)
-                                          {:handler      target
-                                           :route-params (or params {})}
-                                          (bidi/match-route (::db/routes db) target))]
-     (when (and (not= url new-url)
-                (not
-                 (get-in db [::db/config :mobile] false)))
-       (.pushState (.-history js/window)
-                   #js {}
-                   ""
-                   new-url))
+
+         _ (.log js/console "Navigation"
+                 (clj->js
+                  {:params params
+                   :target target
+                   :route (reitit/match-by-path router target)
+                   :name (reitit/match-by-name router target params)}))
+
+         {:keys [path-params query-params data]}
+         (if (keyword? target)
+           {:handler      target
+            :route-params (or params {})}
+           (reitit/match-by-path router target))
+
+         handler
+         (:name data)
+
+         route-params
+         (merge {}
+                query-params
+                path-params)]
+
+     (.pushState (.-history js/window)
+                 #js {}
+                 ""
+                 new-url)
      {:dispatch [(get pages-init-events handler)
                  route-params]
       :db       (assoc db ::db/drawer false

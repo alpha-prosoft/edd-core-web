@@ -1,10 +1,10 @@
 {:deps    {org.clojure/clojure       {:mvn/version "1.11.1"}
            org.clojure/clojurescript {:mvn/version "1.11.121"}
-           org.clojure/core.async {:mvn/version "1.6.681"}
+           org.clojure/core.async    {:mvn/version "1.6.681"}
            cljs-ajax/cljs-ajax       {:mvn/version "0.8.4"}
            re-frame/re-frame         {:mvn/version "1.4.2"}
            reagent/reagent           {:mvn/version "1.2.0"}
-           bidi/bidi                 {:mvn/version "2.1.6"}
+           metosin/reitit-frontend   {:mvn/version "0.7.0-alpha7"}
            kibu/pushy                {:mvn/version "0.3.8"}}
  :paths   ["src" "resources" "modules/src" "template"],
  :aliases {:jar      {:extra-paths ["resources"]

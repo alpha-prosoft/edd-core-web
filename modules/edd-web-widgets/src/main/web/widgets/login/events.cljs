@@ -49,7 +49,8 @@
 (rf/reg-event-fx
  ::load-application
  (fn [{:keys [db]} [_ do-after-login]]
-   (let [config (::edd-db/config db)]
+   (let [config (::edd-db/config db)
+         application-nam]
      {:fx [[::client/call {:on-success [::edd-events/application-loaded do-after-login]
                            :service    (get config :ApplicationServiceName)
                            :query      {:query-id :application->fetch-by-id
@@ -83,7 +84,8 @@
          config (::edd-db/config db)]
      {:db (login-suceeded db auth)
       :fx [(cond
-             (get config :ApplicationId) [:dispatch [::load-application do-after-login]]
+             (or (get config :ApplicationId)
+                 (get config :ApplicationName)) [:dispatch [::load-application do-after-login]]
              do-after-login [:dispatch do-after-login])]})))
 
 (defn request-code
