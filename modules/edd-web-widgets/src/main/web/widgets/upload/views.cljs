@@ -17,7 +17,8 @@
            on-file-rejected
            formats
            max-size-mb
-           multiple]
+           multiple
+           grid-styles]
     :or {enabled true
          label "Drop file to upload"
          on-file-accepted (fn [e]
@@ -26,7 +27,8 @@
                             (js/console.log "File Rejected" e))
          formats default-formats
          max-size-mb 5
-         multiple false}}]
+         multiple false
+         grid-styles {}}}]
   (let [dropzone-params {:disabled (not enabled)
                          :maxSize (* max-size-mb * 1024 * 1024)
                          :multiple multiple
@@ -68,12 +70,12 @@
          (r/as-element
           [:div root-props
            [:> Grid {:container true
-                     :sx {:border "2px dashed #ccc"
-                          :border-radius "5px"
-                          :padding "10px"
-                          :background-color "#eee"}
-                     :align-items "center"
-                     }
+                     :sx (merge {:border "2px dashed #ccc"
+                                 :border-radius "5px"
+                                 :padding "10px"
+                                 :background-color "#eee"}
+                                grid-styles)
+                     :align-items "center"}
 
             [:> Grid {:item true
                       :xs 1}
@@ -97,10 +99,43 @@
                formats-label]
               [:input input-props]]]]])))]))
 
+(declare uploaded-image)
 
+(defn ImageWidget
+  [{:keys [read-only?
+           default-value
+           on-change]
+    :or {default-value
+         "/images/missing-image.svg"
 
+         on-change
+         (fn [_f])}
+    :as _config}]
 
-
-
-
-
+  (r/with-let [uploaded-image (r/atom nil)]
+    [:div {:width   "100%"
+           :padding "5px"
+           :style {:position "relative"
+                   :width "100%"}}
+     [:div {:bottom "5px"
+            :right "5px"
+            :style {:position "absolute"
+                    :right "20px"
+                    :bottom "20px"
+                    :width "90%"
+                    :color "white"}}
+      (when (not read-only?)
+        [UploadArea
+         {:label            "Upload event image!"
+          :grid-styles   {:opacity "0.9"
+                          :width "100%"}
+          :on-file-accepted (fn [images]
+                              (reset! uploaded-image
+                                      (first images))
+                              (apply on-change [(first images)]))}])]
+     (let [src @uploaded-image]
+       [:img {:src    (if src
+                        (js/URL.createObjectURL src)
+                        default-value)
+              :style    {:width   "100%"
+                         :padding "5px"}}])]))
