@@ -62,7 +62,14 @@
                 (assoc ::db/record-call-func record-call-func)
                 (assoc ::db/on-expired-jwt-func on-expired-jwt-func))]
      {:db (cond-> db
-            application-name (assoc ::db/ready false))
+
+            (and (::db/user db)
+                 application-name)
+            (assoc ::db/ready false)
+
+            (not (::db/user db))
+            (assoc ::db/ready true))
+
       :fx [(if (and (::db/user db)
                     application-name)
              [:dispatch [::load-application [::navigate
