@@ -5,7 +5,6 @@
    [clojure.string :as str]
    [edd.db :as edd-db]
    [edd.events :as edd-events]
-   [edd.client :as client]
    [web.widgets.login.utils :as utils]))
 
 (rf/reg-event-fx
@@ -46,24 +45,7 @@
  (fn [db [_ do-after-login]]
    (assoc-in db [::db/do-after-login] do-after-login)))
 
-(rf/reg-event-fx
- ::load-application
- (fn [{:keys [db]} [_ do-after-login]]
-   (let [config (::edd-db/config db)
-         application-name (get config :ApplicationName)
-         application-id (get config :ApplicationId)]
-     (.info js/console (str "App name: " application-name))
-     {:fx [[::client/call {:on-success [::edd-events/application-loaded do-after-login]
-                           :service    (get config :ApplicationServiceName)
-                           :query      (cond
 
-                                         application-name
-                                         {:query-id :application->fetch-by-name
-                                          :name (get config :ApplicationName)}
-
-                                         application-id
-                                         {:query-id :application->fetch-by-id
-                                          :id (get config :ApplicationId)})}]]})))
 
 (defn close-dialog
   [db]
@@ -89,13 +71,14 @@
 (rf/reg-event-fx
  ::login-succeeded
  (fn [{:keys [db]} [_ auth]]
-   (let [do-after-login (get-in db [::db/interrupted-event])
+   (let [do-after-load (get-in db [::db/interrupted-event])
          config (::edd-db/config db)]
      {:db (login-suceeded db auth)
       :fx [(cond
              (or (get config :ApplicationId)
-                 (get config :ApplicationName)) [:dispatch [::load-application do-after-login]]
-             do-after-login [:dispatch do-after-login])]})))
+                 (get config :ApplicationName))
+             [:dispatch [::edd-events/load-application do-after-load]]
+             do-after-load [:dispatch do-after-load])]})))
 
 (defn request-code
   [db]

@@ -5,17 +5,12 @@
    [reagent.dom.client :as dom]
    [edd.i18n :as i18n]
    [malli.core :as m]
-   [malli.error :as me]
-   [pushy.core :as pushy]))
+   [malli.error :as me]))
 
 (defonce root (dom/create-root
               (.getElementById js/document "app")))
 (defn mount-root
   [{:keys [body] :as ctx}]
-  (pushy/start!
-   (pushy/pushy #(rf/dispatch [::events/navigate %])
-                (fn [url] url)))
-
   (dom/render
      root
      (body ctx)))

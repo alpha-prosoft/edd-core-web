@@ -3,7 +3,6 @@
    [reagent.core :as r]
    [re-frame.core :as rf]
    [goog.object :as g]
-   [edd.events :as events]
    [edd.json :as json]
    [edd.db :as db]
    [clojure.string :as string]
@@ -128,7 +127,7 @@
 
 (defn handle-invalid-jwt []
   (print "invalid token")
-  (rf/dispatch [::events/remove-user]))
+  (rf/dispatch [:edd.events-remove-user]))
 
 (defn jwt-expired? [{:keys [status]}]
   (= status 401))

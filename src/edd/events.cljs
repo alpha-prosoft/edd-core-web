@@ -3,23 +3,44 @@
   (:require
    [re-frame.core :as rf]
    [reitit.frontend :as reitit]
+   [edd.client :as client]
    [edd.db :as db]))
 
 (rf/reg-event-fx
  ::application-loaded
- (fn [{:keys [db]} [_ do-after-login {:keys [result]}]]
+ (fn [{:keys [db]} [_ do-after-load {:keys [result]}]]
    {:db (-> db
             (assoc ::db/application result)
             (assoc-in [::db/config :ApplicationId]
-                      (:id result)))
-    :fx [(when (some? do-after-login)
-           (conj [:dispatch] do-after-login))]}))
+                      (:id result))
+            (assoc ::db/ready true))
+    :fx [(when (some? do-after-load)
+           (conj [:dispatch] do-after-load))]}))
 
+(rf/reg-event-fx
+ ::load-application
+ (fn [{:keys [db]} [_ do-after-load]]
+   (let [config (::db/config db)
+         application-name (get config :ApplicationName)
+         application-id (get config :ApplicationId)]
+     (.info js/console (str "App name: " application-name))
+     {:fx [[::client/call {:on-success [::application-loaded do-after-load]
+                           :service    (get config :ApplicationServiceName)
+                           :query      (cond
+
+                                         application-name
+                                         {:query-id :application->fetch-by-name
+                                          :name (get config :ApplicationName)}
+
+                                         application-id
+                                         {:query-id :application->fetch-by-id
+                                          :id (get config :ApplicationId)})}]]})))
 (rf/reg-event-fx
  ::initialize-db
  (fn [{:keys [db]} [_ {:keys [selected-language
                               show-language-switcher?
-                              config routes
+                              config
+                              routes
                               pages-init-events
                               translations
                               record-call-failure-func
@@ -28,17 +49,30 @@
                        :or   {selected-language       :en
                               show-language-switcher? false}}]]
 
-   {:db (-> db/default-db
-            (merge db)
-            (assoc-in [::db/selected-language] selected-language)
-            (assoc-in [::db/show-language-switcher?] show-language-switcher?)
-            (assoc ::db/config config)
-            (assoc ::db/pages-init-events pages-init-events)
-            (assoc ::db/routes (reitit/router routes))
-            (assoc ::db/translations translations)
-            (assoc ::db/record-call-failure-func record-call-failure-func)
-            (assoc ::db/record-call-func record-call-func)
-            (assoc ::db/on-expired-jwt-func on-expired-jwt-func))}))
+   (let [application-name (get config :ApplicationName)
+         db (-> db/default-db
+                (merge db)
+                (assoc-in [::db/selected-language] selected-language)
+                (assoc-in [::db/show-language-switcher?] show-language-switcher?)
+                (assoc ::db/config config)
+                (assoc ::db/pages-init-events pages-init-events)
+                (assoc ::db/routes (reitit/router routes))
+                (assoc ::db/translations translations)
+                (assoc ::db/record-call-failure-func record-call-failure-func)
+                (assoc ::db/record-call-func record-call-func)
+                (assoc ::db/on-expired-jwt-func on-expired-jwt-func))]
+     {:db (cond-> db
+            application-name (assoc ::db/ready false))
+      :fx [(if (and (::db/user db)
+                    application-name)
+             [:dispatch [::load-application [::navigate
+                                             (-> js/window
+                                                 .-location
+                                                 .-pathname)]]]
+             [:dispatch [::navigate
+                         (-> js/window
+                             .-location
+                             .-pathname)]])]})))
 
 (rf/reg-event-fx
  ::set-active-panel
@@ -73,7 +107,6 @@
  (fn [{:keys [db]} [_ target & [params]]]
    (let [router (::db/routes db)
          pages-init-events (::db/pages-init-events db)
-         url (::db/url db "/")
          new-url (if (keyword? target)
                    (-> (reitit/match-by-name router target params)
                        :path)
@@ -123,5 +156,12 @@
  ::remove-user
  (fn [db]
    (assoc-in db [::db/user] nil)))
+
+(rf/reg-event-db
+ :edd.events-remove-user
+ (fn [db]
+   (assoc-in db [::db/user] nil)))
+
+
 
 
