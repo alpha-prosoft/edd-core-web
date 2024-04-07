@@ -7,7 +7,5 @@
   [{:keys [pages classes] :as _ctx}]
   (let [active-panel @(rf/subscribe [::subs/active-panel])]
     (if (contains? pages active-panel)
-      (apply
-       (get-in pages [active-panel :panel])
-       [classes])
+      [(get-in pages [active-panel :panel]) classes]
       [:h2 "Not found"])))

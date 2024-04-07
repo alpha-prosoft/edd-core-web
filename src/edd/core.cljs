@@ -5,15 +5,17 @@
    [reagent.dom.client :as dom]
    [edd.i18n :as i18n]
    [malli.core :as m]
-   [malli.error :as me]))
+   [malli.error :as me]
+   ["react" :refer [StrictMode]]))
 
 (defonce root (dom/create-root
-              (.getElementById js/document "app")))
+               (.getElementById js/document "app")))
 (defn mount-root
   [{:keys [body] :as ctx}]
   (dom/render
-     root
-     (body ctx)))
+   root
+   [:> StrictMode
+    (body ctx)]))
 
 (def CtxSchema
   (m/schema
