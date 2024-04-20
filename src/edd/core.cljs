@@ -1,12 +1,13 @@
 (ns edd.core
   (:require
-   [re-frame.core :as rf]
+   ["react" :refer [StrictMode]]
    [edd.events :as events]
-   [reagent.dom.client :as dom]
    [edd.i18n :as i18n]
+   [edd.json :as json]
    [malli.core :as m]
    [malli.error :as me]
-   ["react" :refer [StrictMode]]))
+   [re-frame.core :as rf]
+   [reagent.dom.client :as dom]))
 
 (defonce root (dom/create-root
                (.getElementById js/document "app")))
@@ -66,9 +67,10 @@
                              (assoc p key init))
                            {}
                            pages)
-        config  (merge (js->clj
-                        (.-eddconfig js/window)
-                        :keywordize-keys true)
+        config  (merge (-> (js->clj
+                            (.-eddconfig js/window)
+                            :keywordize-keys true)
+                           json/parse-custom-fields)
                        config)
         translations (cond-> i18n/base-translations
                        translations (merge translations))

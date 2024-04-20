@@ -57,7 +57,8 @@
 
 (defn page
   [{:keys [app-bar
-           page-config] :as ctx}]
+           page-config
+           hide-menu] :as ctx}]
 
   (if @(rf/subscribe [::subs/ready])
     (let [{:keys [xs
@@ -75,10 +76,11 @@
                     :position   "static"}
 
          [:> Toolbar
-          [:> IconButton {:edge     "start"
-                          :bel      "Menu"
-                          :on-click #(rf/dispatch [::events/toggle-drawer])}
-           [:> MenuIcon]]
+          (when-not (hide-menu)
+            [:> IconButton {:edge     "start"
+                            :bel      "Menu"
+                            :on-click #(rf/dispatch [::events/toggle-drawer])}
+             [:> MenuIcon]])
 
           (cond
             app-bar (app-bar)
