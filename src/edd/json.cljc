@@ -7,14 +7,33 @@
   #?(:cljs (uuid val)
      :clj  (java.util.UUID/fromString val)))
 
+(defn decode-json-special
+  [in]
+  (let [v (name in)]
+    (case (first v)
+      \: (if (str/starts-with? v "::")
+           (subs v 1)
+           (keyword (subs v 1)))
+      \# (if (str/starts-with? v "##")
+           (subs v 1)
+           (parse-uuid (subs v 1)))
+      in)))
+
 (defn parse-custom-fields
   [edn]
   (postwalk (fn [x]
               (cond
+                (keyword? x)
+                (decode-json-special x)
+
                 (and (string? x)
-                     (str/starts-with? x ":")) (keyword (subs x 1))
+                     (str/starts-with? x ":"))
+                (keyword (subs x 1))
+
                 (and (string? x)
-                     (str/starts-with? x "#")) (read-uuid (subs x 1))
+                     (str/starts-with? x "#"))
+                (read-uuid (subs x 1))
+
                 :else x))
             edn))
 

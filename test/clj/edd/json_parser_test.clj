@@ -36,5 +36,25 @@
                \"b\":\"b\",
                \"c\":1}"))))
 
+(deftest test-json-field-setting
+  "Test json field setting"
+  (is (= {:a  :b
+          "a" :a
+          :b  1}
+         (json/parse-custom-fields {:a  :b
+                                    "a" ":a"
+                                    :b  1}))))
+
+(deftest test-json-field-setting
+  "Test json field setting"
+  (let [id (random-uuid)]
+    (is (= {:a  :b
+            id :a
+            :b  1}
+           (json/parse-custom-fields {:a  :b
+                                      (keyword
+                                       (str "#"
+                                            id)) ":a"
+                                      :b  1})))))
 (run-tests 'edd.json-parser-test)
 
