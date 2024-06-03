@@ -24,7 +24,8 @@
          application-name (get config :ApplicationName)
          application-id (get config :ApplicationId)]
      (.info js/console (str "App name: " application-name))
-     {:fx [[::client/call {:on-success [::application-loaded do-after-load]
+     {:db db
+      :fx [[::client/call {:on-success [::application-loaded do-after-load]
                            :service    (get config :ApplicationServiceName)
                            :query      (cond
 
@@ -49,37 +50,39 @@
                        :or   {selected-language       :en
                               show-language-switcher? false}}]]
 
-   (let [application-name (get config :ApplicationName)
-         db (-> db/default-db
-                (merge db)
-                (assoc-in [::db/selected-language] selected-language)
-                (assoc-in [::db/show-language-switcher?] show-language-switcher?)
-                (assoc ::db/config config)
-                (assoc ::db/pages-init-events pages-init-events)
-                (assoc ::db/routes (reitit/router routes))
-                (assoc ::db/translations translations)
-                (assoc ::db/record-call-failure-func record-call-failure-func)
-                (assoc ::db/record-call-func record-call-func)
-                (assoc ::db/on-expired-jwt-func on-expired-jwt-func))]
-     {:db (cond-> db
+   (if (get db ::db/ready)
+     {:db db}
+     (let [application-name (get config :ApplicationName)
+           db (-> db/default-db
+                  (merge db)
+                  (assoc-in [::db/selected-language] selected-language)
+                  (assoc-in [::db/show-language-switcher?] show-language-switcher?)
+                  (assoc ::db/config config)
+                  (assoc ::db/pages-init-events pages-init-events)
+                  (assoc ::db/routes (reitit/router routes))
+                  (assoc ::db/translations translations)
+                  (assoc ::db/record-call-failure-func record-call-failure-func)
+                  (assoc ::db/record-call-func record-call-func)
+                  (assoc ::db/on-expired-jwt-func on-expired-jwt-func))]
+       {:db (cond-> db
 
-            (and (::db/user db)
-                 application-name)
-            (assoc ::db/ready false)
+              (and (::db/user db)
+                   application-name)
+              (assoc ::db/ready false)
 
-            (not (::db/user db))
-            (assoc ::db/ready true))
+              (not (::db/user db))
+              (assoc ::db/ready true))
 
-      :fx [(if (and (::db/user db)
-                    application-name)
-             [:dispatch [::load-application [::navigate
-                                             (-> js/window
-                                                 .-location
-                                                 .-pathname)]]]
-             [:dispatch [::navigate
-                         (-> js/window
-                             .-location
-                             .-pathname)]])]})))
+        :fx [(if (and (::db/user db)
+                      application-name)
+               [:dispatch [::load-application [::navigate
+                                               (-> js/window
+                                                   .-location
+                                                   .-pathname)]]]
+               [:dispatch [::navigate
+                           (-> js/window
+                               .-location
+                               .-pathname)]])]}))))
 
 (rf/reg-event-fx
  ::set-active-panel
@@ -148,11 +151,11 @@
                  #js {}
                  ""
                  new-url)
-     {:dispatch [(get pages-init-events handler)
-                 route-params]
-      :db       (assoc db ::db/drawer false
+     {:db       (assoc db ::db/drawer false
                        ::db/url new-url
-                       ::db/active-panel handler)})))
+                       ::db/active-panel handler)
+      :fx [[:dispatch [(get pages-init-events handler)
+                       route-params]]]})))
 
 (rf/reg-event-db
  ::register-menu-item
