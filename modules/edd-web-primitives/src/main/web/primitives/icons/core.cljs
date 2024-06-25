@@ -87,6 +87,7 @@
    ["@mui/icons-material/Troubleshoot" :default Troubleshoot]
    ["@mui/icons-material/Insights" :default Insights]
    ["@mui/icons-material/Handyman" :default Handyman]
+   ["@mui/icons-material/GppGood" :default GppGood]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -362,6 +363,9 @@
 
 (defn LogoutIcon [props]
   [:> Logout props])
+
+(defn GppGoodIcon [props]
+  [:> GppGood props])
 
 (defn ArrowLeftIcon [props]
   [:svg (handle-props props)

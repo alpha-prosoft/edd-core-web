@@ -7,7 +7,7 @@
    [web.devcards.utils :refer [apply-stiles]]
 
    [web.primitives.icons.core :refer
-    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon  AdminPanelSettingsIcon
+    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon AdminPanelSettingsIcon
      AllColapseIcon AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon ArrowDropDownIcon
      ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
      BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon CalculateIcon
@@ -22,7 +22,7 @@
      PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon
-     SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon]]))
+     SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon GppGoodIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
@@ -215,3 +215,5 @@
 (defcard-rg :insights-icon "## Insights Icon" [InsightsIcon])
 
 (defcard-rg :handyman-icon "## HandymanIcon" [HandymanIcon])
+
+(defcard-rg :gpp-good-icon "## GppGoodIcon" [GppGoodIcon])
