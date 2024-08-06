@@ -348,41 +348,44 @@
   (let [contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
         formatting-func (get props :formatting-func)]
     [utils/adapted-text-field
-     (merge {:full-width true :color "primary" :variant "standard" :autoFocus auto-focus}
-            (dissoc props :formatting-func :read-only-with-underline)
-            (when
-             (or (some? (or prefix suffix)) read-only read-only-with-underline)
-              {:InputProps
-               (merge
-                (when read-only
-                  {:disableUnderline true
-                   :readOnly         true})
+     (merge
+      {:full-width true
+       :color "primary"
+       :variant "standard"
+       :autoFocus auto-focus}
+      (dissoc props :formatting-func :read-only-with-underline)
+      {:default-value (cond
+                        (and read-only contains-comma-or-letter?) default-value
+                        (some? separator) (pprint/cl-format nil (str "~,,'" separator ":D") (/ default-value 100))
+                        (some? formatting-func) (formatting-func default-value)
+                        :else (formatting/format-number default-value amount-scaling))
+       :on-change (fn [event]
+                    (utils/handle-input-change-with-number-formatting
+                     event
+                     (get props :on-change
+                          (fn [] (println "BLL")))
+                     formatting-func
+                     separator))}
+      (when
+       (or (some? (or prefix suffix)) read-only read-only-with-underline)
+        {:InputProps
+         (merge
+          (when read-only
+            {:disableUnderline true
+             :readOnly         true})
 
-                (when read-only-with-underline
-                  {:disableUnderline true
-                   :readOnly         true
-                   :style            read-only-underline})
+          (when read-only-with-underline
+            {:disableUnderline true
+             :readOnly         true
+             :style            read-only-underline})
 
-                (when (some? prefix)
-                  {:startAdornment (r/as-element
-                                    [:> InputAdornment {:position "start"} prefix])})
+          (when (some? prefix)
+            {:startAdornment (r/as-element
+                              [:> InputAdornment {:position "start"} prefix])})
 
-                (when (some? suffix)
-                  {:endAdornment (r/as-element
-                                  [:> InputAdornment {:position "end"} suffix])}))})
-
-            {:on-change (fn [event] (utils/handle-input-change-with-number-formatting event
-                                                                                      (get props :on-change
-                                                                                           (fn [] (println "BLL")))
-                                                                                      formatting-func
-                                                                                      separator))}
-            {:default-value (if (and read-only contains-comma-or-letter?)
-                              default-value
-                              (if (some? separator)
-                                (pprint/cl-format nil (str "~,,'" separator ":D") (/ default-value 100))
-                                (if (some? formatting-func)
-                                  (formatting-func default-value)
-                                  (formatting/format-number default-value amount-scaling))))})]))
+          (when (some? suffix)
+            {:endAdornment (r/as-element
+                            [:> InputAdornment {:position "end"} suffix])}))}))]))
 
 (defn RawPercentField
   [{:keys [prefix suffix read-only read-only-with-underline default-value auto-focus]

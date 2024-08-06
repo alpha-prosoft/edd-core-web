@@ -14,11 +14,13 @@
      (format (/ value 1e8) 2 2)
      ""))
   ([value scaling]
-   (case (keyword scaling)
-     :mn (format (/ value 1e8) 2 2)
-     :tsd (format (/ value 1e5))
-     :full (format (/ value 100))
-     (format (/ value 1e8) 2 2))))
+   (if-not (string/blank? value)
+     (case (keyword scaling)
+       :mn (format (/ value 1e8) 2 2)
+       :tsd (format (/ value 1e5))
+       :full (format (/ value 100))
+       (format (/ value 1e8) 2 2))
+     "")))
 
 (defn format-percent [value]
   (if (and (not (string/blank? value)) (number? value))
