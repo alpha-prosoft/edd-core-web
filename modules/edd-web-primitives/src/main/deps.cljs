@@ -2,7 +2,7 @@
             "@mui/lab"            "5.0.0-alpha.161"
             "@mui/x-date-pickers" "6.18.6"
             "@mui/material"       "5.15.3"
-            "@mui/icons-material" "5.15.3"
+            "@mui/icons-material" "5.15.16"
             "@emotion/react"      "11.11.3"
             "@emotion/styled"     "11.11.0"
             :highlight.js         "11.2.0"
