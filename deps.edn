@@ -4,7 +4,7 @@
            cljs-ajax/cljs-ajax       {:mvn/version "0.8.4"}
            re-frame/re-frame         {:mvn/version "1.4.3"}
            reagent/reagent           {:mvn/version "1.2.0"}
-           metosin/reitit-frontend   {:mvn/version "0.7.0-alpha7"}}
+           metosin/reitit-frontend   {:mvn/version "0.7.2"}}
  :paths   ["src" "resources" "modules/src" "template"],
  :aliases {:jar      {:extra-paths ["resources"]
                       :extra-deps  {luchiniatwork/cambada {:mvn/version "1.0.5"}},
@@ -13,15 +13,15 @@
                                     "-m" "--copy-source "]},
            :shadow-cljs  {:main-opts ["-m" "shadow.cljs.devtools.cli"]
                           :extra-deps
-                          {thheller/shadow-cljs {:mvn/version "2.28.3"}}}
+                          {thheller/shadow-cljs {:mvn/version "2.28.18"}}}
            :dev      {:extra-paths ["test/clj" "test/cljs"]
                       :extra-deps  {org.clojure/test.check {:mvn/version "1.1.1"}}}
            :test     {:extra-paths ["test/clj" "test/cljs"],
                       :extra-deps  {org.clojure/test.check {:mvn/version "1.1.1"}}},
            :unit     {:extra-paths ["test/clj" "test/cljs"]
-                      :extra-deps  {lambdaisland/kaocha {:mvn/version "1.88.1376"}},
+                      :extra-deps  {lambdaisland/kaocha {:mvn/version "1.91.1392"}},
                       :main-opts   ["-m" "kaocha.runner", "unit"]}
-           :it       {:extra-deps {lambdaisland/kaocha {:mvn/version "1.88.1376"}},
+           :it       {:extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}},
                       :main-opts  ["-m" "kaocha.runner", "it"]}
            :readme   {:extra-paths ["target/src"]
                       :extra-deps  {alpha-prosoft/readme {:mvn/version "1.7"}}
