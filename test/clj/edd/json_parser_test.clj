@@ -56,5 +56,18 @@
                                        (str "#"
                                             id)) ":a"
                                       :b  1})))))
+
+(deftest test-convert
+  "Test converting edn keys"
+
+  (are [expected input] (= expected (json/convert input))
+    ":x" :x
+    ":>aggregate/references" :>aggregate/references
+    "#4fb62f2c-9c1d-4043-9c74-bbe2e017befc" #uuid "4fb62f2c-9c1d-4043-9c74-bbe2e017befc"
+    "key" "key"
+    [":a" 1] [:a 1]
+    [{:a "#4fb62f2c-9c1d-4043-9c74-bbe2e017befc"}] [{:a #uuid "4fb62f2c-9c1d-4043-9c74-bbe2e017befc"}]
+    1 1))
+
 (run-tests 'edd.json-parser-test)
 

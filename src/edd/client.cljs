@@ -237,6 +237,11 @@
                                         "?dbg_service=" service
                                         "&dbg_cmds=" (string/join "," (map :cmd-id commands))))))
 
+(defn convert-keyword->js [key-word]
+  (if-let [keyword-namespace (namespace key-word)]
+    (str keyword-namespace "/" (name key-word))
+    (name key-word)))
+
 (defn get-body-str [{:keys [query commands]} mock-for]
   (let [ref (case mock-for
               :query {:request-id     (str "#" (random-uuid))
@@ -245,7 +250,8 @@
               :commands {:request-id     (str "#" (random-uuid))
                          :interaction-id utils/interaction-id
                          :commands       commands})]
-    (clj->js (json/encode-custom-fields (add-user ref)))))
+    (clj->js (json/encode-custom-fields (add-user ref))
+             {:keyword-fn convert-keyword->js})))
 
 (defn do-post-with-retry
   ([post-for props retry-attempts]
