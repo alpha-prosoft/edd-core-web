@@ -21,15 +21,15 @@
               (concat [lang]
                       prop))
         val (get-in @(rf/subscribe [::subs/translations])
-            prop
-            (str "{tr " prop "}"))]
+                    prop
+                    (str "{tr " prop "}"))]
     (when-not (string? val)
       (throw (js/Error. (str
-                        "Translation key does not result in string: "
-                        (->> {:key prop
-                             :value val}
-                            clj->js
-                            (.stringify js/JSON))))))
+                         "Translation key does not result in string: "
+                         (->> {:key prop
+                               :value val}
+                              clj->js
+                              (.stringify js/JSON))))))
     val))
 
 (comment

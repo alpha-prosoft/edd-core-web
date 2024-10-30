@@ -48,7 +48,7 @@
 (defn convert
   [x]
   (cond
-    (keyword? x) (str ":" (name x))
+    (keyword? x) (str x)
     (uuid? x) (str "#" x)
     (coll? x) (fmap convert x)
     :else x))
