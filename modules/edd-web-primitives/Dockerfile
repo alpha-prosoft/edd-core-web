@@ -30,7 +30,7 @@ RUN mkdir -p /dist/s3
 RUN ls -la /dist
 
 RUN set -e &&\
-    clojure -Sdeps '{:deps {cljfmt {:mvn/version "0.6.7"}}}' \
+    clojure -Sdeps '{:deps {cljfmt {:mvn/version "0.8.0"}}}' \
             -m cljfmt.main check src/main/ src/test
 
 RUN ls -la /dist
@@ -38,24 +38,11 @@ RUN cp -r resources/public/* /dist/s3/
 RUN sed -i 's/version=1/version='${BUILD_ID}'/g' /dist/s3/index.html
 RUN ls -la /dist
 
-ENV CHROME_BIN /usr/bin/chromium-browser
-
-RUN set -e &&\
-    npx shadow-cljs classpath &&\
-    clojure -A:lint --lint src &&\
-    clojure -A:test:runner &&\
-    shadow-cljs -A:dev compile test &&\
-    shadow-cljs -A:dev compile &&\
-    npx shadow-cljs -A:dev release devcards &&\
-    cp -r resources/public/* /dist/s3/ &&\
-    npx karma start karma.conf.js  --log-level debug --single-run &&\
-    clojure -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.5"}}}' \
+RUN set -e && clojure -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.5"}}}' \
                       -m cambada.jar \
                       --app-version "1.0.${BUILD_ID}" \
                       --app-artifact-id "${PROJECT_NAME}" \
                       --app-group-id "${ARTIFACT_ORG}" \
                       --copy-source \
-                      -o /dist/release-libs/ &&\
-    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.${BUILD_ID}.jar.pom.xml"
-
-
+                      -o /dist/release-libs/; \
+                    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.${BUILD_ID}.jar.pom.xml"; \

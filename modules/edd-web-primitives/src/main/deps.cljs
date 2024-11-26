@@ -6,7 +6,7 @@
             "@emotion/react"      "11.11.3"
             "@emotion/styled"     "11.11.0"
             :highlight.js         "11.2.0"
-            :d3-scale             "3.2.1"
+            :d3-scale             "4.0.2"
             :date-fns             "^2.29.1"
             :dayjs                "^1.8.29"
             :g                    "^2.0.1"
@@ -16,6 +16,6 @@
             :react                "18.2.0"
             :react-dom            "18.2.0"
             :react-number-format  "^4.4.1"
-            :suneditor            "2.45.1"
+            :suneditor            "2.47.0"
             :suneditor-react      "3.6.1"
-            :dompurify            "2.3.10"}}
+            :dompurify            "2.5.7"}}

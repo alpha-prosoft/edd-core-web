@@ -132,26 +132,40 @@
                 :required     required?
                 :style        style}]))
 
-(defn RawFormSelect [{:keys [id input-label required required? helper-text] :as props}]
-  (let [id-pre id
-        input-label input-label
-        required? (or required required?)]
+(defn RawFormSelect [{:keys [id input-label required required? helper-text
+                             read-only-with-underline read-only]
+                      :or   {read-only-with-underline false read-only false} :as props}]
+  (let [required? (or required required?)]
     [:> FormControl
      (merge
-      {:id          (str id-pre "-form-control")
+      {:id          (str id "-form-control")
        :no-validate true
        :full-width  true}
-      (dissoc props :id :input-label :render-value :on-change :value :children :helper-text))
+      (dissoc props :id :input-label :render-value :on-change :value :children :helper-text :read-only-with-underline :read-only))
      [:> InputLabel
       {:class-name :form-select-input-label
        :required   required?}
       input-label]
      [:> Select
       (merge
-       {:id         (str id-pre "-select")
+       {:id         (str id "-select")
         :variant    "standard"
-        :inputProps {:hidden true}}
-       (dissoc props :id :input-label :full-width :required :disabled :helper-text))]
+        :inputProps (merge
+                     {:hidden true}
+                     (when (or read-only read-only-with-underline)
+                       {:readOnly      true
+                        :IconComponent ""
+                        :sx {"&:focus"        {:background-color "#fff0"}}}))}
+       (when read-only
+         {:sx         {"&.Mui-focused:after" {:border-bottom "none"}
+                       "&.MuiInput-root"     {"&:after"        {:border-bottom "none!important"}
+                                              "&:before"       {:border-bottom "none"}
+                                              "&:hover:before" {:border-bottom "none"}}}})
+       (when read-only-with-underline
+         {:sx         {"&.Mui-focused:after" {:border-bottom "1px solid #0000006b"}
+                       "&.MuiInput-root"     {"&:after"        {:border-bottom "none!important"}
+                                              "&:hover:before" {:border-bottom "1px solid #0000006b"}}}})
+       (dissoc props :id :input-label :full-width :required :disabled :helper-text :read-only-with-underline :read-only))]
      (when helper-text
        [:> FormHelperText {:sx {:margin-left 0}} helper-text])]))
 
@@ -176,7 +190,7 @@
            minDate maxDate min-date max-date]
     :or   {id                   ::date-picker
            required             false
-           variant "standard"
+           variant              "standard"
            set-touched          (fn [] (print "set-touched"))
            invalid-date-message "Invalid date"}
     :as   props}]
@@ -188,28 +202,28 @@
      [:> DesktopDatePicker
       (merge
        props
-       {:format           "dd.MM.yyyy"
+       {:format                 "dd.MM.yyyy"
         :allowSameDateSelection true
         :label                  label
         :mask                   "__.__.____"
         :clearable              true
         :clear-text             "Clear"
-        :value (if (and (not invalid?)
-                        (string/blank? value))
-                 nil
-                 (js/Date.parse value))
+        :value                  (if (and (not invalid?)
+                                         (string/blank? value))
+                                  nil
+                                  (js/Date.parse value))
         :minDate                (js/Date.parse component-min-date)
         :maxDate                (js/Date.parse component-max-date)
-        :error       error
-        :slotProps {:textField
-                    (merge
-                     {:id          id
-                      :helper-text helper-text
-                      :variant     variant
-                      :required    required
-                      :on-blur              #(comp (set-touched) (set-focused false))}
-                     (when invalid?
-                       {:helper-text invalid-date-message}))}
+        :error                  error
+        :slotProps              {:textField
+                                 (merge
+                                  {:id          id
+                                   :helper-text helper-text
+                                   :variant     variant
+                                   :required    required
+                                   :on-blur     #(comp (set-touched) (set-focused false))}
+                                  (when invalid?
+                                    {:helper-text invalid-date-message}))}
         :on-close               #(comp (set-touched) (set-focused false))
         :on-change              #(utils/handle-date-picker-date-change
                                   (merge
@@ -350,22 +364,22 @@
     [utils/adapted-text-field
      (merge
       {:full-width true
-       :color "primary"
-       :variant "standard"
-       :autoFocus auto-focus}
+       :color      "primary"
+       :variant    "standard"
+       :autoFocus  auto-focus}
       (dissoc props :formatting-func :read-only-with-underline)
       {:default-value (cond
                         (and read-only contains-comma-or-letter?) default-value
                         (some? separator) (pprint/cl-format nil (str "~,,'" separator ":D") (/ default-value 100))
                         (some? formatting-func) (formatting-func default-value)
                         :else (formatting/format-number default-value amount-scaling))
-       :on-change (fn [event]
-                    (utils/handle-input-change-with-number-formatting
-                     event
-                     (get props :on-change
-                          (fn [] (println "BLL")))
-                     formatting-func
-                     separator))}
+       :on-change     (fn [event]
+                        (utils/handle-input-change-with-number-formatting
+                         event
+                         (get props :on-change
+                              (fn [] (println "BLL")))
+                         formatting-func
+                         separator))}
       (when
        (or (some? (or prefix suffix)) read-only read-only-with-underline)
         {:InputProps
