@@ -23,6 +23,10 @@ COPY --chown=build:build karma.conf.js karma.conf.js
 COPY --chown=build:build resources resources
 COPY --chown=build:build src src
 
+RUN set -e && clojure -M:lint --lint src/main src/test
+RUN set -e && clojure -M:test:runner
+RUN set -e && npx shadow-cljs -A:dev compile
+
 RUN ls -la
 
 

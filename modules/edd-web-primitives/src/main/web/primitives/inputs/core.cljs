@@ -153,7 +153,8 @@
         :inputProps (merge
                      {:hidden true}
                      (when (or read-only read-only-with-underline)
-                       {:readOnly      true
+                       {:aria-readOnly true
+                        :readOnly      true
                         :IconComponent ""
                         :sx {"&:focus"        {:background-color "#fff0"}}}))}
        (when read-only
