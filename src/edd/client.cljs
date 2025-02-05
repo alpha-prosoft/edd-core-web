@@ -43,8 +43,12 @@
   (-> @re-frame-db/app-db ::db/on-expired-jwt-func))
 
 (defn get-proxy-or-host [host]
-  (let [proxy-host (get-in (get-config) [:proxies host])]
-    (if (some? proxy-host)
+  (let [{:keys [proxies use-proxy-for]} (get-config)
+        current-host (-> js/window .-location .-host)
+        use-proxy? (contains? (set use-proxy-for) current-host)
+        proxy-host (get proxies (keyword host))]
+    (if (and use-proxy?
+             (some? proxy-host))
       proxy-host
       host)))
 
