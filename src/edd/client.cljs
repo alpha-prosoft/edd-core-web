@@ -42,9 +42,16 @@
 (defn get-handle-expired-jwt-func []
   (-> @re-frame-db/app-db ::db/on-expired-jwt-func))
 
+(defn get-proxy-or-host [host]
+  (let [proxy-host (get-in (get-config) [:proxies host])]
+    (if (some? proxy-host)
+      proxy-host
+      host)))
+
 (defn document-uri [service path]
-  (let [hosted-zone-name (-> (get-config) :HostedZoneName)]
-    (str "https://" (name service) "." hosted-zone-name path)))
+  (let [hosted-zone-name (-> (get-config) :HostedZoneName)
+        host (get-proxy-or-host (str (name service) "." hosted-zone-name))]
+    (str "https://" host path)))
 
 (defn stage-for-realm [realm]
   (let [client-routing (-> (get-config) :clientRouting)
@@ -57,9 +64,10 @@
 (defn service-uri [service path]
   (let [hosted-zone-name (-> (get-config) :HostedZoneName)
         realm (-> @re-frame-db/app-db ::db/user :realm)
-        stage (stage-for-realm realm)]
-    (str "https://api."
-         hosted-zone-name
+        stage (stage-for-realm realm)
+        host (get-proxy-or-host (str "api." hosted-zone-name))]
+    (str "https://"
+         host
          "/private/"
          (str stage)
          "/"
