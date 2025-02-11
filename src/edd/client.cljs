@@ -219,18 +219,21 @@
    :mode            :cors
    :body            (.stringify js/JSON body-str)
    :timeout         31000
+   :with-credentials true
    :response-format (json/custom-response-format {:keywords? true})
    :headers         (make-headers)})
 
 (defn put-params [data]
   {:mode    "cors"
    :method  "PUT"
+   :with-credentials true
    :headers (make-put-headers)
    :body    data})
 
 (defn get-params []
   {:method          :get
    :timeout         50000
+   :with-credentials true
    :response-format (json/custom-response-format {:keywords? true})
    :headers         (make-get-headers)})
 
