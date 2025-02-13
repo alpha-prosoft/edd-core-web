@@ -215,27 +215,30 @@
         false))))
 
 (defn post-params [body-str]
-  {:method          :post
-   :mode            :cors
-   :body            (.stringify js/JSON body-str)
-   :timeout         31000
+  {:method           :post
+   :mode             :cors
+   :body             (.stringify js/JSON body-str)
+   :timeout          31000
    :with-credentials true
-   :response-format (json/custom-response-format {:keywords? true})
-   :headers         (make-headers)})
+   :credentials      "include"
+   :response-format  (json/custom-response-format {:keywords? true})
+   :headers          (make-headers)})
 
 (defn put-params [data]
-  {:mode    "cors"
-   :method  "PUT"
+  {:mode             "cors"
+   :method           "PUT"
    :with-credentials true
-   :headers (make-put-headers)
-   :body    data})
+   :credentials      "include"
+   :headers          (make-put-headers)
+   :body             data})
 
 (defn get-params []
-  {:method          :get
-   :timeout         50000
+  {:method           :get
+   :timeout          50000
    :with-credentials true
-   :response-format (json/custom-response-format {:keywords? true})
-   :headers         (make-get-headers)})
+   :credentials      "include"
+   :response-format  (json/custom-response-format {:keywords? true})
+   :headers          (make-get-headers)})
 
 (defn get-mock-func [{:keys [query commands service]} mock-for]
   (let [mock-func-name (case mock-for
@@ -297,10 +300,10 @@
                        (if (and expired?
                                 (some? handle-expired-jwt-func))
                          (handle-expired-jwt-func {:do-post-with-retry do-post-with-retry
-                                                   :post-for post-for
-                                                   :props post-for
-                                                   :attempt attempt
-                                                   :body-str body-str})
+                                                   :post-for           post-for
+                                                   :props              post-for
+                                                   :attempt            attempt
+                                                   :body-str           body-str})
                          r))))
       (.then (fn [r] (do
                        (when (some? record-call-func)
