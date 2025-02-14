@@ -21,7 +21,7 @@
      NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon
      PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
      SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
-     TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon
+     TrendingFlatIcon TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon
      SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon GppGoodIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
@@ -217,3 +217,5 @@
 (defcard-rg :handyman-icon "## HandymanIcon" [HandymanIcon])
 
 (defcard-rg :gpp-good-icon "## GppGoodIcon" [GppGoodIcon])
+
+(defcard-rg :trending-flat-icon "## TrendingFlatIcon" [TrendingFlatIcon])

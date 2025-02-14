@@ -15,11 +15,11 @@
                     [RawTabs {:value (:selected @data-atom)
                               :on-change #(swap! data-atom merge {:selected (-> %2)})
                               :indicatorColor "primary"
-                              :tabs [{:id (str "Tab Number 1")
+                              :tabs [{:id "Tab Number 1"
                                       :label "Tab 1"}
-                                     {:id (str "Tab Number 2")
+                                     {:id "Tab Number 2"
                                       :label "Tab 2"}
-                                     {:id (str "Tab Number 3")
+                                     {:id "Tab Number 3"
                                       :label "Disabled Tab" :disabled true}]}]]
                    [RawGrid {:item true :xs 12}
                     (case (:selected @data-atom)

@@ -71,7 +71,8 @@
 (declare accordion-state-id)
 
 (defn EddAccordion [props content]
-  (r/with-let [accordion-state-id (keyword (str "accordion-expanded-state-" (str (random-uuid))))]
+  (r/with-let [uuid (str (random-uuid))
+               accordion-state-id (keyword (str "accordion-expanded-state-" uuid))]
     (let [expanded? @(rf/subscribe [::model/get-accordion-expanded-state accordion-state-id props])
           right? (control-position-right? props)
           on-click (fn [] (rf/dispatch [::model/set-accordion-expanded-state accordion-state-id props]))]

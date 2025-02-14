@@ -34,8 +34,8 @@
   [:> Alert (merge {:severity severity
                     :color    severity}
                    (when (some? id)
-                     {:id id}
-                     (dissoc props :title-props)))
+                     {:id id})
+                   (dissoc props :title-props))
    (when (some? title)
      [:> AlertTitle (if (some? title-props) title-props {}) title])
    (r/as-element content)])

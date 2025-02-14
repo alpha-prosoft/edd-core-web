@@ -76,6 +76,7 @@
    ["@mui/icons-material/Star" :default Star]
    ["@mui/icons-material/StarBorder" :default StarBorder]
    ["@mui/icons-material/SubdirectoryArrowRight" :default SubdirectoryArrowRight]
+   ["@mui/icons-material/TrendingFlat" :default TrendingFlat]
    ["@mui/icons-material/Tune" :default Tune]
    ["@mui/icons-material/UnfoldLess" :default UnfoldLess]
    ["@mui/icons-material/UnfoldMore" :default UnfoldMore]
@@ -366,6 +367,9 @@
 
 (defn GppGoodIcon [props]
   [:> GppGood props])
+
+(defn TrendingFlatIcon [props]
+  [:> TrendingFlat props])
 
 (defn ArrowLeftIcon [props]
   [:svg (handle-props props)

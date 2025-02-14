@@ -239,7 +239,8 @@
 (defn date-picker-with-state [{:keys [on-invalid-hook]
                                :or   {on-invalid-hook (fn [])}
                                :as   props}]
-  (r/with-let [date-picker-state-id (keyword (str ::date-picker-state- (str (random-uuid))))]
+  (r/with-let [uuid (str (random-uuid))
+               date-picker-state-id (keyword (str ::date-picker-state- uuid))]
     (let [focused? @(rf/subscribe [::model/date-picker-focused? date-picker-state-id])
           touched? @(rf/subscribe [::model/date-picker-touched? date-picker-state-id])
           date-input-invalid? @(rf/subscribe [::model/date-input-invalid? date-picker-state-id])
@@ -308,7 +309,8 @@
    [RawIconButton props icon])
 
   ([props icon on-hover-icon]
-   (r/with-let [icon-button-state-id (keyword (str "icon-button-state-" (str (random-uuid))))]
+   (r/with-let [uuid (str (random-uuid))
+                icon-button-state-id (keyword (str "icon-button-state-" uuid))]
      (let [hovered? @(rf/subscribe [::model/icon-button-hovered? icon-button-state-id])]
        [RawIconButton
         (merge props

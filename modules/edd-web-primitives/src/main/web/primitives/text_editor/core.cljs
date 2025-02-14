@@ -84,7 +84,8 @@
 
 (defn EddTextEditor
   [props]
-  (r/with-let [editor-id (keyword (str "rich-text-editor-mode-" (str (random-uuid))))]
+  (r/with-let [uuid (str (random-uuid))
+               editor-id (keyword (str "rich-text-editor-mode-" uuid))]
     (let [editor-mode @(rf/subscribe [::model/get-editor-mode editor-id])
           set-read-only-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :read-only-mode]))
           set-edit-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :edit-mode]))]
