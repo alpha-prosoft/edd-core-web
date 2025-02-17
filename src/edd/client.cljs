@@ -215,30 +215,30 @@
         false))))
 
 (defn post-params [body-str]
-  {:method           :post
-   :mode             :cors
-   :body             (.stringify js/JSON body-str)
-   :timeout          31000
-   :with-credentials true
-   :credentials      "include"
-   :response-format  (json/custom-response-format {:keywords? true})
-   :headers          (make-headers)})
+  (merge
+   {:method           :post
+    :mode             :cors
+    :body             (.stringify js/JSON body-str)
+    :timeout          31000
+    :response-format  (json/custom-response-format {:keywords? true})
+    :headers          (make-headers)}
+   (-> (get-config) :post-params)))
 
 (defn put-params [data]
-  {:mode             "cors"
-   :method           "PUT"
-   :with-credentials true
-   :credentials      "include"
-   :headers          (make-put-headers)
-   :body             data})
+  (merge
+   {:mode             "cors"
+    :method           "PUT"
+    :headers          (make-put-headers)
+    :body             data}
+   (-> (get-config) :put-params)))
 
 (defn get-params []
-  {:method           :get
-   :timeout          50000
-   :with-credentials true
-   :credentials      "include"
-   :response-format  (json/custom-response-format {:keywords? true})
-   :headers          (make-get-headers)})
+  (merge
+   {:method           :get
+    :timeout          50000
+    :response-format  (json/custom-response-format {:keywords? true})
+    :headers          (make-get-headers)}
+   (-> (get-config) :get-params)))
 
 (defn get-mock-func [{:keys [query commands service]} mock-for]
   (let [mock-func-name (case mock-for
