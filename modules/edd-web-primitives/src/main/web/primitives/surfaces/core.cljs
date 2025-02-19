@@ -2,11 +2,21 @@
   (:require
    [re-frame.core :as rf]
    [reagent.core :as r]
-   ["@mui/material/index" :refer [AppBar Toolbar Accordion AccordionSummary AccordionDetails
-                                  Card CardHeader CardMedia CardContent CardActions
-                                  ClickAwayListener CardActionArea
-                                  Grid
-                                  IconButton]]
+   ["@mui/material/AppBar" :default AppBar]
+   ["@mui/material/Toolbar" :default Toolbar]
+   ["@mui/material/Accordion" :default Accordion]
+   ["@mui/material/AccordionSummary" :default AccordionSummary]
+   ["@mui/material/AccordionDetails" :default AccordionDetails]
+   ["@mui/material/Card" :default Card]
+   ["@mui/material/CardHeader" :default CardHeader]
+   ["@mui/material/CardContent" :default CardContent]
+   ["@mui/material/CardMedia" :default CardMedia]
+   ["@mui/material/CardActions" :default CardActions]
+   ["@mui/material/CardActionArea" :default CardActionArea]
+   ["@mui/material/ClickAwayListener" :default ClickAwayListener]
+   ["@mui/material/Grid" :default Grid]
+   ["@mui/material/IconButton" :default IconButton]
+
    [web.primitives.icons.core :refer [ExpandMoreIcon ExpandLessIcon]]
 
    [web.primitives.surfaces.model :as model]))
@@ -26,35 +36,36 @@
   [:> Accordion
    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
     :elevation elevation
-    :style     (merge {:width "100%"} style)
+    :sx     (merge {:width "100%"} style)
     :onChange  on-change}
 
    [:> AccordionSummary
-    (merge {:style (merge {} summary-style)}
-           (when (some? summary-class-name) {:class-name summary-class-name}))
-    [:> Grid {:container true :alignItems "center"}
-     [:> Grid {:item  true
-               :style (merge
-                       {:position "absolute" :top "0px"}
-                       (when (= control-position :right) {:right "0px"}))}
-      [:> IconButton
-       (merge
-        {:on-click on-click
-         :disabled disabled
-         :style    (if (= control-position :right)
-                     {:marginRight "-1.1rem"}
-                     {:marginLeft "-1.1rem"})}
-        (when (:id props) {:id (:id props)}))
-       (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
-     [:> Grid {:container true :style (if (= control-position :right)
-                                        {:paddingRight "2.5rem"}
-                                        {:paddingLeft "2.5rem"})}
-      (if (and expanded? (contains? props :header-expanded))
-        (:header-expanded props)
-        (:header props))]]]
-   (into [:> AccordionDetails
-          {:style (merge {:padding "0px"} details-style)}
-          content])])
+    (merge {:sx (merge {} summary-style)
+            :component Grid
+            :children	(r/as-element [:> Grid {:container true :alignItems "center"}
+                                     [:> Grid {:item  true
+                                               :sx (merge
+                                                    {:position "absolute" :top "0px"}
+                                                    (when (= control-position :right) {:right "0px"}))}
+                                      [:> IconButton
+                                       (merge
+                                        {:on-click on-click
+                                         :disabled disabled
+                                         :sx    (if (= control-position :right)
+                                                  {:marginRight "-1.1rem"}
+                                                  {:marginLeft "-1.1rem"})}
+                                        (when (:id props) {:id (:id props)}))
+                                       (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
+                                     [:> Grid {:container true :sx (if (= control-position :right)
+                                                                     {:paddingRight "2.5rem"}
+                                                                     {:paddingLeft "2.5rem"})}
+                                      (if (and expanded? (contains? props :header-expanded))
+                                        (:header-expanded props)
+                                        (:header props))]])}
+           (when (some? summary-class-name) {:class-name summary-class-name}))]
+   [:> AccordionDetails
+    {:sx (merge {:padding "0px"} details-style)}
+    content]])
 
 (defn RawHeadlessAccordion [{:keys [id expanded? elevation style details-style]
                              :or   {expanded? true elevation 0 style {}}}

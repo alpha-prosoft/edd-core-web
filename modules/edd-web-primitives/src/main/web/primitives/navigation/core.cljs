@@ -1,7 +1,11 @@
 (ns web.primitives.navigation.core
   (:require
-   ["@mui/material/index" :refer [Tabs Tab Link Drawer SwipeableDrawer]]
-   [reagent.core :as r]))
+   [reagent.core :as r]
+   ["@mui/material/Tabs" :default Tabs]
+   ["@mui/material/Tab" :default Tab]
+   ["@mui/material/Link" :default Link]
+   ["@mui/material/Drawer" :default Drawer]
+   ["@mui/material/SwipeableDrawer" :default SwipeableDrawer]))
 
 (def adapted-RawTabs (r/adapt-react-class Tabs))
 
@@ -19,4 +23,8 @@
   [:> Drawer props content])
 
 (defn RawSwipeableDrawer [props content]
-  [:> SwipeableDrawer props content])
+  [:> SwipeableDrawer
+   (merge
+    {:onOpen (fn [])}
+    props)
+   content])

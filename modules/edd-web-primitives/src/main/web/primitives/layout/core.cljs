@@ -1,6 +1,8 @@
 (ns web.primitives.layout.core
   (:require
-   ["@mui/material/index" :refer [Box Grid Stack]]))
+   ["@mui/material/Box" :default Box]
+   ["@mui/material/Grid" :default Grid]
+   ["@mui/material/Stack" :default Stack]))
 
 (defn RawGrid [props & children]
   (into

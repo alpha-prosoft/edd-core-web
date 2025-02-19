@@ -20,16 +20,16 @@
                                 :dark  "#cf030a"
                                 :light "#f7bbc1"}
                     :grey      {:main "#d5d5d6"
-                                :050 "#fbfbfb"
-                                :100 "#f8f8f8"
-                                :200 "#edeeee"
-                                :300 "#e9eaea"
-                                :400 "#d5d5d6"
-                                :500 "#aaabad"
-                                :600 "#808185"
-                                :700 "#55575c"
-                                :800 "#404247"
-                                :900 "#212121"}}
+                                :050  "#fbfbfb"
+                                :100  "#f8f8f8"
+                                :200  "#edeeee"
+                                :300  "#e9eaea"
+                                :400  "#d5d5d6"
+                                :500  "#aaabad"
+                                :600  "#808185"
+                                :700  "#55575c"
+                                :800  "#404247"
+                                :900  "#212121"}}
    :accent-palette {:dark    "rgb(3, 68, 84)"
                     :default "rgb(3, 112, 128)"
                     :60      "rgb(104, 169, 179)"
@@ -169,17 +169,17 @@
                     :MuiAccordion
                     {:styleOverrides
                      {:root
-                      {"&:before"        {:opacity 0}
-                       "& .Mui-expanded" {:margin 0}
-                       "&.Mui-expanded"  {:margin 0}}}}
+                      {"&:before"        {:opacity 0}}}}
 
                     :MuiAccordionSummary
                     {:styleOverrides {:root
-                                      {:padding         0
+                                      {:transition      "unset"
+                                       :padding         0
                                        :minHeight       0
-                                       "&.Mui-expanded" {:minHeight 0
-                                                         :margin    0}}
-                                      :content {"&.Mui-expanded" {:margin "12px 0"}}}}
+                                       "&.Mui-expanded" {:minHeight 0}
+                                       "&:hover"        {:cursor "auto!important"}}
+                                      :content {:transition      "unset"
+                                                "&.Mui-expanded" {:margin "12px 0"}}}}
 
                     :MuiAutocomplete
                     {:styleOverrides
@@ -257,11 +257,11 @@
                        {"& .MuiSwitch-colorSecondary"              {:color "#037080"}
                         "& .MuiSwitch-colorSecondary + .MuiSwitch-track"
                         {:backgroundColor "#b3d4d8"
-                         :opacity          1}
+                         :opacity         1}
                         "& .MuiSwitch-colorSecondary.Mui-checked " {:color "#037080"}
                         "& .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track"
                         {:backgroundColor "#b3d4d8"
-                         :opacity          1}}}
+                         :opacity         1}}}
                       :opacity             1
                       "& .MuiSwitch-input" {:left "initial" :width "100%"}}}
 

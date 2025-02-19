@@ -1,10 +1,28 @@
 (ns web.primitives.data-display.core
   (:require
-   ["@mui/material/index" :refer [Avatar Badge Divider Grid
-                                  List ListItem ListItemText ListItemIcon ListSubheader
-                                  Menu MenuItem MenuList
-                                  Typography Tooltip
-                                  Table TableBody TableCell TableContainer TableHead TableRow Chip]]))
+
+   ["@mui/material/Avatar" :default Avatar]
+   ["@mui/material/Badge" :default Badge]
+   ["@mui/material/Divider" :default Divider]
+   ["@mui/material/Grid" :default Grid]
+   ["@mui/material/List" :default List]
+   ["@mui/material/ListItem" :default ListItem]
+   ["@mui/material/ListItemText" :default ListItemText]
+   ["@mui/material/ListItemIcon" :default ListItemIcon]
+   ["@mui/material/ListSubheader" :default ListSubheader]
+   ["@mui/material/Menu" :default Menu]
+   ["@mui/material/MenuItem" :default MenuItem]
+   ["@mui/material/MenuList" :default MenuList]
+
+   ["@mui/material/Typography" :default Typography]
+   ["@mui/material/Tooltip" :default Tooltip]
+   ["@mui/material/Table" :default Table]
+   ["@mui/material/TableBody" :default TableBody]
+   ["@mui/material/TableCell" :default TableCell]
+   ["@mui/material/TableContainer" :default TableContainer]
+   ["@mui/material/TableHead" :default TableHead]
+   ["@mui/material/TableRow" :default TableRow]
+   ["@mui/material/Chip" :default Chip]))
 
 (defn RawBadge [{:keys [color]
                  :or   {color "primary"}
@@ -29,8 +47,12 @@
         (for [child children]
           child)))
 
-(defn RawListItem [props & children]
-  (into [:> ListItem props]
+(defn RawListItem [{:keys [button] :as props} & children]
+  (into [:> ListItem
+         (-> props
+             (dissoc :button :disableTouchRipple)
+             (cond-> (true? button) (assoc-in [:sx :cursor] "pointer"))
+             (cond-> (true? button) (assoc :button "true")))]
         (for [child children]
           child)))
 

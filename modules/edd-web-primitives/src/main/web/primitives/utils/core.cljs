@@ -3,7 +3,8 @@
    [reagent.core :as r]
 
    ["@mui/material/Zoom" :default Zoom]
-   ["@mui/material/index" :refer [Slide Grid]]))
+   ["@mui/material/Slide" :default Slide]
+   ["@mui/material/Grid" :default Grid]))
 
 (defn RawSlide [{:keys [in direction timeout]
                  :or   {in false direction "left" timeout 500}}

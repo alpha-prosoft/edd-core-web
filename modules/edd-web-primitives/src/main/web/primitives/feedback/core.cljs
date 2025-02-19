@@ -1,15 +1,16 @@
 (ns web.primitives.feedback.core
   (:require
-   ["@mui/material/index" :refer [Alert
-                                  Dialog
-                                  DialogTitle
-                                  DialogContent
-                                  DialogActions
-                                  LinearProgress
-                                  CircularProgress
-                                  Snackbar
-                                  Backdrop]]
-   [reagent.core :as r]))
+   [reagent.core :as r]
+
+   ["@mui/material/Alert" :default Alert]
+   ["@mui/material/Dialog" :default Dialog]
+   ["@mui/material/DialogTitle" :default DialogTitle]
+   ["@mui/material/DialogContent" :default DialogContent]
+   ["@mui/material/DialogActions" :default DialogActions]
+   ["@mui/material/LinearProgress" :default LinearProgress]
+   ["@mui/material/CircularProgress" :default CircularProgress]
+   ["@mui/material/Snackbar" :default Snackbar]
+   ["@mui/material/Backdrop" :default Backdrop]))
 
 (defn RawDialog [{:keys [title actions dividers]
                   :or   {dividers false} :as props} content]

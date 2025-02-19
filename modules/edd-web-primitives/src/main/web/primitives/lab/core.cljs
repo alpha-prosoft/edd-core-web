@@ -1,15 +1,15 @@
 (ns web.primitives.lab.core
   (:require
-   ["@mui/material/index" :refer [Autocomplete
-                                  Alert AlertTitle
-                                  Skeleton
-                                  ToggleButtonGroup ToggleButton]]
-
-   ["@mui/lab/TimelineDot" :default TimelineDot]
-   ["@mui/lab/TreeView" :default TreeView]
-   ["@mui/lab/TreeItem" :default TreeItem]
-
    [reagent.core :as r]
+
+   ["@mui/x-tree-view" :refer [SimpleTreeView TreeItem]]
+   ["@mui/lab/TimelineDot" :default TimelineDot]
+   ["@mui/material/Autocomplete" :default Autocomplete]
+   ["@mui/material/Alert" :default Alert]
+   ["@mui/material/AlertTitle" :default AlertTitle]
+   ["@mui/material/Skeleton" :default Skeleton]
+   ["@mui/material/ToggleButtonGroup" :default ToggleButtonGroup]
+   ["@mui/material/ToggleButton" :default ToggleButton]
 
    [web.primitives.lab.utils :refer [autocomplete-text-field]]))
 
@@ -61,9 +61,9 @@
    (for [child children]
      (r/as-element child))))
 
-(defn RawTreeView [props & children]
+(defn RawSimpleTreeView [props & children]
   (into
-   [:> TreeView props]
+   [:> SimpleTreeView props]
    (for [child children]
      child)))
 

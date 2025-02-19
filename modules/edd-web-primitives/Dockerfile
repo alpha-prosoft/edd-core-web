@@ -37,6 +37,8 @@ RUN set -e &&\
     clojure -Sdeps '{:deps {cljfmt {:mvn/version "0.8.0"}}}' \
             -m cljfmt.main check src/main/ src/test
 
+RUN set -e && npx shadow-cljs -A:dev release devcards
+
 RUN ls -la /dist
 RUN cp -r resources/public/* /dist/s3/
 RUN sed -i 's/version=1/version='${BUILD_ID}'/g' /dist/s3/index.html

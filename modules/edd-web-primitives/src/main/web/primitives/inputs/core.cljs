@@ -22,6 +22,7 @@
 
             ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
             ["@mui/x-date-pickers/index" :refer [LocalizationProvider DesktopDatePicker]]
+            ["moment" :as moment]
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
@@ -52,7 +53,7 @@
             (when read-only-with-underline
               {:disableUnderline true
                :readOnly         true
-               :style            read-only-underline})
+               :sx               read-only-underline})
 
             (when (some? prefix)
               {:startAdornment (r/as-element
@@ -111,26 +112,27 @@
     [:> FormControlLabel
      {:control         (r/as-element [:> Switch (merge {:color "primary"} (utils/clean-switch-props props))])
       :label           label
-      :style           {:margin-right -4}
+      :sx              {:margin-right "-4px"}
       :disabled        disabled
       :label-placement label-placement}]))
 
 (defn RawSelect
-  [{:keys [id options value on-change style required? variant]
+  [{:keys [id options value on-change variant]
     :or   {id        ::simple-select
-           required? true
-           variant   "standard"}}]
+           variant   "standard"}
+    :as   props}]
   (let [default (first options)]
-    [:> Select {:id           id
-                :variant      variant
-                :on-change    (fn [^js event]
-                                (on-change (.. event -target -value)))
-                :value        (or value default)
-                :defaultValue default
-                :children     (for [option options]
-                                (r/as-element [:> MenuItem {:key option :value option} option]))
-                :required     required?
-                :style        style}]))
+    [:> Select
+     (merge
+      {:id           id
+       :variant      variant
+       :value        (or value default)
+       :defaultValue default
+       :children     (for [option options]
+                       (r/as-element [:> MenuItem {:key option :value option} option]))}
+      props
+      {:on-change    (fn [^js event]
+                       (on-change (.. event -target -value)))})]))
 
 (defn RawFormSelect [{:keys [id input-label required required? helper-text
                              read-only-with-underline read-only]
@@ -153,19 +155,19 @@
         :inputProps (merge
                      {:hidden true}
                      (when (or read-only read-only-with-underline)
-                       {:aria-readOnly true
+                       {:aria-readonly true
                         :readOnly      true
                         :IconComponent ""
-                        :sx {"&:focus"        {:background-color "#fff0"}}}))}
+                        :sx            {"&:focus" {:background-color "#fff0"}}}))}
        (when read-only
-         {:sx         {"&.Mui-focused:after" {:border-bottom "none"}
-                       "&.MuiInput-root"     {"&:after"        {:border-bottom "none!important"}
-                                              "&:before"       {:border-bottom "none"}
-                                              "&:hover:before" {:border-bottom "none"}}}})
+         {:sx {"&.Mui-focused:after" {:border-bottom "none"}
+               "&.MuiInput-root"     {"&:after"        {:border-bottom "none!important"}
+                                      "&:before"       {:border-bottom "none"}
+                                      "&:hover:before" {:border-bottom "none"}}}})
        (when read-only-with-underline
-         {:sx         {"&.Mui-focused:after" {:border-bottom "1px solid #0000006b"}
-                       "&.MuiInput-root"     {"&:after"        {:border-bottom "none!important"}
-                                              "&:hover:before" {:border-bottom "1px solid #0000006b"}}}})
+         {:sx {"&.Mui-focused:after" {:border-bottom "1px solid #0000006b"}
+               "&.MuiInput-root"     {"&:after"        {:border-bottom "none!important"}
+                                      "&:hover:before" {:border-bottom "1px solid #0000006b"}}}})
        (dissoc props :id :input-label :full-width :required :disabled :helper-text :read-only-with-underline :read-only))]
      (when helper-text
        [:> FormHelperText {:sx {:margin-left 0}} helper-text])]))
@@ -197,7 +199,6 @@
     :as   props}]
   (let [component-min-date (or minDate min-date "1900-01-01")
         component-max-date (or maxDate max-date "2099-12-31")]
-
     [:> LocalizationProvider
      {:dateAdapter AdapterDateFns}
      [:> DesktopDatePicker
@@ -212,9 +213,9 @@
         :value                  (if (and (not invalid?)
                                          (string/blank? value))
                                   nil
-                                  (js/Date.parse value))
-        :minDate                (js/Date.parse component-min-date)
-        :maxDate                (js/Date.parse component-max-date)
+                                  (.toDate (moment value "YYYY-MM-DD")))
+        :minDate                (.toDate (moment component-min-date "YYYY-MM-DD"))
+        :maxDate                (.toDate (moment component-max-date "YYYY-MM-DD"))
         :error                  error
         :slotProps              {:textField
                                  (merge
@@ -228,11 +229,11 @@
         :on-close               #(comp (set-touched) (set-focused false))
         :on-change              #(utils/handle-date-picker-date-change
                                   (merge
-                                   props
                                    {:component-min-date component-min-date
                                     :component-max-date component-max-date
                                     :set-focused        set-focused
-                                    :date               %}))})]]))
+                                    :date               %}
+                                   props))})]]))
 
 (declare date-picker-state-id)
 

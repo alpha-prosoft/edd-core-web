@@ -5,7 +5,7 @@
   {:target     :browser
    :output-dir "resources/public/js"
    :asset-path "/js"
-   :modules {:main {:entries [web.devcards.start-ui]}}
+   :modules {:main {:entries [web.start-ui]}}
    :js-options
    {:resolve
     {"devcards-marked" {:target :npm :require "marked"}
@@ -24,8 +24,8 @@
     :http-root        "resources/public"
     :http-handler     shadow.http.push-state/handle
     :push-state/index "index.html"
-    :preloads   [devtools.preload day8.re-frame-10x.preload.react-18]
-    :after-load       web.devcards.start-ui/init}
+    ;:preloads   [devtools.preload day8.re-frame-10x.preload.react-18]
+    :after-load       web.start-ui/init}
    :dev
    {:compiler-options {:devcards true}}
    :release

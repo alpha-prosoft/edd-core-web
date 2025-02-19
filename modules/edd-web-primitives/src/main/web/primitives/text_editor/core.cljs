@@ -1,11 +1,13 @@
 (ns web.primitives.text-editor.core
   (:require
    ["suneditor-react/dist" :default SunEditor]
-   ["@mui/material/index" :refer [Grid Button IconButton]]
+   ["@mui/material/Button" :default Button]
+   ["@mui/material/IconButton" :default IconButton]
    [re-frame.core :as rf]
    [reagent.core :as r]
    [dompurify :default purify]
    [web.primitives.icons.core :refer [EditIcon]]
+   [web.primitives.layout.core :refer [RawGrid]]
    [web.primitives.text-editor.utils :refer [sun-editor-button-list handle-on-paste handle-on-drop handle-on-save]]
    [web.primitives.text-editor.model :as model]))
 
@@ -13,20 +15,21 @@
   (-> purify (.sanitize (if (= value "<p><br></p>") "" value))))
 
 (defn- read-only-mode [props set-edit-mode-funk]
-  [:> Grid {:container true :style {:position "relative"}}
-   [:> Grid {:container true
+  [RawGrid {:container true
+            :sx {:position "relative"}}
+   [RawGrid {:container true
              :item true
-             :style {:border "solid 1px #dadada"
-                     :min-height "2rem"
-                     :padding "1rem"
-                     :display "block"
-                     :font-size "13px"
-                     :overflow "hidden"}
+             :sx {:border "solid 1px #dadada"
+                  :min-height "2rem"
+                  :padding "1rem"
+                  :display "block"
+                  :font-size "13px"
+                  :overflow "hidden"}
              :class-name "sun-editor-editable"
              :dangerouslySetInnerHTML {:__html (sanitize-html (:set-contents props))}}]
    (let [edit-icon-position (:edit-icon-position props)]
-     [:> Grid {:item true
-               :style
+     [RawGrid {:item true
+               :sx
                (merge
                 {:position "absolute"}
                 (if (contains? #{:left :right} edit-icon-position)
@@ -35,15 +38,15 @@
       [:> IconButton
        (merge
         {:on-click set-edit-mode-funk
-         :style    (merge
-                    {:padding 0}
-                    (when (true? (:disable props)) {:opacity 0.5}))
+         :sx    (merge
+                 {:padding 0}
+                 (when (true? (:disable props)) {:opacity 0.5}))
          :disabled (:disable props)}
         (when (:id props) {:id       (str "edit-button-" (:id props))}))
        [EditIcon]]])])
 
 (defn- edit-mode [{:keys [on-change] :as props} set-read-only-mode]
-  [:> Grid (merge
+  [RawGrid (merge
             {:container true}
             (when (:id props) {:id (str "editor-" (:id props))}))
    [:> SunEditor
@@ -56,19 +59,19 @@
       :enableToolbar (not (:disable props))}
      props
      {:on-change #(on-change (sanitize-html %))})]
-   [:> Grid {:container true :style {:border "solid 1px #dadada"
+   [RawGrid {:container true :style {:border "solid 1px #dadada"
                                      :border-top "none"
                                      :justify-content "flex-end"}}
     (when (contains? props :on-save)
-      [:> Grid {:item true :style {:padding "1rem"}}
+      [RawGrid {:item true :style {:padding "1rem"}}
        [:> Button (merge
                    {:variant  "outlined"
                     :on-click (handle-on-save props set-read-only-mode)
-                    :style    {:height "2rem"}}
+                    :sx   {:height "2rem"}}
                    (when (:id props) {:id (str "save-button-" (:id props))})) "Save"]
        [:> Button (merge
                    {:on-click set-read-only-mode
-                    :style    {:height "2rem"}}
+                    :sx    {:height "2rem"}}
                    (when (:id props) {:id (str "discard-button-" (:id props))})) "Discard"]])]])
 
 (defn RawTextEditor

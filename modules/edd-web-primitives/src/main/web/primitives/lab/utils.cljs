@@ -1,7 +1,8 @@
 (ns web.primitives.lab.utils
   (:require
-   ["@mui/material/index" :refer [CircularProgress TextField]]
-   [reagent.core :as r]))
+   [reagent.core :as r]
+   ["@mui/material/CircularProgress" :default CircularProgress]
+   ["@mui/material/TextField" :default TextField]))
 
 (defn autocomplete-text-field [input-params
                                {:keys [helper-text FormHelperTextProps label disabled required loading error variant]
