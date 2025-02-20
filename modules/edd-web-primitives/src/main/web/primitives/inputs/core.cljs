@@ -356,21 +356,25 @@
 
 (defn RawNumberField
   [{:keys [prefix suffix read-only read-only-with-underline separator default-value amount-scaling
-           auto-focus]
-    :or   {read-only                false
-           read-only-with-underline false
-           amount-scaling           "full"
-           auto-focus               false}
+           read-only-with-red-number-color auto-focus]
+    :or   {read-only                               false
+           read-only-with-underline                false
+           read-only-with-red-number-color         false
+           amount-scaling                          "full"
+           auto-focus                              false}
     :as   props}]
   (let [contains-comma-or-letter? (some? (re-matches #".*[A-Za-z\,].*" (str default-value)))
-        formatting-func (get props :formatting-func)]
+        formatting-func (get props :formatting-func)
+        style (cond-> {}
+                read-only-with-underline (merge read-only-underline)
+                read-only-with-red-number-color (merge {:color "red"}))]
     [utils/adapted-text-field
      (merge
       {:full-width true
        :color      "primary"
        :variant    "standard"
        :autoFocus  auto-focus}
-      (dissoc props :formatting-func :read-only-with-underline)
+      (dissoc props :formatting-func :read-only-with-underline :read-only-with-red-number-color)
       {:default-value (cond
                         (and read-only contains-comma-or-letter?) default-value
                         (some? separator) (pprint/cl-format nil (str "~,,'" separator ":D") (/ default-value 100))
@@ -384,17 +388,18 @@
                          formatting-func
                          separator))}
       (when
-       (or (some? (or prefix suffix)) read-only read-only-with-underline)
+       (or (some? (or prefix suffix)) read-only read-only-with-underline read-only-with-red-number-color)
         {:InputProps
          (merge
           (when read-only
             {:disableUnderline true
              :readOnly         true})
 
+          {:style style}
+
           (when read-only-with-underline
             {:disableUnderline true
-             :readOnly         true
-             :style            read-only-underline})
+             :readOnly         true})
 
           (when (some? prefix)
             {:startAdornment (r/as-element
