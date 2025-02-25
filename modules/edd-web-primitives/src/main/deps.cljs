@@ -19,4 +19,4 @@
             :react-number-format  "^4.4.1"
             :suneditor            "2.47.5"
             :suneditor-react      "3.6.1"
-            :dompurify            "2.5.8"}}
+            :dompurify            "3.2.4"}}

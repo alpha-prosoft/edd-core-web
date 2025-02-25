@@ -5,14 +5,14 @@
    ["@mui/material/IconButton" :default IconButton]
    [re-frame.core :as rf]
    [reagent.core :as r]
-   [dompurify :default purify]
+   [dompurify :as dompurify]
    [web.primitives.icons.core :refer [EditIcon]]
    [web.primitives.layout.core :refer [RawGrid]]
    [web.primitives.text-editor.utils :refer [sun-editor-button-list handle-on-paste handle-on-drop handle-on-save]]
    [web.primitives.text-editor.model :as model]))
 
 (defn sanitize-html [value]
-  (-> purify (.sanitize (if (= value "<p><br></p>") "" value))))
+  (dompurify/sanitize (if (= value "<p><br></p>") "" value)))
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [RawGrid {:container true
