@@ -6,7 +6,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.components :refer [RawSwitch]]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :switch
   "## Switch"

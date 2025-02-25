@@ -8,7 +8,7 @@
 
    [web.primitives.formatting.core :as formatting]
 
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
 
    [web.primitives.components :refer [RawGrid RawTextField]]))
 

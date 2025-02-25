@@ -5,7 +5,7 @@
    [reagent.core :as r]
    [web.primitives.components :refer [EddTextEditor]]
    [devcards.core :refer-macros (defcard-rg)]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :text-editor
   "## Text editor"

@@ -8,7 +8,7 @@
    [cljs-time.format :as format]
 
    [web.primitives.components :refer [EddDatePicker]]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :date-picker
   "## Date picker"

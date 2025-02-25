@@ -5,7 +5,7 @@
    [devcards.core :refer-macros (defcard-rg)]
    [reagent.core :as r]
 
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
 
    [web.primitives.components :refer [RawStack RawChip]]))
 

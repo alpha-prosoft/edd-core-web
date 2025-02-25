@@ -5,7 +5,7 @@
    [reagent.core :as r]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
    [web.primitives.components :refer [RawAutocomplete RawCheckbox RawMenuItem]]))
 
 (def months-list [{:id 0 :name "January"}

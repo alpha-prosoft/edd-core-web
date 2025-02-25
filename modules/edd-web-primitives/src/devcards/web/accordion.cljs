@@ -5,7 +5,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.components :refer [RawGrid EddAccordion RawHeadlessAccordion RawCard RawTextField RawButton]]
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
    [reagent.core :as r]))
 
 (defcard-rg :accordion-init-expanded

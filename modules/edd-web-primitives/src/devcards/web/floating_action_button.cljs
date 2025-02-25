@@ -5,7 +5,7 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
    [web.primitives.components :refer [RawGrid RawFab]]
    [web.primitives.icons.core :refer [AddIcon SaveIcon ClearIcon]]))
 

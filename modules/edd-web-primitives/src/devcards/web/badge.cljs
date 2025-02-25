@@ -6,7 +6,7 @@
 
    [web.primitives.components :refer [RawBadge RawGrid]]
    [web.primitives.icons.core :refer [NotificationsNoneIcon]]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :badge
   "## Badge"

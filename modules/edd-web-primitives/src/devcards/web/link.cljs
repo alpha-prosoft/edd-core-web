@@ -4,7 +4,7 @@
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
    [web.primitives.components :refer [RawLink]]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :link
   "## Link"

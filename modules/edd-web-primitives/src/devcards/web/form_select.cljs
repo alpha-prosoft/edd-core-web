@@ -6,7 +6,7 @@
    [devcards.core :refer-macros (defcard-rg)]
    [clojure.string :as str]
 
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
    [web.primitives.components :refer [RawFormSelect RawMenuItem]]))
 
 (def list-options

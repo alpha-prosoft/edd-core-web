@@ -5,7 +5,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.components :refer [RawSkeleton]]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :skeleton
   "## Skeleton"

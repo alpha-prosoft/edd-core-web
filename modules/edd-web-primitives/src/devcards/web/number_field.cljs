@@ -7,7 +7,7 @@
    [clojure.string :as str]
 
    [devcards.core :refer-macros (defcard-rg)]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defn formatting-func [value]
   (str/replace (str value) #"9" "0"))

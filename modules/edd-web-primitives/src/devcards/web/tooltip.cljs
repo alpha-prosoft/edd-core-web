@@ -3,7 +3,7 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
-   [web.utils :refer [apply-stiles]]
+   [web.primitives.utils :refer [apply-stiles]]
 
    [web.primitives.components :refer [RawTooltip RawButton]]))
 

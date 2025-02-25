@@ -4,7 +4,7 @@
    [cljsjs.react.dom]
    [web.primitives.components :refer [RawButton]]
    [devcards.core :refer-macros (defcard-rg)]
-   [web.utils :refer [apply-stiles]]))
+   [web.primitives.utils :refer [apply-stiles]]))
 
 (defcard-rg :button
   "## Button"

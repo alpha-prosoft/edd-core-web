@@ -1,4 +1,4 @@
-(ns web.utils
+(ns web.primitives.utils
   (:require
    [web.primitives.styles :as styles]
    ["@mui/material/CssBaseline" :default CssBaseline]
