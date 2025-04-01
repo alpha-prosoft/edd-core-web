@@ -28,6 +28,7 @@
    ["@mui/icons-material/DirectionsRun" :default DirectionsRun]
    ["@mui/icons-material/DoNotTouch" :default DoNotTouch]
    ["@mui/icons-material/Download" :default Download]
+   ["@mui/icons-material/DragIndicator" :default DragIndicator]
    ["@mui/icons-material/Edit" :default Edit]
    ["@mui/icons-material/EmojiPeople" :default EmojiPeople]
    ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
@@ -313,6 +314,9 @@
 
 (defn DownloadIcon [props]
   [:> Download props])
+
+(defn DragIndicatorIcon [props]
+  [:> DragIndicator props])
 
 (defn ArrowDropDownCircleIcon [props]
   [:> ArrowDropDownCircle props])

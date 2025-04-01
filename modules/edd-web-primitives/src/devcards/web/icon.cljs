@@ -12,17 +12,18 @@
      ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
      BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon CalculateIcon
      CheckCircleOutlineOutlinedIcon ChevronRightIcon ChromeReaderModeIcon ClearIcon CloseIcon
-     ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon EditIcon
-     UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon ExpandLessIcon
-     ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon GetAppIcon
-     HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon KeyboardTabIcon LaunchIcon
-     LinkIcon LinkOffIcon LogoIcon HierarchyIcon ManageSearchIcon MarkunreadMailboxIcon MenuIcon
-     MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon NoteOutlinedIcon QueryStatsIcon
-     NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon PictureAsPdfIcon
-     PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon ReportProblemIcon
-     SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon SubdirectoryArrowRightIcon
-     TrendingFlatIcon TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon TableChartIcon UpdateIcon
-     SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon GppGoodIcon]]))
+     ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon
+     DragIndicatorIcon EditIcon UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon
+     ExpandLessIcon ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon
+     ForwardIcon GetAppIcon HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon
+     KeyboardTabIcon LaunchIcon LinkIcon LinkOffIcon LogoIcon HierarchyIcon ManageSearchIcon
+     MarkunreadMailboxIcon MenuIcon MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon
+     NoteOutlinedIcon QueryStatsIcon NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon
+     PictureAsPdfIcon PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon
+     ReportProblemIcon SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon
+     SubdirectoryArrowRightIcon TrendingFlatIcon TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon
+     TableChartIcon UpdateIcon SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon
+     GppGoodIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
@@ -89,6 +90,8 @@
 (defcard-rg :directions-run-icon "## Directions Run Icon" [DirectionsRunIcon])
 
 (defcard-rg :download-icon "## Download Icon" [DownloadIcon])
+
+(defcard-rg :drag-indicator-icon "## Drag IndicatorIcon" [DragIndicatorIcon])
 
 (defcard-rg :do-not-touch-icon "## DoNotTouch Icon" [DoNotTouchIcon])
 
