@@ -14,14 +14,9 @@
   (fn [data-atom _]
     (apply-stiles
      [RawGrid {:container true}
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawSlider {:value (:value @data-atom)
                    :color "secondary"
-                   :min 0
-                   :max 100
-                   :on-change (fn [_ value] (swap! data-atom merge {:value value}))}]]
-      [RawGrid {}]]))
+                   :on-change #(swap! data-atom merge {:value %2})}]]]))
 
   (r/atom {:value 30}))
-
-

@@ -16,8 +16,8 @@
                             :action    (r/as-element [RawButton {:on-click #(print "action")} "actions"])}
                   :actions [RawGrid {:container true} [RawButton {:on-click #(print "action")} "actions"]]}
 
-                 [RawGrid {:container true :style {:background-color "#ececec"}}
-                  [RawGrid {:item true}
+                 [RawGrid {:container true :sx {:background-color "#ececec"}}
+                  [RawGrid {}
                    "Content"]]]))
 
 (defcard-rg :card-with-on-click-event
@@ -26,8 +26,9 @@
                  {:header  {:title     "Header"
                             :subheader "Subheader"}
                   :on-click #(print "on-card-click")
-                  :actions [RawGrid {:container true} [RawButton {:on-click #(print "action")} "actions"]]}
+                  :actions [RawGrid {:container true}
+                            [RawButton {:on-click #(print "action")} "actions"]]}
 
-                 [RawGrid {:container true :style {:background-color "#ececec"}}
-                  [RawGrid {:item true}
+                 [RawGrid {:container true :sx {:background-color "#ececec"}}
+                  [RawGrid {}
                    "Content"]]]))

@@ -14,13 +14,13 @@
   (fn [data-atom _]
     (apply-stiles
      [RawGrid {:container true}
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawCheckbox {:checked (:show @data-atom)
                      :on-change (fn [] (swap! data-atom merge {:show (not (:show @data-atom))}))
                      :label "Show"}]]
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawZoom
         {:in (:show @data-atom)}
-        [RawGrid {:container true :style {:background-color "#edeeee"}} "Hello there!"]]]]))
+        [RawGrid {:container true :sx {:background-color "#edeeee"}} "Hello there!"]]]]))
 
   (r/atom {:show false}))

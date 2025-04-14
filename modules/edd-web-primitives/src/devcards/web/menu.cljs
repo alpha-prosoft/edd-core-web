@@ -11,7 +11,7 @@
   "## Menu"
   (fn [data-atom _]
     (apply-stiles
-     [RawGrid {:container true :item true}
+     [RawGrid {:container true}
       [RawButton {:on-click #(swap! data-atom assoc :open (. % -target))}
        "Menu"]
       [RawMenu {:id "menu"

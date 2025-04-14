@@ -14,14 +14,16 @@
   (fn [data-atom _]
     (apply-stiles
      [RawGrid {:container true}
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawCheckbox {:checked (:show @data-atom)
                      :on-change (fn [] (swap! data-atom merge {:show (not (:show @data-atom))}))
                      :label "Show"}]]
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawSlide
         {:in (:show @data-atom)}
-        [RawGrid {:container true :style {:background-color "#edeeee"}} "Hello there!"]]]]))
+        [RawGrid {:container true
+                  :sx {:background-color "#edeeee"}}
+         "Hello there!"]]]]))
 
   (r/atom {:show false}))
 
@@ -30,20 +32,24 @@
   (fn [data-atom _]
     (apply-stiles
      [RawGrid {:container true}
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawSwitch {:left-label  "Left"
                    :right-label "Right"
                    :left-value  :left
                    :right-value :right
                    :value       (:selected @data-atom)
                    :on-change #(swap! data-atom merge {:selected %})}]]
-      [RawGrid {:container true :item true}
+      [RawGrid {:size 12}
        [RawSlide
         {:in (= :right (:selected @data-atom))}
-        [RawGrid {:container true :item true :xs true :style {:background-color "#edee99"}} "Right block"]]
+        [RawGrid {:container true
+                  :sx {:background-color "#edee99"}}
+         "Right block"]]
        [RawSlide
         {:in (= :left (:selected @data-atom)) :direction "right"}
-        [RawGrid {:container true :item true :xs true :style {:background-color "#edeeee"}} "Left block"]]]]))
+        [RawGrid {:container true
+                  :sx {:background-color "#edeeee"}}
+         "Left block"]]]]))
 
   (r/atom {:selected :left}))
 

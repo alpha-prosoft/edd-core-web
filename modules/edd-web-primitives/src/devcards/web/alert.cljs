@@ -45,7 +45,7 @@
 (defcard-rg :info-alert
   "## Info Alert with Grids"
   (apply-stiles [RawGrid {:container true}
-                 [RawGrid {:item true :container true}
+                 [RawGrid {:size 12}
                   [RawAlert
                    {:id          "info-success"
                     :severity    "info"
@@ -53,9 +53,7 @@
                     :title-props {:variant "h4"}
                     :action      (r/as-element [RawIconButton {} [ClearIcon]])}
                    [RawGrid {:container true :justify-content "space-between"}
-                    [RawGrid {:item true} "Info Alert"]
-                    [RawGrid {:container       true
-                              :item            true
-                              :xs              1
+                    [RawGrid {} "Info Alert"]
+                    [RawGrid {:size              1
                               :alignContent    "center"
                               :justify-content "flex-end"}]]]]]))

@@ -39,29 +39,29 @@
                  "Content"]))
 
 (def header-first-row
-  [RawGrid {:container true :spacing 1}
-   [RawGrid {:item true :xs 2} "Export Finance"]
-   [RawGrid {:item true :xs 2} "EUR 20 000 000"]
-   [RawGrid {:item true :xs 2} "Facility"]])
+  [RawGrid {:container true :size 12 :spacing 1}
+   [RawGrid {:size 2} "Export Finance"]
+   [RawGrid {:size 2} "EUR 20 000 000"]
+   [RawGrid {:size 2} "Facility"]])
 
 (def header-second-row
-  [RawGrid {:container true :spacing 1 :style {:margin-top "1rem"}}
-   [RawGrid {:item true}
+  [RawGrid {:container true :size 12 :spacing 1 :sx {:margin-top "1rem"}}
+   [RawGrid {}
     [RawTextField {:label         "Customer"
                    :default-value "Customer name"
                    :InputProps    {:disableUnderline true
                                    :readOnly         true}}]]
-   [RawGrid {:item true}
+   [RawGrid {}
     [RawTextField {:label         "Product Group"
                    :default-value "Product group name"
                    :InputProps    {:disableUnderline true
                                    :readOnly         true}}]]
-   [RawGrid {:item true}
+   [RawGrid {}
     [RawTextField {:label         "Start Date"
                    :default-value "2020-03-21"
                    :InputProps    {:disableUnderline true
                                    :readOnly         true}}]]
-   [RawGrid {:item true}
+   [RawGrid {}
     [RawTextField {:label         "End Date"
                    :default-value "2025-03-21"
                    :InputProps    {:disableUnderline true
@@ -73,26 +73,27 @@
                                :header          [RawGrid {:container true}
                                                  header-first-row
                                                  header-second-row]
-                               :header-expanded [RawGrid {:container true}
-                                                 header-first-row]
+                               :header-expanded header-first-row
                                :init-expanded?  true}
                  [RawCard {} [RawGrid {:container true :style {:margin-top "-1rem"}}
                               header-second-row
-                              [RawGrid {:container true :spacing 1}
-                               [RawGrid {:item true :xs 12} "Content..."]]]]]))
+                              [RawGrid {:container true
+                                        :spacing 1}
+                               [RawGrid {:size 12} "Content..."]]]]]))
 
 (defcard-rg :accordion-controlled-from-outside
   "## Accordion controlled from outside"
   (fn [data-atom _]
-    (apply-stiles [RawGrid {:container true}
-                   [RawGrid {:container true :item true}
+    (apply-stiles [RawGrid {:container true
+                            :spacing 2}
+                   [RawGrid {:size 12}
                     [EddAccordion {:id             "accordion-init-expanded"
                                    :header         "Header"
                                    :expanded?      (:expanded? @data-atom)
                                    :on-click       #(swap! data-atom merge {:expanded? (not (:expanded? @data-atom))})
                                    :on-expand-func #(print "on-expand controlled outside" (:expanded? @data-atom))}
                      "Content"]]
-                   [RawGrid {:container true :item true}
+                   [RawGrid {:size 12}
                     [RawButton {:on-click #(swap! data-atom merge {:expanded? (not (:expanded? @data-atom))})}
                      "Switch"]]]))
   (r/atom {:expanded? false}))
@@ -101,13 +102,13 @@
   "## Headless Accordion"
   (fn [data-atom _]
     (apply-stiles [RawGrid {:container true}
-                   [RawGrid {:container true :item true}
+                   [RawGrid {:size 12}
                     [RawHeadlessAccordion {:id        "headless-accordion"
                                            :expanded? (:expanded? @data-atom)}
                      [RawGrid {:container true}
-                      [RawGrid {:item true}
+                      [RawGrid {}
                        "Content"]]]]
-                   [RawGrid {:container true :item true}
+                   [RawGrid {:size 12}
                     [RawButton {:on-click #(swap! data-atom merge {:expanded? (not (:expanded? @data-atom))})}
                      "Switch"]]]))
   (r/atom {:expanded? false}))

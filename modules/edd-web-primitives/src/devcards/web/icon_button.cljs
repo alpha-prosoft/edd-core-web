@@ -12,12 +12,12 @@
 (defcard-rg :iconbutton-add
   "## IconButton Add (default :size \"medium\" option \"small\")"
   (apply-stiles [RawGrid {:container true :align-items "baseline" :spacing 4 :direction "row"}
-                 [RawGrid {:item true}
+                 [RawGrid {}
                   [RawIconButton
                    {:id       "button-add"
                     :on-click (fn [] (print "on-click"))}
                    [AddIcon]]]
-                 [RawGrid {:item true}
+                 [RawGrid {}
                   [RawIconButton
                    {:id       "button-add"
                     :size     "small"
@@ -56,11 +56,11 @@
 (defcard-rg :iconbutton-delete
   "## IconButton No icon"
   (apply-stiles [RawGrid {:container true :align-items "baseline" :spacing 4 :direction "row"}
-                 [RawGrid {:item true}
+                 [RawGrid {}
                   [RawIconButton
                    {:id       "button-delete"
                     :on-click (fn [] (print "on-click"))}]]
-                 [RawGrid {:item true}
+                 [RawGrid {}
                   [RawIconButton
                    {:id       "button-delete"
                     :size     "small"
@@ -71,14 +71,14 @@
   (apply-stiles [RawGrid {:container true
                           :direction "column"
                           :sx {:width "fit-content"}}
-                 [RawGrid {:item true}
+                 [RawGrid {}
                   [RawIconButton {:size "small"
                                   :edge "start"
                                   :sx {:padding "7px!important"}
                                   :disabled true}
                    [ArrowDropUpCircleIcon {:color "secondary"
                                            :font-size "small"}]]]
-                 [RawGrid {:item true}
+                 [RawGrid {}
                   [RawIconButton {:size "small"
                                   :edge "start"
                                   :sx {:padding "7px!important"}}

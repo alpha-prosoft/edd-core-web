@@ -15,12 +15,7 @@
 (defn RawDialog [{:keys [title actions dividers]
                   :or   {dividers false} :as props} content]
   [:> Dialog
-   (merge {:disableEnforceFocus true}
-          (->
-           props
-           (dissoc :dividers)
-           (dissoc :title)
-           (dissoc :actions)))
+   (dissoc props :dividers :title :actions)
    [:> DialogTitle title]
    [:> DialogContent {:dividers dividers} content]
    (when (some? actions)

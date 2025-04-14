@@ -41,10 +41,10 @@
 
    [:> AccordionSummary
     (merge {:sx (merge {} summary-style)
+            :container true
             :component Grid
-            :children	(r/as-element [:> Grid {:container true :alignItems "center"}
-                                     [:> Grid {:item  true
-                                               :sx (merge
+            :children	(r/as-element [:> Grid {:container true :size 12 :alignItems "center"}
+                                     [:> Grid {:sx (merge
                                                     {:position "absolute" :top "0px"}
                                                     (when (= control-position :right) {:right "0px"}))}
                                       [:> IconButton
@@ -56,9 +56,9 @@
                                                   {:marginLeft "-1.1rem"})}
                                         (when (:id props) {:id (:id props)}))
                                        (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
-                                     [:> Grid {:container true :sx (if (= control-position :right)
-                                                                     {:paddingRight "2.5rem"}
-                                                                     {:paddingLeft "2.5rem"})}
+                                     [:> Grid {:size 12 :sx (if (= control-position :right)
+                                                              {:paddingRight "2.5rem"}
+                                                              {:paddingLeft "2.5rem"})}
                                       (if (and expanded? (contains? props :header-expanded))
                                         (:header-expanded props)
                                         (:header props))]])}

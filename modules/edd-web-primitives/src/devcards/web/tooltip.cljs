@@ -19,7 +19,8 @@
   (apply-stiles [RawTooltip
                  {:title "Tooltip text"
                   :enterDelay 1000
-                  :leaveDelay 1000
-                  :enterNextDelay 1000}
+                  :leaveDelay 10000
+                  :enterNextDelay 1000
+                  :sx {:width "auto"}}
 
                  [RawButton {} "Tooltip"]]))

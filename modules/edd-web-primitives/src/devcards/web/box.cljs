@@ -8,5 +8,5 @@
 
 (defcard-rg :box
   "## Box"
-  [RawBox {:style {:text-align "center" :background-color "#ececec"}}
+  [RawBox {:sx {:text-align "center" :background-color "#ececec"}}
    "Box Wrapper"])

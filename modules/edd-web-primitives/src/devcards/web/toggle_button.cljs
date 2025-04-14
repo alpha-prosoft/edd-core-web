@@ -34,14 +34,14 @@
   (fn [data-atom _]
     (apply-stiles
      [RawGrid {:container true :direction "column" :spacing 2}
-      [RawGrid {:item true}
+      [RawGrid {}
        [RawToggleButtonGroup
         {:id        "button"}
         (RawToggleButton {:value    :one :selected (= :one (:selected @data-atom))
                           :on-click (fn [] (swap! data-atom merge {:selected :one}))
                           :sx       button-style}
                          "One")]]
-      [RawGrid {:item true}
+      [RawGrid {}
        [RawToggleButtonGroup
         {:id        "button"
          :orientation "horizontal"}
@@ -50,7 +50,7 @@
                           :on-click (fn [] (swap! data-atom merge {:selected :two}))
                           :sx       button-style}
                          "Two")]]
-      [RawGrid {:item true}
+      [RawGrid {}
        [RawToggleButtonGroup
         {:id        "button"
          :orientation "horizontal"}

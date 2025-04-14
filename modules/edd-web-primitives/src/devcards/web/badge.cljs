@@ -19,7 +19,7 @@
   "## Notifications with Badge"
   (apply-stiles
    [RawGrid {:container true :spacing 2}
-    [RawGrid {:item true}
+    [RawGrid {}
      [RawBadge
       {:id "badge"
        :color "error"
@@ -27,7 +27,7 @@
                       :horizontal "right"}
        :content [NotificationsNoneIcon]
        :badge-content "9+"}]]
-    [RawGrid {:item true}
+    [RawGrid {}
      [RawBadge
       {:id "badge"
        :color "error"

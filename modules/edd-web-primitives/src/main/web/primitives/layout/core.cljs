@@ -4,11 +4,15 @@
    ["@mui/material/Grid" :default Grid]
    ["@mui/material/Stack" :default Stack]))
 
-(defn RawGrid [props & children]
-  (into
-   [:> Grid props]
-   (for [child children]
-     child)))
+(defn RawGrid [{:keys [xs size]
+                :as props}
+               & children]
+  (let [size (or size {:xs xs})]
+    (into
+     [:> Grid (-> props
+                  (assoc :size size))]
+     (for [child children]
+       child))))
 
 (defn RawBox [props & children]
   (into

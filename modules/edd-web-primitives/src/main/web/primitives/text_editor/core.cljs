@@ -16,33 +16,30 @@
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [RawGrid {:container true
-            :sx {:position "relative"}}
-   [RawGrid {:container true
-             :item true
-             :sx {:border "solid 1px #dadada"
-                  :min-height "2rem"
-                  :padding "1rem"
-                  :display "block"
-                  :font-size "13px"
-                  :overflow "hidden"}
-             :class-name "sun-editor-editable"
+            :sx        {:position "relative"}}
+   [RawGrid {:size 12
+             :sx                      {:border     "solid 1px #dadada"
+                                       :min-height "2rem"
+                                       :padding    "1rem"
+                                       :display    "block"
+                                       :font-size  "13px"
+                                       :overflow   "hidden"}
+             :class-name              "sun-editor-editable"
              :dangerouslySetInnerHTML {:__html (sanitize-html (:set-contents props))}}]
    (let [edit-icon-position (:edit-icon-position props)]
-     [RawGrid {:item true
-               :sx
-               (merge
-                {:position "absolute"}
-                (if (contains? #{:left :right} edit-icon-position)
-                  {edit-icon-position 0}
-                  {:right 0}))}
+     [RawGrid {:sx (merge
+                    {:position "absolute"}
+                    (if (contains? #{:left :right} edit-icon-position)
+                      {edit-icon-position 0}
+                      {:right 0}))}
       [:> IconButton
        (merge
         {:on-click set-edit-mode-funk
-         :sx    (merge
-                 {:padding 0}
-                 (when (true? (:disable props)) {:opacity 0.5}))
+         :sx       (merge
+                    {:padding 0}
+                    (when (true? (:disable props)) {:opacity 0.5}))
          :disabled (:disable props)}
-        (when (:id props) {:id       (str "edit-button-" (:id props))}))
+        (when (:id props) {:id (str "edit-button-" (:id props))}))
        [EditIcon]]])])
 
 (defn- edit-mode [{:keys [on-change] :as props} set-read-only-mode]
@@ -51,33 +48,35 @@
             (when (:id props) {:id (str "editor-" (:id props))}))
    [:> SunEditor
     (merge
-     {:on-paste (fn [event clean-data] (handle-on-paste event clean-data props))
-      :on-drop (fn [] (handle-on-drop props))
-      :setOptions  {:buttonList sun-editor-button-list
-                    :resizingBar false
-                    :showPathLabel false}
+     {:on-paste      (fn [event clean-data] (handle-on-paste event clean-data props))
+      :on-drop       (fn [] (handle-on-drop props))
+      :setOptions    {:buttonList    sun-editor-button-list
+                      :resizingBar   false
+                      :showPathLabel false}
       :enableToolbar (not (:disable props))}
      props
      {:on-change #(on-change (sanitize-html %))})]
-   [RawGrid {:container true :style {:border "solid 1px #dadada"
-                                     :border-top "none"
-                                     :justify-content "flex-end"}}
+   [RawGrid {:container true
+             :size 12
+             :sx {:border          "solid 1px #dadada"
+                  :border-top      "none"
+                  :justify-content "flex-end"}}
     (when (contains? props :on-save)
-      [RawGrid {:item true :style {:padding "1rem"}}
+      [RawGrid {:sx {:padding "1rem"}}
        [:> Button (merge
                    {:variant  "outlined"
                     :on-click (handle-on-save props set-read-only-mode)
-                    :sx   {:height "2rem"}}
+                    :sx       {:height "2rem"}}
                    (when (:id props) {:id (str "save-button-" (:id props))})) "Save"]
        [:> Button (merge
                    {:on-click set-read-only-mode
-                    :sx    {:height "2rem"}}
+                    :sx       {:height "2rem"}}
                    (when (:id props) {:id (str "discard-button-" (:id props))})) "Discard"]])]])
 
 (defn RawTextEditor
   [{:keys [editor-mode set-read-only-mode set-edit-mode]
-    :or {editor-mode :edit-mode}
-    :as props}]
+    :or   {editor-mode :edit-mode}
+    :as   props}]
   (if
    (= :read-only-mode editor-mode)
     (read-only-mode props set-edit-mode)
@@ -93,8 +92,8 @@
           set-read-only-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :read-only-mode]))
           set-edit-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :edit-mode]))]
       [RawTextEditor (merge
-                      {:editor-mode editor-mode
+                      {:editor-mode        editor-mode
                        :set-read-only-mode set-read-only-mode
-                       :set-edit-mode set-edit-mode}
+                       :set-edit-mode      set-edit-mode}
                       props)])))
 

@@ -2,10 +2,8 @@
   (:require
    [cljsjs.react]
    [cljsjs.react.dom]
-   [web.primitives.components :refer [RawTextField RawNumberField RawPercentField]]
+   [web.primitives.components :refer [RawTextField]]
    [web.primitives.icons.core :refer [ChatIcon]]
-
-   [clojure.string :as str]
 
    [devcards.core :refer-macros (defcard-rg)]
    [web.primitives.utils :refer [apply-stiles]]))

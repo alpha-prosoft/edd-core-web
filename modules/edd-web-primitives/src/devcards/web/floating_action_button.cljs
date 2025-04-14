@@ -31,13 +31,13 @@
   (fn [data-atom _]
     (apply-stiles
      [RawGrid {:container true}
-      [RawGrid {:item true :xs 2}
+      [RawGrid {:size 2}
        (when
         (= 1 (:show @data-atom)) [RawFab
                                   {:id       "add-button"
                                    :on-click #(swap! data-atom merge {:show 2})}
                                   [ClearIcon]])]
-      [RawGrid {:item true :xs 2}
+      [RawGrid {:size 2}
        (when
         (= 2 (:show @data-atom)) [RawFab
                                   {:id       "add-button"

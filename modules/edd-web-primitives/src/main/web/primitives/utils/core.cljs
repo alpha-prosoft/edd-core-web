@@ -1,20 +1,17 @@
 (ns web.primitives.utils.core
   (:require
-   [reagent.core :as r]
-
    ["@mui/material/Zoom" :default Zoom]
-   ["@mui/material/Slide" :default Slide]
-   ["@mui/material/Grid" :default Grid]))
+   ["@mui/material/Slide" :default Slide]))
 
 (defn RawSlide [{:keys [in direction timeout]
                  :or   {in false direction "left" timeout 500}}
                 content]
-  (r/as-element [:> Slide {:in            in
-                           :direction     direction
-                           :mountOnEnter  true
-                           :unmountOnExit true
-                           :timeout       timeout}
-                 [:> Grid {:container true} content]]))
+  [:> Slide {:in            in
+             :direction     direction
+             :mountOnEnter  true
+             :unmountOnExit true
+             :timeout       timeout}
+   [:div content]])
 
 (defn RawZoom [{:keys [in] :or {in false} :as props} content]
   [:> Zoom (merge

@@ -11,7 +11,7 @@
 (defcard-rg :tabs "## Tabs"
   (fn [data-atom _]
     (apply-stiles [RawGrid {:container true}
-                   [RawGrid {:item true :xs 12}
+                   [RawGrid {:size 12}
                     [RawTabs {:value (:selected @data-atom)
                               :on-change #(swap! data-atom merge {:selected (-> %2)})
                               :indicatorColor "primary"
@@ -21,10 +21,10 @@
                                       :label "Tab 2"}
                                      {:id "Tab Number 3"
                                       :label "Disabled Tab" :disabled true}]}]]
-                   [RawGrid {:item true :xs 12}
+                   [RawGrid {:size 12}
                     (case (:selected @data-atom)
-                      0 [RawGrid {:item true :xs 6} "Content of Tab 1"]
-                      1 [RawGrid {:item true :xs 6} "Content of Tab 2"]
-                      2 [RawGrid {:item true :xs 6} "Content of Tab 3"]
+                      0 [RawGrid {:size 6} "Content of Tab 1"]
+                      1 [RawGrid {:size 6} "Content of Tab 2"]
+                      2 [RawGrid {:size 6} "Content of Tab 3"]
                       "")]]))
   (r/atom {:selected 0}))

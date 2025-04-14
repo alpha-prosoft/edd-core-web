@@ -6,7 +6,7 @@
    [reagent.core :as r]
    [web.primitives.utils :refer [apply-stiles]]
 
-   [web.primitives.components :refer [RawDialog RawButton RawGrid]]))
+   [web.primitives.components :refer [RawDialog RawButton RawGrid RawTextField]]))
 
 (defcard-rg :dialog
   "## Dialog"
@@ -18,9 +18,12 @@
        "Open dialog"]
       [RawDialog {:open (:open @data-atom)
                   :title "A dialog"}
-       [RawButton
-        {:on-click #(swap! data-atom merge {:open false})}
-        "Close"]]]))
+       [RawGrid {:container true :spacing 2}
+        [RawTextField {:label "Text field"}]
+        [RawButton
+         {:on-click #(swap! data-atom merge {:open false})}
+         "Close"]]]]))
+
   (r/atom {:open false}))
 
 (defcard-rg :dialog-with-actions
