@@ -11,7 +11,6 @@
             :date-fns             "^2.29.1"
             :dayjs                "1.11.13"
             :g                    "^2.0.1"
-            :js-beautify          "1.15.4"
             :marked               "15.0.9"
             :moment               "^2.27.0"
             :react                "18.3.1"

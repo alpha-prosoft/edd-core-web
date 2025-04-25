@@ -24,7 +24,7 @@
     :http-root        "resources/public"
     :http-handler     shadow.http.push-state/handle
     :push-state/index "index.html"
-    ;:preloads   [devtools.preload day8.re-frame-10x.preload.react-18]
+    :preloads   [devtools.preload day8.re-frame-10x.preload.react-18]
     :after-load       web.start-ui/init}
    :dev
    {:compiler-options {:devcards true}}
