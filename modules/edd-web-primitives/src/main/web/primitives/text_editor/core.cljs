@@ -16,6 +16,7 @@
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [RawGrid {:container true
+            :size 12
             :sx        {:position "relative"}}
    [RawGrid {:size 12
              :sx                      {:border     "solid 1px #dadada"
@@ -44,7 +45,8 @@
 
 (defn- edit-mode [{:keys [on-change] :as props} set-read-only-mode]
   [RawGrid (merge
-            {:container true}
+            {:container true
+             :size 12}
             (when (:id props) {:id (str "editor-" (:id props))}))
    [:> SunEditor
     (merge
