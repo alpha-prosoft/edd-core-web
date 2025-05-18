@@ -18,6 +18,9 @@ ARG BUILD_ID
 COPY --chown=build:build modules modules
 COPY --chown=build:build templates templates
 
+# We copy from Jenkinsfile repo here (cbd-jenkins-pipeline)
+COPY --chown=build:build scripts/build.clj build.clj
+
 RUN set -e &&\
     echo "Building b${BUILD_ID}" &&\
     root=$PWD &&\
@@ -62,37 +65,34 @@ RUN set -e &&\
     mkdir -p resources &&\
     clojure -M:zip &&\
     ls -la resources &&\
-    set -e && clj -A:jar  \
-        --app-group-id ${ARTIFACT_ORG} \
-        --app-artifact-id ${PROJECT_NAME} \
-        --app-version "1.${BUILD_ID}" &&\
-    cp pom.xml /dist/release-libs/${PROJECT_NAME}-1.${BUILD_ID}.jar.pom.xml &&\
+    clojure -T:build jar   \
+             :group-id "\"${ARTIFACT_ORG}\"" \
+             :artifact-id "\"${PROJECT_NAME}\"" \
+             :version "\"1.${BUILD_ID}\"" &&\
+    cp target/classes/META-INF/maven/${ARTIFACT_ORG}/${PROJECT_NAME}/pom.xml \
+             /dist/release-libs/${PROJECT_NAME}-1.${BUILD_ID}.jar.pom.xml &&\
     cp target/${PROJECT_NAME}-1.${BUILD_ID}.jar /dist/release-libs/${PROJECT_NAME}-1.${BUILD_ID}.jar &&\
     mvn install:install-file \
        -Dfile=target/${PROJECT_NAME}-1.${BUILD_ID}.jar \
        -DgroupId=${ARTIFACT_ORG} \
        -DartifactId=${PROJECT_NAME} \
-       -DpomFile=pom.xml \
+       -DpomFile=target/classes/META-INF/maven/${ARTIFACT_ORG}/${PROJECT_NAME}/pom.xml \
        -Dversion="1.${BUILD_ID}" \
        -Dpackaging=jar &&\
     echo "Building modules:" &&\
     for i in $(ls modules); do  \
       echo "Moving to modules/$i" &&\
       cd modules/$i &&\
-      clj -A:jar  \
-           --app-group-id ${ARTIFACT_ORG} \
-           --app-artifact-id $i \
-           --app-version "1.${BUILD_ID}" &&\
-      cp pom.xml /dist/release-libs/$i-1.${BUILD_ID}.jar.pom.xml &&\
-      cp target/$i-1.${BUILD_ID}.jar /dist/release-libs/$i-1.${BUILD_ID}.jar &&\
+      cp $root/build.clj . &&\
+      clojure -T:build jar   \
+             :group-id "\"${ARTIFACT_ORG}\"" \
+             :artifact-id "\"${i}\"" \
+             :version "\"1.${BUILD_ID}\"" &&\
+      cp target/classes/META-INF/maven/${ARTIFACT_ORG}/${i}/pom.xml \
+             /dist/release-libs/${i}-1.${BUILD_ID}.jar.pom.xml &&\
+      cp target/${i}-1.${BUILD_ID}.jar /dist/release-libs/${i}-1.${BUILD_ID}.jar; \
       cd $root || exit 1; \
     done
 
 
 RUN ls -la target
-
-
-RUN cp pom.xml /dist/release-libs/${PROJECT_NAME}-1.${BUILD_ID}.jar.pom.xml
-RUN cp target/${PROJECT_NAME}-1.${BUILD_ID}.jar /dist/release-libs/${PROJECT_NAME}-1.${BUILD_ID}.jar
-
-RUN cat pom.xml
