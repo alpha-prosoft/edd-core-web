@@ -34,11 +34,13 @@
                {:badge-content "0"}))
    (:content props)])
 
-(defn RawTooltip [{:keys [container-style] :as props} content]
+(defn RawTooltip [{:keys [container-style no-grid] :as props :or {no-grid false}} content]
   [:> Tooltip (merge {:arrow true} (dissoc props :container-style))
-   [:> Grid {:sx (merge {:width "fit-content"}
-                        container-style)}
-    content]])
+   (if no-grid
+     content
+     [:> Grid {:sx (merge {:width "fit-content"}
+                          container-style)}
+      content])])
 
 (defn RawTypography [props content]
   [:> Typography props content])
