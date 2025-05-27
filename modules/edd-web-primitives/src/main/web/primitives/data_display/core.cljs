@@ -35,7 +35,7 @@
    (:content props)])
 
 (defn RawTooltip [{:keys [container-style no-grid] :as props :or {no-grid false}} content]
-  [:> Tooltip (merge {:arrow true} (dissoc props :container-style))
+  [:> Tooltip (merge {:arrow true} (dissoc props :container-style :no-grid))
    (if no-grid
      content
      [:> Grid {:sx (merge {:width "fit-content"}
