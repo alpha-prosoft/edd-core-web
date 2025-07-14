@@ -45,8 +45,6 @@
  (fn [db [_ do-after-login]]
    (assoc-in db [::db/do-after-login] do-after-login)))
 
-
-
 (defn close-dialog
   [db]
   (-> db

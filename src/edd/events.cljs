@@ -134,14 +134,6 @@
              :name
              keyword)
 
-         _ (.log js/console "Navigation"
-                 (clj->js
-                  {:params params
-                   :target target
-                   :route (reitit/match-by-path router target)
-                   :name (reitit/match-by-name router target params)
-                   :handler handler}))
-
          route-params
          (merge {}
                 query-params

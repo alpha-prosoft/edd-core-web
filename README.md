@@ -109,3 +109,57 @@ During development you can use local installation:
 ```
 npx re-gen --help
 ```
+
+## Internationalization (i18n)
+
+### Translation Function (tr)
+
+The `tr` function in `src/edd/i18n.cljs` provides flexible translation capabilities with parameter substitution.
+
+#### Usage Examples:
+
+**Basic translation:**
+```clojure
+(tr :first-name)  ; Translates the :first-name key
+```
+
+**Nested key translation:**
+```clojure
+(tr [:user :first-name])  ; Translates {:user {:first-name "..."}}
+```
+
+**Map-based syntax:**
+```clojure
+(tr {:message :first-name})  ; Translates the :first-name key
+(tr {:message [:user :first-name]})  ; Translates nested key
+```
+
+**With positional parameters:**
+```clojure
+(tr {:message :greeting
+     :params ["Bob", "Alice"]})
+; If translation is "Hello {0}, welcome {1}!"
+; Returns: "Hello Bob, welcome Alice!"
+```
+
+**With named parameters:**
+```clojure
+(tr {:message :greeting
+     :params {:name "Bob" :place "Berlin"}})
+; If translation is "Hello {name}, welcome to {place}!"
+; Returns: "Hello Bob, welcome to Berlin!"
+```
+
+#### Translation format:
+
+In your translation files, use placeholders for parameters:
+- Positional: `{0}`, `{1}`, `{2}`, etc.
+- Named: `{name}`, `{place}`, `{count}`, etc.
+
+Example translation structure:
+```clojure
+{:en {:greeting "Hello {name}!"
+      :welcome "Welcome {0} to {1}"
+      :user {:first-name "First Name"
+             :last-name "Last Name"}}}
+```

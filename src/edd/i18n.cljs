@@ -1,6 +1,7 @@
 (ns edd.i18n
-  (:require [re-frame.core :as rf]
-            [edd.subs :as subs]))
+  (:require [edd.db :as db]
+            [re-frame.db :as re-frame-db]
+            [clojure.string :as str]))
 
 (def base-translations
   {:language {:en "English"
@@ -9,18 +10,42 @@
 (def TranslationSchema [:map
                         []])
 
+(defn- format-string
+  [s params]
+  (cond
+    (vector? params)
+    (reduce-kv 
+     (fn [acc idx val]
+       (str/replace acc (str "{" idx "}") (str val)))
+     s
+     params)
+    
+    (map? params)
+    (reduce-kv
+     (fn [acc k v]
+       (str/replace acc (str "{" (name k) "}") (str v)))
+     s
+     params)
+    
+    :else s))
+
 (defn tr
-  [& key]
-  (let [lang @(rf/subscribe [::subs/selected-language])
-        prop (if (keyword?
-                  (first
-                   key))
-               key
-               (first key))
-        prop (vec
-              (concat [lang]
-                      prop))
-        val (get-in @(rf/subscribe [::subs/translations])
+  [& args]
+  (let [lang (get @re-frame-db/app-db ::db/selected-language)
+        [message-spec params] (if (map? (first args))
+                                [(first args) nil]
+                                [args nil])
+        message-key (if (map? message-spec)
+                      (:message message-spec)
+                      (if (keyword? (first message-spec))
+                        message-spec
+                        (first message-spec)))
+        params (or (:params message-spec) params)
+        prop (if (keyword? message-key)
+               [message-key]
+               message-key)
+        prop (vec (concat [lang] prop))
+        val (get-in (get @re-frame-db/app-db ::db/translations)
                     prop
                     (str "{tr " prop "}"))]
     (when-not (string? val)
@@ -30,7 +55,9 @@
                                :value val}
                               clj->js
                               (.stringify js/JSON))))))
-    val))
+    (if params
+      (format-string val params)
+      val)))
 
 (comment
   (defn convert-structure

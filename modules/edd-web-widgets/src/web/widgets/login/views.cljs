@@ -161,7 +161,7 @@
                               :md "none"}}}
       (cacnelbutton)]]]])
 
-(defn username []
+(defn Username []
   [:> TextField {:key           "username"
                  :autoFocus     true
                  :margin        "dense"
@@ -244,7 +244,7 @@
       [:> Grid {:container true :direction "column" :spacing 1}
        (when (some #(= % form-type) [:register :login :forgot-password])
          [:> Grid {:item true :xs true}
-          (username)])
+          [Username]])
 
        (when (some #(= % form-type) [:register :login :confirm-password-reset])
          [:> Grid {:item true} (password-field)])
@@ -286,7 +286,6 @@
                  :as   params}]
   (let [logged? (boolean @(rf/subscribe [::subs/user-name]))
         init? @(rf/subscribe [::subs/init?])]
-    (rf/dispatch [::events/init params])
     (when init?
       [:> Grid {:container       true
                 :justify-content :flex-end
