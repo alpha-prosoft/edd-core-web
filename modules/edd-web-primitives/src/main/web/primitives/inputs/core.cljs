@@ -21,7 +21,7 @@
             ["@mui/material/Slider" :default Slider]
 
             ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
-            ["@mui/x-date-pickers/index" :refer [LocalizationProvider DesktopDatePicker]]
+            ["@mui/x-date-pickers" :refer [LocalizationProvider DesktopDatePicker]]
             ["moment" :as moment]
 
             [web.primitives.layout.core :refer [RawGrid]]

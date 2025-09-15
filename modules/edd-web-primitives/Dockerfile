@@ -3,7 +3,7 @@ ARG DOCKER_ORG
 ARG BUILD_ID
 ARG PROJECT_NAME=edd-web-primitives
 
-FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest
+FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b1849
 
 ENV PROJECT_NAME edd-web-primitives
 
@@ -17,9 +17,21 @@ RUN npm install -g shadow-cljs karma karma-cljs-test karma-chrome-launcher karma
 USER build
 
 COPY --chown=build:build shadow-cljs.edn shadow-cljs.edn
-COPY --chown=build:build deps.edn deps.edn
+COPY --chown=build:build deps.edn deps-temp.edn
 COPY --chown=build:build tests.edn tests.edn
-COPY --chown=build:build karma.conf.js karma.conf.js
+
+RUN ls -la
+
+ARG DEPLOY_TARGET
+ENV DEPLOY_TARGET ${DEPLOY_TARGET}
+
+RUN mkdir -p /dist/s3
+RUN ls -la /dist
+RUN set -e &&\
+    clojure merge.clj &&\
+    npx shadow-cljs classpath
+
+
 COPY --chown=build:build resources resources
 COPY --chown=build:build src src
 
@@ -27,16 +39,11 @@ RUN set -e && clojure -M:lint --lint src/main src/test
 RUN set -e && clojure -M:test:runner
 RUN set -e && npx shadow-cljs -A:dev compile
 
-RUN ls -la
-
-
-RUN mkdir -p /dist/s3
-RUN ls -la /dist
-
 RUN set -e &&\
-    clojure -Sdeps '{:deps {cljfmt {:mvn/version "0.8.0"}}}' \
-            -m cljfmt.main check src/main/ src/test
+    clojure -Sdeps '{:deps {cljfmt/cljfmt {:mvn/version "0.9.2"}}}' \
+            -M -m cljfmt.main check src/main/ src/test
 
+RUN ls -la /dist
 RUN set -e && npx shadow-cljs -A:dev release devcards
 
 RUN ls -la /dist
