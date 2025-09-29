@@ -143,7 +143,9 @@
       {:id          (str id "-form-control")
        :no-validate true
        :full-width  true}
-      (dissoc props :id :input-label :render-value :on-change :value :children :helper-text :read-only-with-underline :read-only))
+      (dissoc props :id :input-label :render-value :on-change :value :children :helper-text :read-only-with-underline :read-only)
+      (when (or read-only read-only-underline)
+        {:read-only true}))
      [:> InputLabel
       {:class-name :form-select-input-label
        :required   required?}
