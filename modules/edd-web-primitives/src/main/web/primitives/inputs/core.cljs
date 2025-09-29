@@ -225,15 +225,19 @@
                                    :required    required
                                    :on-blur     #(comp (set-touched) (set-focused false))}
                                   (when invalid?
-                                    {:helper-text invalid-date-message}))}
-        :on-close               #(comp (set-touched) (set-focused false))
-        :on-change              #(utils/handle-date-picker-date-change
-                                  (merge
-                                   {:component-min-date component-min-date
-                                    :component-max-date component-max-date
-                                    :set-focused        set-focused
-                                    :date               %}
-                                   props))})]]))
+                                    {:helper-text invalid-date-message}))
+                                 :openPickerButton {:id (str id :openPickerButton)}
+                                 :switchViewButton {:id (str id :switchViewButton)}
+                                 :previousIconButton {:id (str id :previousIconButton)}
+                                 :nextIconButton {:id (str id :nextIconButton)}}
+        :on-close #(comp (set-touched) (set-focused false))
+        :on-change #(utils/handle-date-picker-date-change
+                     (merge
+                      {:component-min-date component-min-date
+                       :component-max-date component-max-date
+                       :set-focused        set-focused
+                       :date               %}
+                      props))})]]))
 
 (declare date-picker-state-id)
 
