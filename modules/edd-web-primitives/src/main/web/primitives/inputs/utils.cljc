@@ -97,7 +97,8 @@
 
 #?(:cljs
    (defn validate-date-min-max-date [{:keys [component-min-date component-max-date disablePast disable-past
-                                             set-date-input-invalid on-change]} date]
+                                             set-date-input-invalid on-change]
+                                      :or   {on-change #(print "date: " %)}} date]
      (let [date-invalid? (and
                           (some? date)
                           (or (t/before? date (time-fmt/parse-local-date component-min-date))
@@ -108,15 +109,11 @@
          (on-change (time-fmt/unparse date-formatter date))))))
 
 #?(:cljs (defn handle-date-picker-date-change
-           [{:keys [set-focused on-change date required set-date-input-invalid]
-             :or   {on-change #(print "date: " %)}
+           [{:keys [set-focused date]
              :as   props}]
            (doall
             (set-focused true)
-            (cond
-              (nil? date) (doall (when required (set-date-input-invalid true)) (on-change nil))
-              (false? (date? date)) (doall (set-date-input-invalid true) nil)
-              :else (validate-date-min-max-date props (t/to-default-time-zone date))))))
+            (validate-date-min-max-date props (t/to-default-time-zone date)))))
 
 (defn invalid-date? [{:keys [value required date-input-invalid? touched? focused?]
                       :or   {required false}}]
