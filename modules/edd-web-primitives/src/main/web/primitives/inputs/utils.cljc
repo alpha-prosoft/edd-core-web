@@ -101,6 +101,7 @@
                                       :or   {on-change #(print "date: " %)}} date]
      (let [date-invalid? (and
                           (some? date)
+                          (date? date)
                           (or (t/before? date (time-fmt/parse-local-date component-min-date))
                               (t/after? date (time-fmt/parse-local-date component-max-date))
                               (and (or disablePast disable-past) (t/before? date (t/today)))))]
