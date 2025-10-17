@@ -90,10 +90,8 @@
 
 #?(:cljs
    (defn date? [date]
-     (try
-       (.toISOString date)
-       (catch js/Error _
-         false))))
+     (and (not (js/isNaN (.getDate date)))
+          (not (js/isNaN (.getTime date))))))
 
 #?(:cljs
    (defn validate-date-min-max-date [{:keys [component-min-date component-max-date disablePast disable-past
@@ -106,7 +104,9 @@
                               (t/after? date (time-fmt/parse-local-date component-max-date))
                               (and (or disablePast disable-past) (t/before? date (t/today)))))]
        (set-date-input-invalid date-invalid?)
-       (when (not date-invalid?)
+       (when (and
+              (not date-invalid?)
+              (date? date))
          (on-change (time-fmt/unparse date-formatter date))))))
 
 #?(:cljs (defn handle-date-picker-date-change
