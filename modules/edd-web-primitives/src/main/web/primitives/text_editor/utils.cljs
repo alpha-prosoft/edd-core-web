@@ -3,6 +3,7 @@
 (def sun-editor-button-list
   [["undo" "redo"]
    ["font" "fontSize" "formatBlock"]
+   ["blockquote"]
    ["bold" "underline" "italic" "strike" "subscript" "superscript"]
    ["removeFormat"]
    ["fontColor" "hiliteColor"]

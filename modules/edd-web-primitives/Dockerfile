@@ -3,7 +3,7 @@ ARG DOCKER_ORG
 ARG BUILD_ID
 ARG PROJECT_NAME=edd-web-primitives
 
-FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b1849
+FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b1866
 
 ENV PROJECT_NAME edd-web-primitives
 
@@ -28,7 +28,7 @@ ENV DEPLOY_TARGET ${DEPLOY_TARGET}
 RUN mkdir -p /dist/s3
 RUN ls -la /dist
 RUN set -e &&\
-    clojure merge.clj &&\
+    clojure -M merge.clj &&\
     npx shadow-cljs classpath
 
 
