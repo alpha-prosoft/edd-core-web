@@ -190,11 +190,13 @@
 
                     :MuiGrid
                     {:styleOverrides
-                     {:root {"& .sun-editor" {:borderBottom                                "none"
-                                              "& .se-toolbar"                              {:backgroundColor "#ffffff"}
-                                              "& .se-container .se-line-breaker"           {:display "none!important"}
-                                              "& .se-container .se-line-breaker-component" {:display "none!important"}
-                                              "& .se-wrapper .se-wrapper-inner"            {:height "auto!important"}}}}}
+                     {:root
+                      {"& .sun-editor"
+                       {:borderBottom                                "none"
+                        "& .se-toolbar"                              {:backgroundColor "#ffffff"}
+                        "& .se-container .se-line-breaker"           {:display "none!important"}
+                        "& .se-container .se-line-breaker-component" {:display "none!important"}
+                        "& .se-wrapper .se-wrapper-inner"            {:height "100% !important"}}}}}
                     :MuiDivider
                     {:styleOverrides
                      {:root {:height 1.1}}}

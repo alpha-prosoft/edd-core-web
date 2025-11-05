@@ -3,7 +3,7 @@ ARG DOCKER_ORG
 ARG BUILD_ID
 ARG PROJECT_NAME=edd-web-primitives
 
-FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b1866
+FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b1880
 
 ENV PROJECT_NAME edd-web-primitives
 
