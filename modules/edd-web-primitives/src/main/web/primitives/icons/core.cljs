@@ -10,6 +10,7 @@
    ["@mui/icons-material/ArrowDropDownCircle" :default ArrowDropDownCircle]
    ["@mui/icons-material/ArrowDropUp" :default ArrowDropUp]
    ["@mui/icons-material/ArrowUpward" :default ArrowUpward]
+   ["@mui/icons-material/ArrowRightAlt" :default ArrowRightAlt]
    ["@mui/icons-material/AssignmentInd" :default AssignmentInd]
    ["@mui/icons-material/Block" :default Block]
    ["@mui/icons-material/Business" :default Business]
@@ -287,6 +288,9 @@
 
 (defn ArrowDownwardIcon [props]
   [:> ArrowDownward props])
+
+(defn ArrowRightAltIcon [props]
+  [:> ArrowRightAlt props])
 
 (defn KeyboardTabIcon [props]
   [:> KeyboardTab props])
