@@ -1,9 +1,12 @@
-(ns edd.client-utils)
+(ns edd.client-utils
+  (:require
+    [edd.json :as edd.json]))
 
 (def interaction-id
-  #?(:cljs (if (and (exists? js/params) (.-interactionId js/params))
-             (.-interactionId js/params)
-             (str "#" (random-uuid)))
+  #?(:cljs (if (and (exists? js/params)
+                    (.-interactionId js/params))
+             (edd.json/read-uuid (.-interactionId js/params))
+             (random-uuid))
      :clj  (java.util.UUID/randomUUID)))
 
 (defn failed? [values]

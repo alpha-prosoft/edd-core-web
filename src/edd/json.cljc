@@ -4,8 +4,16 @@
             [ajax.json :as ajax-json]))
 
 (defn read-uuid [val]
-  #?(:cljs (uuid val)
-     :clj  (java.util.UUID/fromString val)))
+  #?(:cljs (if (and
+                (string? val)
+                (str/starts-with? val "#"))
+             (uuid (subs val 1))
+             val)
+     :clj  (if (and
+                (string? val)
+                (str/starts-with? val "#"))
+             (java.util.UUID/fromString (subs val 1))
+             val)))
 
 (defn decode-json-special
   [in]
@@ -35,7 +43,7 @@
                 (and (string? x)
                      (str/starts-with? x "#")
                      (not (str/starts-with? x "##")))
-                (read-uuid (subs x 1))
+                (read-uuid x)
 
                 :else x))
             edn))

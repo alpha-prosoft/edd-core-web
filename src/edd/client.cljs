@@ -262,10 +262,10 @@
 
 (defn get-body-str [{:keys [query commands]} mock-for]
   (let [ref (case mock-for
-              :query {:request-id     (str "#" (random-uuid))
+              :query {:request-id     (random-uuid)
                       :interaction-id utils/interaction-id
                       :query          query}
-              :commands {:request-id     (str "#" (random-uuid))
+              :commands {:request-id     (random-uuid)
                          :interaction-id utils/interaction-id
                          :commands       commands})]
     (clj->js (json/encode-custom-fields (add-user ref))
