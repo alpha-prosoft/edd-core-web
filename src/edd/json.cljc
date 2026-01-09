@@ -27,11 +27,14 @@
                 (decode-json-special x)
 
                 (and (string? x)
-                     (str/starts-with? x ":"))
+                     (str/starts-with? x ":")
+                     (not (str/starts-with? x "::"))
+                     (not (str/includes? x " ")))
                 (keyword (subs x 1))
 
                 (and (string? x)
-                     (str/starts-with? x "#"))
+                     (str/starts-with? x "#")
+                     (not (str/starts-with? x "##")))
                 (read-uuid (subs x 1))
 
                 :else x))
@@ -48,6 +51,12 @@
 (defn convert
   [x]
   (cond
+    (and
+     (string? x)
+     (str/starts-with? x ":")) (str ":" x)
+    (and
+     (string? x)
+     (str/starts-with? x "#")) (str "#" x)
     (keyword? x) (str x)
     (uuid? x) (str "#" x)
     (coll? x) (fmap convert x)
