@@ -1,15 +1,17 @@
 (ns web.primitives.inputs.utils
-  #?(:cljs (:require
-            [reagent.core :as r]
-            [cljs-time.core :as t]
-            [cljs-time.format :as time-fmt]
-            [clojure.edn :as edn]
-            [clojure.string :as str]
-            ["@mui/material/TextField" :default TextField]
-            [cljs.pprint :as pprint]
-            [goog.string :as gstring])
-     :clj  (:require
-            [clojure.string :as str])))
+  (:require
+   #?@(:clj
+       [[clojure.string :as str]]
+
+       :cljs
+       [["@mui/material/TextField" :default TextField]
+        [cljs-time.core :as t]
+        [cljs-time.format :as time-fmt]
+        [cljs.pprint :as pprint]
+        [clojure.edn :as edn]
+        [clojure.string :as str]
+        [goog.string :as gstring]
+        [reagent.core :as r]])))
 
 #?(:cljs (def adapted-text-field (r/adapt-react-class TextField)))
 
@@ -109,12 +111,16 @@
               (date? date))
          (on-change (time-fmt/unparse date-formatter date))))))
 
-#?(:cljs (defn handle-date-picker-date-change
-           [{:keys [set-focused date]
-             :as   props}]
-           (doall
-            (set-focused true)
-            (validate-date-min-max-date props (t/to-default-time-zone date)))))
+#?(:cljs
+   (defn handle-date-picker-date-change
+     [{:keys [set-focused date on-change]
+       :as   props}]
+
+     (set-focused true)
+
+     (if (some? date)
+       (validate-date-min-max-date props (t/to-default-time-zone date))
+       (on-change nil))))
 
 (defn invalid-date? [{:keys [value required date-input-invalid? touched? focused?]
                       :or   {required false}}]

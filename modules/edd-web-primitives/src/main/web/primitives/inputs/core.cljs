@@ -191,8 +191,9 @@
 
 (defn RawDatePicker
   [{:keys [id value label required error helper-text variant
-           set-touched set-focused invalid? invalid-date-message
-           minDate maxDate min-date max-date]
+           set-touched set-focused
+           invalid? invalid-date-message
+           minDate maxDate min-date max-date slotProps]
     :or   {id                   ::date-picker
            required             false
            variant              "standard"
@@ -200,7 +201,14 @@
            invalid-date-message "Invalid date"}
     :as   props}]
   (let [component-min-date (or minDate min-date "1900-01-01")
-        component-max-date (or maxDate max-date "2099-12-31")]
+        component-max-date (or maxDate max-date "2099-12-31")
+
+        value
+        (if (and (not invalid?) (string/blank? value))
+          nil
+
+          (.toDate (moment value "YYYY-MM-DD")))]
+
     [:> LocalizationProvider
      {:dateAdapter AdapterDateFns}
      [:> DesktopDatePicker
@@ -212,27 +220,36 @@
         :mask                   "__.__.____"
         :clearable              true
         :clear-text             "Clear"
-        :value                  (if (and (not invalid?)
-                                         (string/blank? value))
-                                  nil
-                                  (.toDate (moment value "YYYY-MM-DD")))
-        :minDate                (.toDate (moment component-min-date "YYYY-MM-DD"))
-        :maxDate                (.toDate (moment component-max-date "YYYY-MM-DD"))
-        :error                  error
-        :slotProps              {:textField
-                                 (merge
-                                  {:id          id
-                                   :helper-text helper-text
-                                   :variant     variant
-                                   :required    required
-                                   :on-blur     #(comp (set-touched) (set-focused false))}
-                                  (when invalid?
-                                    {:helper-text invalid-date-message}))
-                                 :openPickerButton {:id (str id :openPickerButton)}
-                                 :switchViewButton {:id (str id :switchViewButton)}
-                                 :previousIconButton {:id (str id :previousIconButton)}
-                                 :nextIconButton {:id (str id :nextIconButton)}}
-        :on-close #(comp (set-touched) (set-focused false))
+
+        :value value
+
+        :minDate
+        (.toDate (moment component-min-date "YYYY-MM-DD"))
+
+        :maxDate
+        (.toDate (moment component-max-date "YYYY-MM-DD"))
+
+        :error error
+
+        :slotProps
+        (merge
+         {:textField
+          (merge
+           {:id          id
+            :helper-text helper-text
+            :variant     variant
+            :required    required
+            :on-blur     #(comp (set-touched) (set-focused false))}
+           (when invalid?
+             {:helper-text invalid-date-message}))
+          :openPickerButton   {:id (str id :openPickerButton)}
+          :switchViewButton   {:id (str id :switchViewButton)}
+          :previousIconButton {:id (str id :previousIconButton)}
+          :nextIconButton     {:id (str id :nextIconButton)}}
+
+         slotProps)
+
+        :on-close  #(comp (set-touched) (set-focused false))
         :on-change #(utils/handle-date-picker-date-change
                      (merge
                       {:component-min-date component-min-date
@@ -243,27 +260,45 @@
 
 (declare date-picker-state-id)
 
-(defn date-picker-with-state [{:keys [on-invalid-hook]
-                               :or   {on-invalid-hook (fn [])}
-                               :as   props}]
+(defn date-picker-with-state
+  [{:keys [on-invalid-hook]
+    :or   {on-invalid-hook (fn [])}
+    :as   props}]
+
   (r/with-let [uuid (str (random-uuid))
                date-picker-state-id (keyword (str ::date-picker-state- uuid))]
-    (let [focused? @(rf/subscribe [::model/date-picker-focused? date-picker-state-id])
-          touched? @(rf/subscribe [::model/date-picker-touched? date-picker-state-id])
-          date-input-invalid? @(rf/subscribe [::model/date-input-invalid? date-picker-state-id])
-          set-focused (fn [focused?] (rf/dispatch [::model/set-date-picker-focused date-picker-state-id focused?]))
-          set-touched (fn [] (rf/dispatch [::model/set-date-picker-touched date-picker-state-id]))
-          set-date-input-invalid (fn [invalid?]
-                                   (doall
-                                    (when (not= date-input-invalid? invalid?) (on-invalid-hook invalid?))
-                                    (rf/dispatch [::model/set-date-input-invalid date-picker-state-id invalid?])))]
+    (let [focused?
+          @(rf/subscribe [::model/date-picker-focused? date-picker-state-id])
+
+          touched?
+          @(rf/subscribe [::model/date-picker-touched? date-picker-state-id])
+
+          date-input-invalid?
+          @(rf/subscribe [::model/date-input-invalid? date-picker-state-id])
+
+          set-focused
+          (fn [focused?]
+            (rf/dispatch [::model/set-date-picker-focused date-picker-state-id focused?]))
+
+          set-touched
+          (fn [] (rf/dispatch [::model/set-date-picker-touched date-picker-state-id]))
+
+          set-date-input-invalid
+          (fn [invalid?]
+            (doall
+             (when (not= date-input-invalid? invalid?) (on-invalid-hook invalid?))
+             (rf/dispatch [::model/set-date-input-invalid date-picker-state-id invalid?])))]
+
       [RawDatePicker
        (merge
-        {:invalid?               (utils/invalid-date? (merge
-                                                       {:touched?            touched?
-                                                        :focused?            focused?
-                                                        :date-input-invalid? date-input-invalid?}
-                                                       props))
+        {:invalid?
+         (utils/invalid-date?
+          (merge
+           {:touched?            touched?
+            :focused?            focused?
+            :date-input-invalid? date-input-invalid?}
+           props))
+
          :set-focused            set-focused
          :set-touched            set-touched
          :set-date-input-invalid set-date-input-invalid}
@@ -275,6 +310,7 @@
            read-only                false
            read-only-with-underline false}
     :as   props}]
+
   (if (or read-only? read-only read-only-with-underline)
     [RawTextField {:id                       id
                    :read-only                (or read-only? read-only)
