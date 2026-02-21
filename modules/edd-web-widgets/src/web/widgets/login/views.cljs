@@ -14,6 +14,7 @@
             ["@mui/material/DialogActions" :default DialogActions]
             ["@mui/material/TextField" :default TextField]
             ["@mui/material/Alert" :default Alert]
+            ["@mui/material/CircularProgress" :default CircularProgress]
             ["@mui/material/IconButton" :default IconButton]
             ["@mui/material/InputAdornment" :default InputAdornment]
             ["@mui/material/Link" :default Link]
@@ -67,111 +68,131 @@
    (tr :cancel)])
 
 (defn login-dialog-actions [form-type]
-  [:> Grid {:container true
-            :spacing   2
-            :sx        {:padding "0 16px 10px 0" :margin "-24px 0 0 0"}}
-   (when (some #(= % form-type) [:login])
-     [:> Grid {:item       true
-               :xs         12
-               :sm         12
-               :text-align "end"}
-      [:> Link {:sx        {:cursor "pointer"}
-                :key       "forgot-password"
-                :on-click  #(rf/dispatch [::events/forgot-password])
-                :color     "primary"
-                :tab-index 3}
-       (tr :forgot-password)]])
-
-   [:> Grid {:item true
-             :xs   12}
+  (let [loading? @(rf/subscribe [::subs/loading?])]
     [:> Grid {:container true
-              :spacing   2}
-     [:> Grid {:item true
-               :sm true
-               :xs 12
-               :sx {:display {:xs "none"
-                              :md "block"}}}
-      (cacnelbutton)]
-
+              :spacing   2
+              :sx        {:padding "0 16px 10px 0" :margin "-24px 0 0 0"}}
      (when (some #(= % form-type) [:login])
-       [:> Grid {:item true :sm true :xs 12}
-        [:> Button {:full-width true
-                    :variant    "outlined"
-                    :key        "login"
-                    :disabled   (or @(rf/subscribe [::subs/username-invalid?])
-                                    @(rf/subscribe [::subs/password-invalid?]))
-                    :on-click   #(rf/dispatch [::events/do-login])
-                    :color      "secondary"}
-         (tr :login)]])
+       [:> Grid {:item       true
+                 :xs         12
+                 :sm         12
+                 :text-align "end"}
+        [:> Link {:sx        {:cursor "pointer"}
+                  :key       "forgot-password"
+                  :on-click  #(rf/dispatch [::events/forgot-password])
+                  :color     "primary"
+                  :tab-index 3}
+         (tr :forgot-password)]])
 
-     (when (some #(= % form-type) [:register])
-       [:> Grid {:item true :sm true :xs 12}
-        [:> Button {:full-width true
-                    :variant    "outlined"
-                    :key        "register"
-                    :disabled   (or @(rf/subscribe [::subs/username-invalid?])
-                                    @(rf/subscribe [::subs/password-invalid?]))
-                    :on-click   #(rf/dispatch [::events/do-register])
-                    :color      "secondary"}
-         (tr :register)]])
-
-     (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
-       [:> Grid {:item true :sm 6 :xs 12}
-        [:> Button {:full-width true
-                    :variant    "outlined"
-                    :key        "resend-code"
-                    :on-click   #(rf/dispatch [::events/resend-code])
-                    :color      "secondary"
-                    :tab-index  5}
-         (tr :resend-code)]])
-
-     (when (some #(= % form-type) [:confirm-login])
-       [:> Grid {:item true :sm true :xs 12}
-        [:> Button {:full-width true
-                    :variant    "outlined"
-                    :key        "confirm-login"
-                    :on-click   #(rf/dispatch [::events/submit-verification])
-                    :color      "secondary"}
-         (tr :login)]])
-
-     (when (some #(= % form-type) [:confirm-password-reset])
-       [:> Grid {:item true :sm true :xs 12}
-        [:> Button {:full-width true
-                    :variant    "outlined"
-                    :key        "confirm-password-code"
-                    :disabled   (or @(rf/subscribe [::subs/password-invalid?])
-                                    @(rf/subscribe [::subs/confirmation-code-empty?]))
-                    :on-click   #(rf/dispatch [::events/confirm-reset-password])
-                    :color      "secondary"}
-         (tr :confirm-reset-password)]])
-
-     (when (some #(= % form-type) [:forgot-password])
-       [:> Grid {:item true :sm true :xs 12}
-        [:> Button {:full-width true
-                    :variant    "outlined"
-                    :key        "confirm-login"
-                    :disabled   @(rf/subscribe [::subs/username-invalid?])
-                    :on-click   #(rf/dispatch [::events/reset-password])
-                    :color      "secondary"}
-         (tr :reset-password)]])
      [:> Grid {:item true
-               :sm true
-               :xs 12
-               :sx {:display {:xs "block"
-                              :md "none"}}}
-      (cacnelbutton)]]]])
+               :xs   12}
+      [:> Grid {:container true
+                :spacing   2}
+       [:> Grid {:item true
+                 :sm true
+                 :xs 12
+                 :sx {:display {:xs "none"
+                                :md "block"}}}
+        (cacnelbutton)]
+
+       (when (some #(= % form-type) [:login])
+         [:> Grid {:item true :sm true :xs 12}
+          [:> Button {:full-width true
+                      :variant    "outlined"
+                      :key        "login"
+                      :disabled   (or loading?
+                                      @(rf/subscribe [::subs/username-invalid?])
+                                      @(rf/subscribe [::subs/password-invalid?]))
+                      :on-click   #(rf/dispatch [::events/do-login])
+                      :color      "secondary"}
+           (if loading?
+             [:> CircularProgress {:size 20 :color "inherit"}]
+             (tr :login))]])
+
+       (when (some #(= % form-type) [:register])
+         [:> Grid {:item true :sm true :xs 12}
+          [:> Button {:full-width true
+                      :variant    "outlined"
+                      :key        "register"
+                      :disabled   (or loading?
+                                      @(rf/subscribe [::subs/username-invalid?])
+                                      @(rf/subscribe [::subs/password-invalid?]))
+                      :on-click   #(rf/dispatch [::events/do-register])
+                      :color      "secondary"}
+           (if loading?
+             [:> CircularProgress {:size 20 :color "inherit"}]
+             (tr :register))]])
+
+       (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
+         [:> Grid {:item true :sm 6 :xs 12}
+          [:> Button {:full-width true
+                      :variant    "outlined"
+                      :key        "resend-code"
+                      :disabled   loading?
+                      :on-click   #(rf/dispatch [::events/resend-code])
+                      :color      "secondary"
+                      :tab-index  5}
+           (tr :resend-code)]])
+
+       (when (some #(= % form-type) [:confirm-login])
+         [:> Grid {:item true :sm true :xs 12}
+          [:> Button {:full-width true
+                      :variant    "outlined"
+                      :key        "confirm-login"
+                      :disabled   loading?
+                      :on-click   #(rf/dispatch [::events/submit-verification])
+                      :color      "secondary"}
+           (if loading?
+             [:> CircularProgress {:size 20 :color "inherit"}]
+             (tr :login))]])
+
+       (when (some #(= % form-type) [:confirm-password-reset])
+         [:> Grid {:item true :sm true :xs 12}
+          [:> Button {:full-width true
+                      :variant    "outlined"
+                      :key        "confirm-password-code"
+                      :disabled   (or loading?
+                                      @(rf/subscribe [::subs/password-invalid?])
+                                      @(rf/subscribe [::subs/confirmation-code-empty?]))
+                      :on-click   #(rf/dispatch [::events/confirm-reset-password])
+                      :color      "secondary"}
+           (if loading?
+             [:> CircularProgress {:size 20 :color "inherit"}]
+             (tr :confirm-reset-password))]])
+
+       (when (some #(= % form-type) [:forgot-password])
+         [:> Grid {:item true :sm true :xs 12}
+          [:> Button {:full-width true
+                      :variant    "outlined"
+                      :key        "confirm-login"
+                      :disabled   (or loading?
+                                      @(rf/subscribe [::subs/username-invalid?]))
+                      :on-click   #(rf/dispatch [::events/reset-password])
+                      :color      "secondary"}
+           (if loading?
+             [:> CircularProgress {:size 20 :color "inherit"}]
+             (tr :reset-password))]])
+
+       [:> Grid {:item true
+                 :sm true
+                 :xs 12
+                 :sx {:display {:xs "block"
+                                :md "none"}}}
+        (cacnelbutton)]]]]))
 
 (defn Username []
-  [:> TextField {:key           "username"
-                 :autoFocus     true
-                 :margin        "dense"
-                 :default-value ""
-                 :label         (tr :username)
-                 :on-change     #(rf/dispatch [::events/username-change (-> % .-target .-value)])
-                 :type          "input"
-                 :fullWidth     true
-                 :tab-index     0
-                 :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}])
+  (let [loading? @(rf/subscribe [::subs/loading?])]
+    [:> TextField {:key           "username"
+                   :autoFocus     true
+                   :margin        "dense"
+                   :default-value ""
+                   :disabled      loading?
+                   :label         (tr :username)
+                   :on-change     #(rf/dispatch [::events/username-change (-> % .-target .-value)])
+                   :type          "input"
+                   :fullWidth     true
+                   :tab-index     0
+                   :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
 
 (defn password-visibility-icon-button [show-password?]
   (r/as-element [:> InputAdornment {:position "end"}
@@ -183,10 +204,12 @@
                     [:> Visibility {}])]]))
 
 (defn password-field []
-  (let [show-password? @(rf/subscribe [::subs/show-password?])]
+  (let [show-password? @(rf/subscribe [::subs/show-password?])
+        loading?       @(rf/subscribe [::subs/loading?])]
     [:> TextField {:key           "password"
                    :margin        "dense"
                    :default-value ""
+                   :disabled      loading?
                    :label         (tr :password)
                    :on-change     #(rf/dispatch [::events/password-change (-> % .-target .-value)])
                    :type          (if show-password? "input" "password")
@@ -196,14 +219,16 @@
                    :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
 
 (defn confirm-login []
-  [:> TextField {:key           "confirm-login"
-                 :margin        "dense"
-                 :default-value ""
-                 :label         (tr :confirmation-code)
-                 :on-change     #(rf/dispatch [::events/confirmation-code-change (-> % .-target .-value)])
-                 :type          "input"
-                 :fullWidth     true
-                 :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}])
+  (let [loading? @(rf/subscribe [::subs/loading?])]
+    [:> TextField {:key           "confirm-login"
+                   :margin        "dense"
+                   :default-value ""
+                   :disabled      loading?
+                   :label         (tr :confirmation-code)
+                   :on-change     #(rf/dispatch [::events/confirmation-code-change (-> % .-target .-value)])
+                   :type          "input"
+                   :fullWidth     true
+                   :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
 
 (defn password-requirement [label checked?]
   [:> Grid {:container true :spacing 1 :align-items "center"}
@@ -261,7 +286,9 @@
        (when show-error?
          [:> Grid {:item true}
           [:> Alert {:severity "error"}
-           (str (tr (or error-message :unknown-error)))]])]]
+           (if (string? error-message)
+             error-message
+             (str (tr (or error-message :unknown-error))))]])]]
      [:> DialogActions (login-dialog-actions form-type)]]))
 
 (defn logout-button []

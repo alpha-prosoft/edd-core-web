@@ -97,6 +97,11 @@
  (fn [db]
    (get-in db [::db/init?])))
 
+(rf/reg-sub
+ ::loading?
+ (fn [db]
+   (get-in db [::db/loading?] false)))
+
 
 
 

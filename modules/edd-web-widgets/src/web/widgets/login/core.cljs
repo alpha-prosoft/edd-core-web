@@ -80,15 +80,16 @@
 (defn match-error-message
   [body]
   (let [message (.-message body)
-        message-type (aget body "__type")]
-    {:message (get (first
-                    (filter
-                     (fn [{:keys [search type]}]
-                       (and
-                        (= type message-type)
-                        (str/includes? message search)))
-                     known-messages))
-                   :key)
+        message-type (aget body "__type")
+        matched-key (get (first
+                          (filter
+                           (fn [{:keys [search type]}]
+                             (and
+                              (= type message-type)
+                              (str/includes? message search)))
+                           known-messages))
+                         :key)]
+    {:message (or matched-key message)
      :type    message-type}))
 
 (fx/reg-fx

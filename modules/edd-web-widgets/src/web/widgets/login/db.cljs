@@ -14,4 +14,6 @@
    ::forgot-password-visible false
    ::dialog-visible          false
    ::interrupted-event nil
-   ::show-password?          false})
+   ::show-password?          false
+  ::loading?                false
+  ::confirmed?              false})

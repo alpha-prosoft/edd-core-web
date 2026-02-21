@@ -54,7 +54,9 @@
              ::db/error-message-visible false
              ::db/error-message ""
              ::db/confirmation-visible false
-             ::db/confirmation-code "")))
+             ::db/confirmation-code ""
+             ::db/confirmed? false
+             ::db/loading? false)))
 
 (rf/reg-event-db
  ::close-dialog
@@ -86,15 +88,18 @@
  ::login-failed
  (fn [{:keys [db]} [_ {:keys [message type]}]]
    (if (= "UserNotConfirmedException" type)
-     {:db (assoc db ::db/form-type :confirm-login)
+     {:db (assoc db ::db/form-type :confirm-login
+                 ::db/loading? false)
       :fx [(request-code db)]}
      {:db (assoc db ::db/error-message-visible true
-                 ::db/error-message message)})))
+                 ::db/error-message message
+                 ::db/loading? false)})))
 
 (rf/reg-event-fx
  ::do-login
  (fn [{:keys [db]}]
-   {:db db
+   {:db (assoc db ::db/loading? true
+               ::db/error-message-visible false)
     :fx [[:amplify-login {:username   (::db/username db)
                           :password   (::db/password db)
                           :on-success [::login-succeeded]
@@ -113,16 +118,26 @@
  ::verification-failed
  (fn [{:keys [db]} [_ {:keys [message]}]]
    {:db (assoc db ::db/error-message-visible true
-               ::db/error-message message)}))
+               ::db/error-message message
+               ::db/loading? false)}))
+
+(rf/reg-event-fx
+ ::verification-succeeded
+ (fn [{:keys [db]} _]
+   {:db (assoc db ::db/confirmed? true)
+    :dispatch [::do-login]}))
 
 (rf/reg-event-fx
  ::submit-verification
  (fn [{:keys [db]} _]
-   {:db db
-    :fx [[:amplify-verify {:username   (::db/username db)
-                           :code       (::db/confirmation-code db)
-                           :on-success [::do-login]
-                           :on-failure [::verification-failed]}]]}))
+   {:db (assoc db ::db/loading? true
+               ::db/error-message-visible false)
+    :fx [(if (::db/confirmed? db)
+           [:dispatch [::do-login]]
+           [:amplify-verify {:username   (::db/username db)
+                             :code       (::db/confirmation-code db)
+                             :on-success [::verification-succeeded]
+                             :on-failure [::verification-failed]}])]}))
 
 (rf/reg-event-fx
  ::login-and-proceed
@@ -144,14 +159,16 @@
      (assoc db
             ::db/error-message-visible false
             ::db/error-message ""
+            ::db/loading? false
             ::db/form-type :confirm-login)
-     db)))
+     (assoc db ::db/loading? false))))
 
 (rf/reg-event-db
  ::register-failed
  (fn [db [_ {:keys [message]}]]
    (assoc db ::db/error-message-visible true
-          ::db/error-message message)))
+          ::db/error-message message
+          ::db/loading? false)))
 
 (rf/reg-event-db
  ::confirmation-code-change
@@ -161,7 +178,8 @@
 (rf/reg-event-fx
  ::do-register
  (fn [{:keys [db]}]
-   {:db db
+   {:db (assoc db ::db/loading? true
+               ::db/error-message-visible false)
     :fx [[:amplify-register {:username   (::db/username db)
                              :password   (::db/password db)
                              :on-success [::register-success]
@@ -187,8 +205,16 @@
    {:db (assoc db ::db/form-type :confirm-password-reset
                ::db/error-message ""
                ::db/password ""
-               ::db/error-message-visible false)
-    :fx [[:amplify-forgot-password {:username (::db/username db)}]]}))
+               ::db/error-message-visible false
+               ::db/loading? true)
+    :fx [[:amplify-forgot-password {:username   (::db/username db)
+                                    :on-success [::reset-password-succeeded]
+                                    :on-failure [::register-failed]}]]}))
+
+(rf/reg-event-db
+ ::reset-password-succeeded
+ (fn [db [_ _]]
+   (assoc db ::db/loading? false)))
 
 (rf/reg-event-fx
  ::resend-code
@@ -201,7 +227,9 @@
 (rf/reg-event-fx
  ::confirm-reset-password
  (fn [{:keys [db]} _]
-   {:db (assoc db ::db/form-type :confirm-password-reset)
+   {:db (assoc db ::db/form-type :confirm-password-reset
+               ::db/loading? true
+               ::db/error-message-visible false)
     :fx [[:amplify-conform-forgot-password {:username   (::db/username db)
                                             :password   (::db/password db)
                                             :code       (::db/confirmation-code db)

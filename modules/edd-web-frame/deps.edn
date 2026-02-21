@@ -1,4 +1,4 @@
-{:paths ["src/main"]
+{:paths ["src"]
  :deps  {edd/edd-core-web                     {:local/root "../../"}
          com.andrewmcveigh/cljs-time          {:mvn/version "0.5.2"}}
  :aliases
