@@ -1,10 +1,57 @@
 (ns edd.events
-  (:import goog.history.Html5History)
   (:require
    [re-frame.core :as rf]
    [reitit.frontend :as reitit]
+   [malli.core :as m]
+   [malli.transform :as mt]
    [edd.client :as client]
    [edd.db :as db]))
+
+(defn parse-query-string
+  [search]
+  (if (or (nil? search) (= "" search))
+    {}
+    (let [params
+          (js/URLSearchParams. search)]
+      (reduce (fn [m [k v]] (assoc m (keyword k) v))
+              {}
+              (es6-iterator-seq (.entries params))))))
+
+(defn serialize-query-string
+  [params]
+  (let [sp
+        (js/URLSearchParams.)]
+    (doseq [[k v] params
+            :when (some? v)]
+      (.append sp (name k) (str v)))
+    (let [s
+          (.toString sp)]
+      (if (= "" s) "" (str "?" s)))))
+
+(defn split-url
+  [url]
+  (let [idx
+        (.indexOf url "?")]
+    (if (neg? idx)
+      [url ""]
+      [(.substring url 0 idx) (.substring url idx)])))
+
+(defn decode-url-params
+  [schema raw-params]
+  (if (nil? schema)
+    {:params raw-params}
+    (let [decoded
+          (m/decode schema raw-params (mt/string-transformer))]
+      (if (m/validate schema decoded)
+        {:params decoded}
+        {:error (str "Invalid URL parameters: "
+                     (pr-str (m/explain schema decoded)))}))))
+
+(defn encode-url-params
+  [schema params]
+  (if (nil? schema)
+    params
+    (m/encode schema params (mt/string-transformer))))
 
 (rf/reg-event-fx
  ::application-loaded
@@ -36,6 +83,7 @@
                                          application-id
                                          {:query-id :application->fetch-by-id
                                           :id (get config :ApplicationId)})}]]})))
+
 (rf/reg-event-fx
  ::initialize-db
  (fn [{:keys [db]} [_ {:keys [selected-language
@@ -43,6 +91,8 @@
                               config
                               routes
                               pages-init-events
+                              pages-url-params
+                              error-pages
                               translations
                               record-call-failure-func
                               record-call-func
@@ -52,18 +102,50 @@
 
    (if (get db ::db/ready)
      {:db db}
-     (let [application-name (get config :ApplicationName)
-           db (-> db/default-db
-                  (merge db)
-                  (assoc-in [::db/selected-language] selected-language)
-                  (assoc-in [::db/show-language-switcher?] show-language-switcher?)
-                  (assoc ::db/config config)
-                  (assoc ::db/pages-init-events pages-init-events)
-                  (assoc ::db/routes (reitit/router routes))
-                  (assoc ::db/translations translations)
-                  (assoc ::db/record-call-failure-func record-call-failure-func)
-                  (assoc ::db/record-call-func record-call-func)
-                  (assoc ::db/on-expired-jwt-func on-expired-jwt-func))]
+     (let [application-name
+           (get config :ApplicationName)
+
+           db
+           (let [with-defaults
+                 (merge db/default-db db)
+
+                 with-language
+                 (assoc with-defaults ::db/selected-language selected-language)
+
+                 with-switcher
+                 (assoc with-language ::db/show-language-switcher? show-language-switcher?)
+
+                 with-config
+                 (assoc with-switcher ::db/config config)
+
+                 with-init-events
+                 (assoc with-config ::db/pages-init-events pages-init-events)
+
+                 with-url-params
+                 (assoc with-init-events ::db/pages-url-params (or pages-url-params {}))
+
+                 with-error-pages
+                 (assoc with-url-params ::db/error-pages (or error-pages {}))
+
+                 with-routes
+                 (assoc with-error-pages ::db/routes (reitit/router routes))
+
+                 with-translations
+                 (assoc with-routes ::db/translations translations)
+
+                 with-failure-func
+                 (assoc with-translations ::db/record-call-failure-func record-call-failure-func)
+
+                 with-call-func
+                 (assoc with-failure-func ::db/record-call-func record-call-func)
+
+                 with-jwt-func
+                 (assoc with-call-func ::db/on-expired-jwt-func on-expired-jwt-func)]
+             with-jwt-func)
+
+           current-url
+           (str (.-pathname (.-location js/window))
+                (.-search (.-location js/window)))]
        {:db (cond-> db
 
               (and (::db/user db)
@@ -75,14 +157,9 @@
 
         :fx [(if (and (::db/user db)
                       application-name)
-               [:dispatch [::load-application [::navigate
-                                               (-> js/window
-                                                   .-location
-                                                   .-pathname)]]]
-               [:dispatch [::navigate
-                           (-> js/window
-                               .-location
-                               .-pathname)]])]}))))
+               [:dispatch [::load-application [::navigate current-url]]]
+               [:dispatch [::navigate current-url]])
+             [::init-popstate nil]]}))))
 
 (rf/reg-event-fx
  ::set-active-panel
@@ -114,40 +191,118 @@
 
 (rf/reg-event-fx
  ::navigate
- (fn [{:keys [db]} [_ target & [params]]]
-   (let [router (::db/routes db)
-         pages-init-events (::db/pages-init-events db)
-         new-url (if (keyword? target)
-                   (-> (reitit/match-by-name router target params)
-                       :path)
-                   target)
+ (fn [{:keys [db]} [_ target & rest-args]]
+   (let [router
+         (::db/routes db)
 
-         {:keys [path-params query-params data]}
-         (if (keyword? target)
-           {:data {:name (name target)}
-            :query-patams {}
-            :path-params (or params {})}
-           (reitit/match-by-path router target))
+         pages-init
+         (::db/pages-init-events db)
 
-         handler
-         (-> data
-             :name
-             keyword)
+         pages-schemas
+         (::db/pages-url-params db)
 
-         route-params
-         (merge {}
-                query-params
-                path-params)]
+         {:keys [target-page url path-params query-params replace?]}
+         (cond
+           (and (map? target) (or (:page target) (:url target)))
+           (if (:page target)
+             {:target-page  (:page target)
+              :path-params  (or (:path target) {})
+              :query-params (or (:query target) {})
+              :replace?     (:replace? target)}
+             {:url      (:url target)
+              :replace? (:replace? target)})
 
-     (.pushState (.-history js/window)
-                 #js {}
-                 ""
-                 new-url)
-     {:db       (assoc db ::db/drawer false
-                       ::db/url new-url
-                       ::db/active-panel handler)
-      :fx [[:dispatch [(get pages-init-events handler)
-                       route-params]]]})))
+           (keyword? target)
+           (let [[a b]
+                 rest-args]
+             {:target-page  target
+              :path-params  (if (map? a) a {})
+              :query-params (if (map? b) b {})})
+
+           (string? target)
+           {:url target})
+
+         [handler path-params query-params pathname]
+         (if target-page
+           (let [match
+                 (reitit/match-by-name router target-page path-params)]
+             [target-page path-params query-params (:path match)])
+           (let [[pathname search]
+                 (split-url url)
+
+                 match
+                 (reitit/match-by-path router pathname)]
+             [(some-> match :data :name keyword)
+              (or (:path-params match) {})
+              (parse-query-string search)
+              pathname]))
+
+         schema
+         (get pages-schemas handler)
+
+         {:keys [params error]}
+         (when handler
+           (decode-url-params schema query-params))
+
+         push-or-replace
+         (if replace?
+           #(.replaceState (.-history js/window) #js {} "" %)
+           #(.pushState (.-history js/window) #js {} "" %))]
+
+     (cond
+       (nil? handler)
+       {:db (assoc db
+                   ::db/active-panel :edd/not-found
+                   ::db/error {:code 404 :detail (or url pathname)}
+                   ::db/url-params {}
+                   ::db/path-params {})}
+
+       (some? error)
+       (do (.warn js/console error)
+           {:db (assoc db
+                       ::db/active-panel :edd/bad-request
+                       ::db/error {:code 400 :detail error}
+                       ::db/url-params {}
+                       ::db/path-params {})})
+
+       :else
+       (let [encoded
+             (encode-url-params schema params)
+
+             clean-qs
+             (serialize-query-string
+              (into {} (filter (comp some? val)) encoded))
+
+             final-url
+             (str pathname clean-qs)
+
+             all-params
+             (merge path-params params)]
+         (push-or-replace final-url)
+         {:db (assoc db
+                     ::db/drawer false
+                     ::db/url final-url
+                     ::db/active-panel handler
+                     ::db/url-params (or params {})
+                     ::db/path-params path-params
+                     ::db/error nil)
+          :fx [[:dispatch [(get pages-init handler) all-params]]]})))))
+
+(defonce ^:private popstate-initialized? (atom false))
+
+(rf/reg-fx
+ ::init-popstate
+ (fn [_]
+   (when-not @popstate-initialized?
+     (reset! popstate-initialized? true)
+     (.addEventListener js/window "popstate"
+                        (fn [_]
+                          (let [current-url
+                                (str (.-pathname (.-location js/window))
+                                     (.-search (.-location js/window)))]
+                            (rf/dispatch [::navigate
+                                          {:url      current-url
+                                           :replace? true}])))))))
 
 (rf/reg-event-db
  ::register-menu-item
@@ -163,7 +318,3 @@
  :edd.events-remove-user
  (fn [db]
    (assoc-in db [::db/user] nil)))
-
-
-
-

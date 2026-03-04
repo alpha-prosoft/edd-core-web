@@ -16,15 +16,15 @@
            (#'i18n/format-string "Hello {0}, welcome {1}!" ["Bob" "Alice"])))
     (is (= "User 1 has 5 items"
            (#'i18n/format-string "User {0} has {1} items" ["1" "5"]))))
-  
+
   (testing "format-string with named parameters"
     (is (= "Hello Bob, welcome to Berlin!"
-           (#'i18n/format-string "Hello {name}, welcome to {place}!" 
-                                {:name "Bob" :place "Berlin"})))
+           (#'i18n/format-string "Hello {name}, welcome to {place}!"
+                                 {:name "Bob" :place "Berlin"})))
     (is (= "User John has 10 points"
-           (#'i18n/format-string "User {username} has {points} points" 
-                                {:username "John" :points "10"}))))
-  
+           (#'i18n/format-string "User {username} has {points} points"
+                                 {:username "John" :points "10"}))))
+
   (testing "format-string with no parameters"
     (is (= "Hello World!" (#'i18n/format-string "Hello World!" nil)))
     (is (= "Hello World!" (#'i18n/format-string "Hello World!" [])))
@@ -36,7 +36,7 @@
                              :last-name "Last Name"}})
     (is (= "First Name" (i18n/tr :first-name)))
     (is (= "Last Name" (i18n/tr :last-name))))
-  
+
   (testing "missing translation returns placeholder"
     (setup-test-db :en {:en {}})
     (is (= "{tr [:en :missing-key]}" (i18n/tr :missing-key)))))
@@ -54,7 +54,7 @@
   (testing "map syntax with simple message"
     (setup-test-db :en {:en {:greeting "Hello"}})
     (is (= "Hello" (i18n/tr {:message :greeting}))))
-  
+
   (testing "map syntax with nested message"
     (setup-test-db :en {:en {:user {:welcome "Welcome User"}}})
     (is (= "Welcome User" (i18n/tr {:message [:user :welcome]})))))
@@ -65,7 +65,7 @@
     (is (= "Hello Bob, welcome Alice!"
            (i18n/tr {:message :greeting
                      :params ["Bob" "Alice"]}))))
-  
+
   (testing "nested translation with positional parameters"
     (setup-test-db :en {:en {:user {:greeting "User {0} has {1} items"}}})
     (is (= "User John has 5 items"
@@ -78,26 +78,26 @@
     (is (= "Hello Bob, welcome to Berlin!"
            (i18n/tr {:message :greeting
                      :params {:name "Bob" :place "Berlin"}}))))
-  
+
   (testing "nested translation with named parameters"
     (setup-test-db :en {:en {:user {:profile "Name: {firstName} {lastName}, Age: {age}"}}})
     (is (= "Name: John Doe, Age: 30"
            (i18n/tr {:message [:user :profile]
-                     :params {:firstName "John" 
-                              :lastName "Doe" 
+                     :params {:firstName "John"
+                              :lastName "Doe"
                               :age "30"}})))))
 
 (deftest tr-language-switching-test
   (testing "switching between languages"
     (let [translations {:en {:greeting "Hello"}
-                       :de {:greeting "Hallo"}
-                       :es {:greeting "Hola"}}]
+                        :de {:greeting "Hallo"}
+                        :es {:greeting "Hola"}}]
       (setup-test-db :en translations)
       (is (= "Hello" (i18n/tr :greeting)))
-      
+
       (setup-test-db :de translations)
       (is (= "Hallo" (i18n/tr :greeting)))
-      
+
       (setup-test-db :es translations)
       (is (= "Hola" (i18n/tr :greeting))))))
 
@@ -112,3 +112,75 @@
                              :user {:name "User Name"}}})
     (is (= "Simple" (i18n/tr :simple)))
     (is (= "User Name" (i18n/tr [:user :name])))))
+
+(deftest deep-merge-test
+  (testing "user translations fill in missing base keys"
+    (let [base
+          {:en {:error {:not-found "Not Found"
+                        :go-home "Go Home"}
+                :language "English"}}
+
+          user-provided
+          {:en {:greeting "Hello"
+                :language "EN"}}
+
+          result
+          (i18n/deep-merge base user-provided)]
+
+      (is
+       (= "Not Found"
+          (get-in result [:en :error :not-found])))
+
+      (is
+       (= "Go Home"
+          (get-in result [:en :error :go-home])))
+
+      (is
+       (= "Hello"
+          (get-in result [:en :greeting])))
+
+      (is
+       (= "EN"
+          (get-in result [:en :language])))))
+
+  (testing "user can override nested base keys"
+    (let [base
+          {:en {:error {:not-found "Not Found"}}}
+
+          user-provided
+          {:en {:error {:not-found "Custom Not Found"}}}
+
+          result
+          (i18n/deep-merge base user-provided)]
+
+      (is
+       (= "Custom Not Found"
+          (get-in result [:en :error :not-found])))))
+
+  (testing "merges multiple languages independently"
+    (let [base
+          {:en {:error {:go-home "Go Home"}}
+           :de {:error {:go-home "Zur Startseite"}}}
+
+          user-provided
+          {:en {:greeting "Hello"}
+           :de {:greeting "Hallo"}}
+
+          result
+          (i18n/deep-merge base user-provided)]
+
+      (is
+       (= "Go Home"
+          (get-in result [:en :error :go-home])))
+
+      (is
+       (= "Hello"
+          (get-in result [:en :greeting])))
+
+      (is
+       (= "Zur Startseite"
+          (get-in result [:de :error :go-home])))
+
+      (is
+       (= "Hallo"
+          (get-in result [:de :greeting]))))))

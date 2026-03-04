@@ -3,9 +3,28 @@
             [re-frame.db :as re-frame-db]
             [clojure.string :as str]))
 
+(defn deep-merge
+  [a b]
+  (merge-with
+   (fn [v1 v2]
+     (if (and (map? v1) (map? v2))
+       (deep-merge v1 v2)
+       v2))
+   a b))
+
 (def base-translations
-  {:language {:en "English"
-              :de "Deutsch"}})
+  {:en {:language "English"
+        :error    {:not-found-title     "Page Not Found"
+                   :not-found-message   "The page you're looking for doesn't exist or has been moved."
+                   :bad-request-title   "Bad Request"
+                   :bad-request-message "The URL contains invalid parameters. Please check the link and try again."
+                   :go-home             "Go to Homepage"}}
+   :de {:language "Deutsch"
+        :error    {:not-found-title     "Seite nicht gefunden"
+                   :not-found-message   "Die gesuchte Seite existiert nicht oder wurde verschoben."
+                   :bad-request-title   "Ungueltige Anfrage"
+                   :bad-request-message "Die URL enthaelt ungueltige Parameter. Bitte ueberpruefen Sie den Link."
+                   :go-home             "Zur Startseite"}}})
 
 (def TranslationSchema [:map
                         []])
@@ -14,19 +33,19 @@
   [s params]
   (cond
     (vector? params)
-    (reduce-kv 
+    (reduce-kv
      (fn [acc idx val]
        (str/replace acc (str "{" idx "}") (str val)))
      s
      params)
-    
+
     (map? params)
     (reduce-kv
      (fn [acc k v]
        (str/replace acc (str "{" (name k) "}") (str v)))
      s
      params)
-    
+
     :else s))
 
 (defn tr

@@ -3,12 +3,11 @@
    [re-frame.core :as re-frame]
    [projectname.about.db :as db]))
 
+;; Use assoc instead of merge-with-defaults so re-init doesn't blow away page state
 (re-frame/reg-event-db
  ::init
  (fn [db [_ params]]
-   (merge db/default-db
-          (assoc db
-                 ::db/params params))))
+   (assoc db ::db/params params)))
 
 (re-frame/reg-event-db
  ::click

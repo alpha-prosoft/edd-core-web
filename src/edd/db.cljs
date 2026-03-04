@@ -14,6 +14,11 @@
    ::config                   {}
    ::routes                   {}
    ::pages-init-events        {}
+   ::url-params               {}
+   ::path-params              {}
+   ::pages-url-params         {}
+   ::error-pages              {}
+   ::error                    nil
    ::record-call-failure-func nil
    ::record-call-func         nil
    ::on-expired-jwt-func      nil})

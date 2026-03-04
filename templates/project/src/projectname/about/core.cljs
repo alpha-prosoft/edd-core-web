@@ -2,8 +2,10 @@
   (:require [projectname.about.events :as events]
             [projectname.about.views :as views]))
 
-
 (defn main
   [_ctx]
-  {:init ::events/init
-   :panel views/main-panel})
+  {:init       ::events/init
+   :panel      views/main-panel
+   :url-params [:map
+                [:tab  {:optional true} :string]
+                [:page {:optional true} :int]]})

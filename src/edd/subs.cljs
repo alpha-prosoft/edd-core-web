@@ -71,3 +71,24 @@
       (assoc p v true))
     {}
     (get-in db [::db/application :attrs :my-roles]))))
+
+(rf/reg-sub
+ ::url-params
+ (fn [db]
+   (::db/url-params db)))
+
+(rf/reg-sub
+ ::url-param
+ :<- [::url-params]
+ (fn [params [_ key]]
+   (get params key)))
+
+(rf/reg-sub
+ ::error
+ (fn [db]
+   (::db/error db)))
+
+(rf/reg-sub
+ ::error-pages
+ (fn [db]
+   (::db/error-pages db)))
