@@ -276,7 +276,7 @@
    (let [body-str (get-body-str props post-for)]
      (do-post-with-retry post-for props retry-attempts body-str)))
 
-  ([post-for {:keys [on-success on-failure retry] :as props} retry-attempts body-str]
+  ([post-for {:keys [on-success on-failure retry service] :as props} retry-attempts body-str]
    (let [{:keys [timeout on-retry attempts] :or {attempts 2}} retry
          mock-func (get-mock-func props post-for)
          uri (get-uri props post-for)
@@ -311,6 +311,7 @@
                           (name post-for)
                           {:took     (.toFixed (- (system-time) start-time) timeout-rounding)
                            :request  body-str
+                           :service service
                            :response (select-keys (:body r)
                                                   [:invocation-id :request-id :interaction-id])}))
                        (handle-exception r attempt))))
@@ -320,7 +321,10 @@
                         (if (neg? attempt)
                           (do
                             (when (some? record-call-failure-func)
-                              (record-call-failure-func (.toString e) body-str))
+                              (record-call-failure-func
+                                (.toString e)
+                                {:request body-str
+                                 :service service}))
                             (rf/dispatch (conj on-failure (.toString e)))
                             false)
                           (do
