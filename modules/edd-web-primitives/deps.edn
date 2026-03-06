@@ -2,8 +2,8 @@
  :deps  {org.clojure/clojure         {:mvn/version "1.11.1"}
          reagent/reagent             {:mvn/version "1.2.0"}
          re-frame/re-frame           {:mvn/version "1.4.3"}
-         org.clojure/clojurescript   {:mvn/version "1.11.60"}
-         thheller/shadow-cljs        {:mvn/version "2.28.20"}
+         org.clojure/clojurescript   {:mvn/version "1.11.132"}
+         thheller/shadow-cljs        {:mvn/version "2.28.7"}
          com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}
          binaryage/devtools          {:mvn/version "1.0.7"}
          org.slf4j/slf4j-simple      {:mvn/version "2.0.17"}}
