@@ -36,48 +36,49 @@
   [:> Accordion
    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
     :elevation elevation
-    :sx     (merge {:width "100%"} style)
+    :sx        (merge {:width "100%"} style)
     :onChange  on-change}
 
    [:> AccordionSummary
-    (merge {:sx (merge {} summary-style)
+    (merge {:sx        (merge {} summary-style)
             :container true
             :component Grid
-            :children	(r/as-element [:> Grid {:container true :size 12 :alignItems "center"}
-                                     [:> Grid {:sx (merge
-                                                    {:position "absolute" :top "0px"}
-                                                    (when (= control-position :right) {:right "0px"}))}
-                                      [:> IconButton
-                                       (merge
-                                        {:on-click on-click
-                                         :disabled disabled
-                                         :sx    (if (= control-position :right)
-                                                  {:marginRight "-1.1rem"}
-                                                  {:marginLeft "-1.1rem"})}
-                                        (when (:id props) {:id (:id props)}))
-                                       (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
-                                     [:> Grid {:size 12 :sx (if (= control-position :right)
-                                                              {:paddingRight "2.5rem"}
-                                                              {:paddingLeft "2.5rem"})}
-                                      (if (and expanded? (contains? props :header-expanded))
-                                        (:header-expanded props)
-                                        (:header props))]])}
+            :children  (r/as-element [:> Grid {:container true :size 12 :alignItems "center"}
+                                      [:> Grid {:sx (merge
+                                                     {:position "absolute" :top "0px"}
+                                                     (when (= control-position :right) {:right "0px"}))}
+                                       [:> IconButton
+                                        (merge
+                                         {:on-click on-click
+                                          :disabled disabled
+                                          :sx       (if (= control-position :right)
+                                                      {:marginRight "-1.1rem"}
+                                                      {:marginLeft "-1.1rem"})}
+                                         (when (:id props) {:id (:id props)}))
+                                        (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
+                                      [:> Grid {:size 12 :sx (if (= control-position :right)
+                                                               {:paddingRight "2.5rem"}
+                                                               {:paddingLeft "2.5rem"})}
+                                       (if (and expanded? (contains? props :header-expanded))
+                                         (:header-expanded props)
+                                         (:header props))]])}
            (when (some? summary-class-name) {:class-name summary-class-name}))]
    [:> AccordionDetails
     {:sx (merge {:padding "0px"} details-style)}
     content]])
 
-(defn RawHeadlessAccordion [{:keys [id expanded? elevation style details-style]
-                             :or   {expanded? true elevation 0 style {}}}
+(defn RawHeadlessAccordion [{:keys [id expanded? elevation sx styles details-sx details-styles]
+                             :or   {expanded? true elevation 0 sx {}}}
                             content]
-  [:> Accordion {:id id
-                 :expanded expanded?
+  [:> Accordion {:id        id
+                 :expanded  expanded?
                  :elevation elevation
-                 :style (merge {:width "100%"} style)}
-   [:> AccordionSummary {:style {:display "none"}}]
-   (into [:> AccordionDetails
-          {:style (merge {:padding "0px"} details-style)}
-          content])])
+                 :sx        (merge {:width "100%"} (or sx styles))}
+   [:> AccordionSummary {:sx {:display "none"}}]
+   (into
+    [:> AccordionDetails
+     {:sx (merge {:padding "0px"} (or details-sx details-styles))}
+     content])])
 
 (declare accordion-state-id)
 
