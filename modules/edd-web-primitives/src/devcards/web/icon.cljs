@@ -3,31 +3,40 @@
    [cljsjs.react]
    [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
-
    [web.primitives.utils :refer [apply-stiles]]
-
    [web.primitives.icons.core :refer
-    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon AddIcon AdminPanelSettingsIcon
-     AllColapseIcon AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon ArrowDropDownIcon
-     ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon ArrowUpwardIcon AssignmentIndIcon BlockIcon
-     BusinessIcon CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon CalculateIcon
-     CheckCircleOutlineOutlinedIcon ChevronRightIcon ChromeReaderModeIcon ClearIcon CloseIcon
-     ContentCopyIcon DeleteIcon DialpadIcon DirectionsRunIcon DoNotTouchIcon DownloadIcon
-     DragIndicatorIcon EditIcon UploadIcon EmojiPeopleIcon EqualizerIcon ErrorOutlineIcon EventIcon
-     ExpandLessIcon ExpandMoreIcon ExposureIcon FindInPageIcon FormatAlignLeftOutlinedIcon
-     ForwardIcon GetAppIcon HelpOutlineIcon HomeIcon HomeOutlinedIcon InfoOutlinedIcon InfoIcon
-     KeyboardTabIcon LaunchIcon LinkIcon LinkOffIcon LogoIcon HierarchyIcon ManageSearchIcon
-     MarkunreadMailboxIcon MenuIcon MonetizationOnIcon MoreHorizIcon MoreVertIcon NoteAddIcon
-     NoteOutlinedIcon QueryStatsIcon NotificationsNoneIcon PeopleIcon PersonIcon PersonSearchIcon
-     PictureAsPdfIcon PlaylistAddCheckIcon PlaylistAddIcon PublishIcon RefreshIcon RemoveIcon
-     ReportProblemIcon SaveIcon SearchIcon SettingsIcon ShareIcon StarBorderIcon StarIcon
-     SubdirectoryArrowRightIcon TrendingFlatIcon TuneIcon LogoutIcon UnfoldLessIcon UnfoldMoreIcon
-     TableChartIcon UpdateIcon SummarizeIcon TroubleshootIcon InsightsIcon HandymanIcon
-     GppGoodIcon]]))
+    [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon
+     AccountTreeIcon AddIcon AdminPanelSettingsIcon AllColapseIcon
+     AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon
+     ArrowDropDownIcon ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon
+     ArrowUpwardIcon AssignmentIndIcon BlockIcon BusinessIcon
+     CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon
+     CalculateIcon CheckCircleOutlineOutlinedIcon ChevronRightIcon
+     ChromeReaderModeIcon ClearIcon CloseIcon ContentCopyIcon
+     DataObjectIcon DeleteIcon DialpadIcon DirectionsRunIcon
+     DoNotTouchIcon DownloadIcon DragIndicatorIcon EditIcon
+     EmojiPeopleIcon EqualizerIcon ErrorIcon ErrorOutlineIcon
+     EventIcon ExpandLessIcon ExpandMoreIcon ExposureIcon
+     FindInPageIcon FormatAlignLeftOutlinedIcon ForwardIcon
+     GetAppIcon GppGoodIcon HandymanIcon HelpOutlineIcon HomeIcon
+     HomeOutlinedIcon HierarchyIcon InfoOutlinedIcon InfoIcon
+     InsightsIcon KeyboardTabIcon LaunchIcon LinkIcon LinkOffIcon
+     LogoIcon LogoutIcon ManageSearchIcon MarkunreadMailboxIcon
+     MenuIcon MonetizationOnIcon MoreHorizIcon MoreVertIcon
+     NoteAddIcon NoteOutlinedIcon NotificationsNoneIcon PeopleIcon
+     PersonIcon PersonSearchIcon PictureAsPdfIcon
+     PlaylistAddCheckIcon PlaylistAddIcon PopUpTableIcon
+     PublishIcon QueryStatsIcon RefreshIcon RemoveIcon
+     ReportProblemIcon SaveIcon SearchIcon SettingsIcon ShareIcon
+     StarBorderIcon StarIcon SubdirectoryArrowRightIcon
+     SummarizeIcon TableChartIcon TimerIcon TrendingFlatIcon
+     TroubleshootIcon TuneIcon UnfoldLessIcon UnfoldMoreIcon
+     UpdateIcon UploadIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
-(defcard-rg :account-balance-wallet-icon "## Account Balance Wallet Icon" [AccountBalanceWalletIcon])
+(defcard-rg :account-balance-wallet-icon
+  "## Account Balance Wallet Icon" [AccountBalanceWalletIcon])
 
 (defcard-rg :account-circle-icon "## Account Circle Icon" [AccountCircleIcon])
 
@@ -60,7 +69,7 @@
 
 (defcard-rg :business-icon "## Business Icon" [BusinessIcon])
 
-(defcard-rg :call-made-icon "## Cached Icon" [CachedIcon])
+(defcard-rg :cached-icon "## Cached Icon" [CachedIcon])
 
 (defcard-rg :calculate-icon "## Calculate Icon" [CalculateIcon])
 
@@ -83,17 +92,19 @@
 
 (defcard-rg :content-copy-icon "## Content Copy Icon" [ContentCopyIcon])
 
+(defcard-rg :data-object-icon "## DataObject Icon" [DataObjectIcon])
+
 (defcard-rg :delete-icon "## Delete Icon" [DeleteIcon])
 
 (defcard-rg :dialpad-icon "## Dialpad Icon" [DialpadIcon])
 
 (defcard-rg :directions-run-icon "## Directions Run Icon" [DirectionsRunIcon])
 
+(defcard-rg :do-not-touch-icon "## DoNotTouch Icon" [DoNotTouchIcon])
+
 (defcard-rg :download-icon "## Download Icon" [DownloadIcon])
 
 (defcard-rg :drag-indicator-icon "## Drag IndicatorIcon" [DragIndicatorIcon])
-
-(defcard-rg :do-not-touch-icon "## DoNotTouch Icon" [DoNotTouchIcon])
 
 (defcard-rg :edit-icon "## Edit Icon" [EditIcon])
 
@@ -113,25 +124,35 @@
 
 (defcard-rg :find-in-page-icon "## Find In Page Icon" [FindInPageIcon])
 
-(defcard-rg :format-align-left-outlined-icon "## Format Align Left Outlined Icon" [FormatAlignLeftOutlinedIcon])
+(defcard-rg :format-align-left-outlined-icon
+  "## Format Align Left Outlined Icon"
+  [FormatAlignLeftOutlinedIcon])
 
 (defcard-rg :forward-icon "## Forward Icon" [ForwardIcon])
 
 (defcard-rg :get-app-icon-icon "## GetApp Icon" [GetAppIcon])
 
-(defcard-rg :help-outline-icon "## Help Outline Icon" [HelpOutlineIcon])
+(defcard-rg :gpp-good-icon "## GppGoodIcon" [GppGoodIcon])
 
-(defcard-rg :hierarchy-icon-small "## Hierarchy Icon" [HierarchyIcon {:style {:height "15px" :width "15px"}}])
+(defcard-rg :handyman-icon "## HandymanIcon" [HandymanIcon])
+
+(defcard-rg :help-outline-icon "## Help Outline Icon" [HelpOutlineIcon])
 
 (defcard-rg :hierarchy-icon "## Hierarchy Icon" [HierarchyIcon {:style {:width "18px"}}])
 
-(defcard-rg :home-outlined-icon "## Home Outlined Icon" [HomeOutlinedIcon])
+(defcard-rg :hierarchy-icon-small
+  "## Hierarchy Icon Small"
+  [HierarchyIcon {:style {:height "15px" :width "15px"}}])
 
 (defcard-rg :home-icon "## Home Icon" [HomeIcon])
+
+(defcard-rg :home-outlined-icon "## Home Outlined Icon" [HomeOutlinedIcon])
 
 (defcard-rg :info-icon "## Info Icon" [InfoIcon])
 
 (defcard-rg :info-outlined-icon "## Info Outlined Icon" [InfoOutlinedIcon])
+
+(defcard-rg :insights-icon "## Insights Icon" [InsightsIcon])
 
 (defcard-rg :keyboard-tab-icon "## Keyboard Tab Icon" [KeyboardTabIcon])
 
@@ -171,9 +192,11 @@
 
 (defcard-rg :picture-as-pdf-icon "## PictureAsPdf Icon" [PictureAsPdfIcon])
 
+(defcard-rg :playlist-add-check-icon "## Playlist Add Check Icon" [PlaylistAddCheckIcon])
+
 (defcard-rg :playlist-add-icon "## Playlist Add Icon" [PlaylistAddIcon])
 
-(defcard-rg :playlist-add-check-icon "## Playlist Add Check Icon" [PlaylistAddCheckIcon])
+(defcard-rg :pop-up-table-icon "## PopUpTableIcon" [PopUpTableIcon])
 
 (defcard-rg :publish-icon "## Publish Icon" [PublishIcon])
 
@@ -193,32 +216,29 @@
 
 (defcard-rg :share-icon "## Share Icon" [ShareIcon])
 
-(defcard-rg :subdirectory-arrow-right-icon "## Subdirectory Arrow Right Icon" [SubdirectoryArrowRightIcon])
-
 (defcard-rg :star-border-icon "## Star Border Icon" [StarBorderIcon])
 
 (defcard-rg :star-icon "## Star Icon" [StarIcon])
 
+(defcard-rg :subdirectory-arrow-right-icon
+  "## Subdirectory Arrow Right Icon"
+  [SubdirectoryArrowRightIcon])
+
+(defcard-rg :summarize-icon "## Summarize Icon" [SummarizeIcon])
+
 (defcard-rg :table-chart-icon "## Table Chart Icon" [TableChartIcon])
+
+(defcard-rg :trending-flat-icon "## TrendingFlatIcon" [TrendingFlatIcon])
+
+(defcard-rg :troubleshoot-icon "## Troubleshoot Icon" [TroubleshootIcon])
 
 (defcard-rg :tune-icon "## Tune Icon" [TuneIcon])
 
-(defcard-rg :unfold-more-icon "## Unfold More Icon" [UnfoldMoreIcon])
-
 (defcard-rg :unfold-less-icon "## Unfold Less Icon" [UnfoldLessIcon])
+
+(defcard-rg :unfold-more-icon "## Unfold More Icon" [UnfoldMoreIcon])
 
 (defcard-rg :update-icon "## Update Icon" [UpdateIcon])
 
 (defcard-rg :upload-icon "## Upload Icon" [UploadIcon])
 
-(defcard-rg :summarize-icon "## Summarize Icon" [SummarizeIcon])
-
-(defcard-rg :troubleshoot-icon "## Troubleshoot Icon" [TroubleshootIcon])
-
-(defcard-rg :insights-icon "## Insights Icon" [InsightsIcon])
-
-(defcard-rg :handyman-icon "## HandymanIcon" [HandymanIcon])
-
-(defcard-rg :gpp-good-icon "## GppGoodIcon" [GppGoodIcon])
-
-(defcard-rg :trending-flat-icon "## TrendingFlatIcon" [TrendingFlatIcon])

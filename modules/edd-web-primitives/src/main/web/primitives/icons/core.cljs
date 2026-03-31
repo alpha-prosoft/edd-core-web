@@ -3,6 +3,7 @@
    ["@mui/icons-material/AccountBalance" :default AccountBalance]
    ["@mui/icons-material/AccountBalanceWallet" :default AccountBalanceWallet]
    ["@mui/icons-material/AccountCircle" :default AccountCircle]
+   ["@mui/icons-material/AccountTree" :default AccountTree]
    ["@mui/icons-material/Add" :default Add]
    ["@mui/icons-material/AdminPanelSettings" :default AdminPanelSettings]
    ["@mui/icons-material/ArrowDownward" :default ArrowDownward]
@@ -24,6 +25,7 @@
    ["@mui/icons-material/Clear" :default Clear]
    ["@mui/icons-material/Close" :default Close]
    ["@mui/icons-material/ContentCopy" :default ContentCopy]
+   ["@mui/icons-material/DataObject" :default DataObject]
    ["@mui/icons-material/Delete" :default Delete]
    ["@mui/icons-material/Dialpad" :default Dialpad]
    ["@mui/icons-material/DirectionsRun" :default DirectionsRun]
@@ -32,6 +34,7 @@
    ["@mui/icons-material/DragIndicator" :default DragIndicator]
    ["@mui/icons-material/Edit" :default Edit]
    ["@mui/icons-material/EmojiPeople" :default EmojiPeople]
+   ["@mui/icons-material/Error" :default Error]
    ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
    ["@mui/icons-material/ExpandLess" :default ExpandLess]
    ["@mui/icons-material/ExpandMore" :default ExpandMore]
@@ -78,6 +81,7 @@
    ["@mui/icons-material/Star" :default Star]
    ["@mui/icons-material/StarBorder" :default StarBorder]
    ["@mui/icons-material/SubdirectoryArrowRight" :default SubdirectoryArrowRight]
+   ["@mui/icons-material/Timer" :default Timer]
    ["@mui/icons-material/TrendingFlat" :default TrendingFlat]
    ["@mui/icons-material/Tune" :default Tune]
    ["@mui/icons-material/UnfoldLess" :default UnfoldLess]
@@ -94,308 +98,23 @@
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
-(defn AddIcon [props]
-  [:> Add props])
-
-(defn DoNotTouchIcon [props]
-  [:> DoNotTouch props])
-
-(defn SaveIcon [props]
-  [:> Save props])
-
-(defn DeleteIcon [props]
-  [:> Delete props])
-
-(defn CalculateIcon [props]
-  [:> Calculate props])
-
-(defn ClearIcon [props]
-  [:> Clear props])
-
-(defn SearchIcon [props]
-  [:> Search props])
-
-(defn RefreshIcon [props]
-  [:> Refresh props])
-
-(defn ShareIcon [props]
-  [:> Share props])
-
-(defn MenuIcon [props]
-  [:> Menu props])
-
-(defn MonetizationOnIcon [props]
-  [:> MonetizationOn props])
-
-(defn TuneIcon [props]
-  [:> Tune props])
-
-(defn CloseIcon [props]
-  [:> Close props])
-
-(defn RemoveIcon [props]
-  [:> Remove props])
-
-(defn UnfoldMoreIcon [props]
-  [:> UnfoldMore props])
-
-(defn UnfoldLessIcon [props]
-  [:> UnfoldLess props])
-
-(defn ExpandMoreIcon [props]
-  [:> ExpandMore props])
-
-(defn ExpandLessIcon [props]
-  [:> ExpandLess props])
-
-(defn MoreHorizIcon [props]
-  [:> MoreHoriz props])
-
-(defn MoreVertIcon [props]
-  [:> MoreVert props])
-
-(defn ForwardIcon [props]
-  [:> Forward props])
-
-(defn SubdirectoryArrowRightIcon [props]
-  [:> SubdirectoryArrowRight props])
-
-(defn CallMadeIcon [props]
-  [:> CallMade props])
-
-(defn CachedIcon [props]
-  [:> Cached props])
-
-(defn DialpadIcon [props]
-  [:> Dialpad props])
-
-(defn EventIcon [props]
-  [:> Event props])
-
-(defn ChatBubbleOutlineIcon [props]
-  [:> ChatBubbleOutline props])
-
-(defn ChatIcon [props]
-  [:> Chat props])
-
 (defn AccountBalanceIcon [props]
   [:> AccountBalance props])
 
 (defn AccountBalanceWalletIcon [props]
   [:> AccountBalanceWallet props])
 
-(defn ExposureIcon [props]
-  [:> Exposure props])
-
 (defn AccountCircleIcon [props]
   [:> AccountCircle props])
 
-(defn HomeOutlinedIcon [props]
-  [:> HomeOutlined props])
+(defn AccountTreeIcon [props]
+  [:> AccountTree props])
 
-(defn NoteOutlinedIcon [props]
-  [:> NoteOutlined props])
-
-(defn FormatAlignLeftOutlinedIcon [props]
-  [:> FormatAlignLeftOutlined props])
-
-(defn StarBorderIcon [props]
-  [:> StarBorder props])
-
-(defn CheckCircleOutlineOutlinedIcon [props]
-  [:> CheckCircleOutlineOutlined props])
-
-(defn EmojiPeopleIcon [props]
-  [:> EmojiPeople props])
-
-(defn DirectionsRunIcon [props]
-  [:> DirectionsRun props])
-
-(defn PeopleIcon [props]
-  [:> People props])
-
-(defn PersonIcon [props]
-  [:> Person props])
-
-(defn PictureAsPdfIcon [props]
-  [:> PictureAsPdf props])
-
-(defn InfoIcon [props]
-  [:> Info props])
-
-(defn InfoOutlinedIcon [props]
-  [:> InfoOutlined props])
-
-(defn AssignmentIndIcon [props]
-  [:> AssignmentInd props])
-
-(defn EqualizerIcon [props]
-  [:> Equalizer props])
-
-(defn FindInPageIcon [props]
-  [:> FindInPage props])
-
-(defn MarkunreadMailboxIcon [props]
-  [:> MarkunreadMailbox props])
-
-(defn NoteAddIcon [props]
-  [:> NoteAdd props])
-
-(defn PlaylistAddIcon [props]
-  [:> PlaylistAdd props])
-
-(defn PlaylistAddCheckIcon [props]
-  [:> PlaylistAddCheck props])
-
-(defn StarIcon [props]
-  [:> Star props])
-
-(defn LinkIcon [props]
-  [:> Link props])
-
-(defn LinkOffIcon [props]
-  [:> LinkOff props])
-
-(defn ErrorOutlineIcon [props]
-  [:> ErrorOutline props])
-
-(defn HelpOutlineIcon [props]
-  [:> HelpOutline props])
-
-(defn PublishIcon [props]
-  [:> Publish props])
-
-(defn QueryStatsIcon [props]
-  [:> QueryStats props])
-
-(defn HomeIcon [props]
-  [:> Home props])
-
-(defn BlockIcon [props]
-  [:> Block props])
-
-(defn BusinessIcon [props]
-  [:> Business props])
-
-(defn ReportProblemIcon [props]
-  [:> ReportProblemOutlined props])
-
-(defn ChromeReaderModeIcon [props]
-  [:> ChromeReaderMode props])
-
-(defn ArrowUpwardIcon [props]
-  [:> ArrowUpward props])
-
-(defn ArrowDownwardIcon [props]
-  [:> ArrowDownward props])
-
-(defn ArrowRightAltIcon [props]
-  [:> ArrowRightAlt props])
-
-(defn KeyboardTabIcon [props]
-  [:> KeyboardTab props])
-
-(defn LaunchIcon [props]
-  [:> Launch props])
-
-(defn NotificationsNoneIcon [props]
-  [:> NotificationsNone props])
-
-(defn PersonSearchIcon [props]
-  [:> PersonSearch props])
+(defn AddIcon [props]
+  [:> Add props])
 
 (defn AdminPanelSettingsIcon [props]
   [:> AdminPanelSettings props])
-
-(defn ChevronRightIcon [props]
-  [:> ChevronRight props])
-
-(defn TableChartIcon [props]
-  [:> TableChart props])
-
-(defn UpdateIcon [props]
-  [:> Update props])
-
-(defn DownloadIcon [props]
-  [:> Download props])
-
-(defn DragIndicatorIcon [props]
-  [:> DragIndicator props])
-
-(defn ArrowDropDownCircleIcon [props]
-  [:> ArrowDropDownCircle props])
-
-(defn ArrowDropDownIcon [props]
-  [:> ArrowDropDown props])
-
-(defn ContentCopyIcon [props]
-  [:> ContentCopy  props])
-
-(defn ArrowDropUpCircleIcon [{:keys [style] :as props}]
-  [:> ArrowDropDownCircle (assoc props
-                                 :style (merge {:rotate "180deg"} style))])
-
-(defn ArrowDropUpIcon [props]
-  [:> ArrowDropUp props])
-
-(defn ManageSearchIcon [props]
-  [:> ManageSearch props])
-
-(defn GetAppIcon [props]
-  [:> GetApp props])
-
-(defn SettingsIcon [props]
-  [:svg (handle-props props)
-   [:rect {:id "bounding-box-24" :fill "#FFFFFF" :opacity "0" :x "0" :y "0" :width "24" :height "24"}]
-   [:path {:d         "M17,13 C19.209139,13 21,14.790861 21,17 C21,19.209139 19.209139,21 17,21 C15.1364348,21 13.570521,19.7256022 13.1262135,18.0007613 L3,18 L3,16 L13.1259548,16.0002435 C13.5699129,14.2748927 15.1360729,13 17,13 Z M17,15 C15.8954305,15 15,15.8954305 15,17 C15,18.1045695 15.8954305,19 17,19 C18.1045695,19 19,18.1045695 19,17 C19,15.8954305 18.1045695,15 17,15 Z M7,3 C8.86392711,3 10.4300871,4.27489272 10.8740452,6.00024347 L21,6 L21,8 L10.8737865,8.00076134 C10.429479,9.72560224 8.86356525,11 7,11 C4.790861,11 3,9.209139 3,7 C3,4.790861 4.790861,3 7,3 Z M7,5 C5.8954305,5 5,5.8954305 5,7 C5,8.1045695 5.8954305,9 7,9 C8.1045695,9 9,8.1045695 9,7 C9,5.8954305 8.1045695,5 7,5 Z"
-           :id        "settings"
-           :fill      "#2B2D33"
-           :fill-rule "nonzero"}]])
-
-(defn SummarizeIcon [props]
-  [:> Summarize props])
-
-(defn TroubleshootIcon [props]
-  [:> Troubleshoot props])
-
-(defn InsightsIcon [props]
-  [:> Insights props])
-
-(defn HandymanIcon [props]
-  [:> Handyman props])
-
-(defn EditIcon [props]
-  [:> Edit props])
-
-(defn UploadIcon [props]
-  [:> Upload props])
-
-(defn LogoutIcon [props]
-  [:> Logout props])
-
-(defn GppGoodIcon [props]
-  [:> GppGood props])
-
-(defn TrendingFlatIcon [props]
-  [:> TrendingFlat props])
-
-(defn ArrowLeftIcon [props]
-  [:svg (handle-props props)
-   [:rect {:id "bounding-box-24" :fill "#FFFFFF" :opacity "0" :x "0" :y "0" :width "24" :height "24"}]
-   [:path {:d         "M12,9.41421356 L4.70710678,16.7071068 L3.29289322,15.2928932 L11.2928932,7.29289322 C11.6834175,6.90236893 12.3165825,6.90236893 12.7071068,7.29289322 L20.7071068,15.2928932 L19.2928932,16.7071068 L12,9.41421356 Z"
-           :id        "arrow-left"
-           :fill      "#2B2D33"
-           :fill-rule "nonzero"
-           :transform "translate(12.000000, 11.853553) rotate(-90.000000) translate(-12.000000, -11.853553) "}]])
-
-(defn ArrowRightIcon [props]
-  [:svg (handle-props props)
-   [:rect {:id "bounding-box-24" :fill "#FFFFFF" :opacity "0" :x "0" :y "0" :width "24" :height "24"}]
-   [:path {:d         "M12,9.41421356 L4.70710678,16.7071068 L3.29289322,15.2928932 L11.2928932,7.29289322 C11.6834175,6.90236893 12.3165825,6.90236893 12.7071068,7.29289322 L20.7071068,15.2928932 L19.2928932,16.7071068 L12,9.41421356 Z"
-           :id        "arrow-right"
-           :fill      "#2B2D33"
-           :fill-rule "nonzero"
-           :transform "translate(12.000000, 11.853553) rotate(-270.000000) translate(-12.000000, -11.853553) "}]])
 
 (defn AllColapseIcon [props]
   [:svg (handle-props props)
@@ -413,16 +132,158 @@
            :stroke       "#979797"
            :stroke-width ".68"}]])
 
-(defn LogoIcon [props]
-  [:svg (merge {:style {:width   "36px"
-                        :height  "34px"
-                        :viewbox "0 0 36 34"
-                        :version "1.1"
-                        :xlmns   "http://www.w3.org/2000/svg"}} props)
-   [:path {:d         "M6.78433054,0.600418777 C5.63610913,0.615852373 4.3496967,1.05886756 3.06370843,2.30362121 C0.236864005,5.03973958 0,8.53618948 0,9.54926002 L1.5460119,7.97534313 L7.49221121,13.8831517 L9.14582085,12.2417815 L9.14582085,8.36320095 L10.8447347,10.0439189 L10.8390824,14.731943 L13.2118987,17.0815755 L1.14960884,29.0489638 L5.91223136,33.7650933 L17.9688587,21.8426739 L30.1444093,33.9 L34.9070323,29.1726282 L22.7201545,17.0815755 L25.098635,14.7488063 L25.098635,10.0439189 L26.7918859,8.36320095 L26.7918859,12.2586448 L28.4511585,13.8831517 L34.3916946,7.97534313 L36,9.54926002 C36,8.531595 35.6951798,5.03973958 32.8683357,2.30362121 C29.7009738,-0.760389773 26.5339931,1.0306571 25.4384178,2.11812456 L19.7074137,7.81232974 L21.1231763,9.22885553 L17.9688587,12.3598248 L14.8032151,9.22885553 L16.2359667,7.81232974 L10.4936366,2.11812456 C9.84698403,1.47244057 8.46251123,0.57784829 6.78434123,0.600418777 L6.78433054,0.600418777 Z"
-           :id        "Logo"
+(defn ArrowDownwardIcon [props]
+  [:> ArrowDownward props])
+
+(defn ArrowDropDownCircleIcon [props]
+  [:> ArrowDropDownCircle props])
+
+(defn ArrowDropDownIcon [props]
+  [:> ArrowDropDown props])
+
+(defn ArrowDropUpCircleIcon [{:keys [style] :as props}]
+  [:> ArrowDropDownCircle (assoc props
+                                 :style (merge {:rotate "180deg"} style))])
+
+(defn ArrowDropUpIcon [props]
+  [:> ArrowDropUp props])
+
+(defn ArrowLeftIcon [props]
+  [:svg (handle-props props)
+   [:rect {:id "bounding-box-24" :fill "#FFF" :opacity "0"
+           :x "0" :y "0" :width "24" :height "24"}]
+   [:path {:d         "M12,9.41421356 L4.70710678,16.7071068 L3.29289322,15.2928932 L11.2928932,7.29289322 C11.6834175,6.90236893 12.3165825,6.90236893 12.7071068,7.29289322 L20.7071068,15.2928932 L19.2928932,16.7071068 L12,9.41421356 Z"
+           :id        "arrow-left"
            :fill      "#2B2D33"
-           :fill-rule "nonzero"}]])
+           :fill-rule "nonzero"
+           :transform "translate(12.000000, 11.853553) rotate(-90.000000) translate(-12.000000, -11.853553) "}]])
+
+(defn ArrowRightAltIcon [props]
+  [:> ArrowRightAlt props])
+
+(defn ArrowRightIcon [props]
+  [:svg (handle-props props)
+   [:rect {:id "bounding-box-24" :fill "#FFF" :opacity "0"
+           :x "0" :y "0" :width "24" :height "24"}]
+   [:path {:d         "M12,9.41421356 L4.70710678,16.7071068 L3.29289322,15.2928932 L11.2928932,7.29289322 C11.6834175,6.90236893 12.3165825,6.90236893 12.7071068,7.29289322 L20.7071068,15.2928932 L19.2928932,16.7071068 L12,9.41421356 Z"
+           :id        "arrow-right"
+           :fill      "#2B2D33"
+           :fill-rule "nonzero"
+           :transform "translate(12.000000, 11.853553) rotate(-270.000000) translate(-12.000000, -11.853553) "}]])
+
+(defn ArrowUpwardIcon [props]
+  [:> ArrowUpward props])
+
+(defn AssignmentIndIcon [props]
+  [:> AssignmentInd props])
+
+(defn BlockIcon [props]
+  [:> Block props])
+
+(defn BusinessIcon [props]
+  [:> Business props])
+
+(defn CachedIcon [props]
+  [:> Cached props])
+
+(defn CalculateIcon [props]
+  [:> Calculate props])
+
+(defn CallMadeIcon [props]
+  [:> CallMade props])
+
+(defn ChatBubbleOutlineIcon [props]
+  [:> ChatBubbleOutline props])
+
+(defn ChatIcon [props]
+  [:> Chat props])
+
+(defn CheckCircleOutlineOutlinedIcon [props]
+  [:> CheckCircleOutlineOutlined props])
+
+(defn ChevronRightIcon [props]
+  [:> ChevronRight props])
+
+(defn ChromeReaderModeIcon [props]
+  [:> ChromeReaderMode props])
+
+(defn ClearIcon [props]
+  [:> Clear props])
+
+(defn CloseIcon [props]
+  [:> Close props])
+
+(defn ContentCopyIcon [props]
+  [:> ContentCopy  props])
+
+(defn DataObjectIcon [props]
+  [:> DataObject props])
+
+(defn DeleteIcon [props]
+  [:> Delete props])
+
+(defn DialpadIcon [props]
+  [:> Dialpad props])
+
+(defn DirectionsRunIcon [props]
+  [:> DirectionsRun props])
+
+(defn DoNotTouchIcon [props]
+  [:> DoNotTouch props])
+
+(defn DownloadIcon [props]
+  [:> Download props])
+
+(defn DragIndicatorIcon [props]
+  [:> DragIndicator props])
+
+(defn EditIcon [props]
+  [:> Edit props])
+
+(defn EmojiPeopleIcon [props]
+  [:> EmojiPeople props])
+
+(defn EqualizerIcon [props]
+  [:> Equalizer props])
+
+(defn ErrorOutlineIcon [props]
+  [:> ErrorOutline props])
+
+(defn ErrorIcon [props]
+  [:> Error props])
+
+(defn EventIcon [props]
+  [:> Event props])
+
+(defn ExposureIcon [props]
+  [:> Exposure props])
+
+(defn ExpandLessIcon [props]
+  [:> ExpandLess props])
+
+(defn ExpandMoreIcon [props]
+  [:> ExpandMore props])
+
+(defn FindInPageIcon [props]
+  [:> FindInPage props])
+
+(defn FormatAlignLeftOutlinedIcon [props]
+  [:> FormatAlignLeftOutlined props])
+
+(defn ForwardIcon [props]
+  [:> Forward props])
+
+(defn GetAppIcon [props]
+  [:> GetApp props])
+
+(defn GppGoodIcon [props]
+  [:> GppGood props])
+
+(defn HandymanIcon [props]
+  [:> Handyman props])
+
+(defn HelpOutlineIcon [props]
+  [:> HelpOutline props])
 
 (defn HierarchyIcon [props]
   [:svg (merge {:viewBox "0 0 14 14"
@@ -440,3 +301,183 @@
      [:rect {:x "0", :y "7", :width "1", :height "5"}]
      [:rect {:x "0", :y "7", :width "4", :height "1"}]
      [:rect {:x "0", :y "12", :width "4", :height "1"}]]]])
+
+(defn HomeIcon [props]
+  [:> Home props])
+
+(defn HomeOutlinedIcon [props]
+  [:> HomeOutlined props])
+
+(defn InfoIcon [props]
+  [:> Info props])
+
+(defn InfoOutlinedIcon [props]
+  [:> InfoOutlined props])
+
+(defn InsightsIcon [props]
+  [:> Insights props])
+
+(defn KeyboardTabIcon [props]
+  [:> KeyboardTab props])
+
+(defn LaunchIcon [props]
+  [:> Launch props])
+
+(defn LinkIcon [props]
+  [:> Link props])
+
+(defn LinkOffIcon [props]
+  [:> LinkOff props])
+
+(defn LogoIcon [props]
+  [:svg (merge {:style {:width   "36px"
+                        :height  "34px"
+                        :viewbox "0 0 36 34"
+                        :version "1.1"
+                        :xlmns   "http://www.w3.org/2000/svg"}} props)
+   [:path {:d         "M6.78433054,0.600418777 C5.63610913,0.615852373 4.3496967,1.05886756 3.06370843,2.30362121 C0.236864005,5.03973958 0,8.53618948 0,9.54926002 L1.5460119,7.97534313 L7.49221121,13.8831517 L9.14582085,12.2417815 L9.14582085,8.36320095 L10.8447347,10.0439189 L10.8390824,14.731943 L13.2118987,17.0815755 L1.14960884,29.0489638 L5.91223136,33.7650933 L17.9688587,21.8426739 L30.1444093,33.9 L34.9070323,29.1726282 L22.7201545,17.0815755 L25.098635,14.7488063 L25.098635,10.0439189 L26.7918859,8.36320095 L26.7918859,12.2586448 L28.4511585,13.8831517 L34.3916946,7.97534313 L36,9.54926002 C36,8.531595 35.6951798,5.03973958 32.8683357,2.30362121 C29.7009738,-0.760389773 26.5339931,1.0306571 25.4384178,2.11812456 L19.7074137,7.81232974 L21.1231763,9.22885553 L17.9688587,12.3598248 L14.8032151,9.22885553 L16.2359667,7.81232974 L10.4936366,2.11812456 C9.84698403,1.47244057 8.46251123,0.57784829 6.78434123,0.600418777 L6.78433054,0.600418777 Z"
+           :id        "Logo"
+           :fill      "#2B2D33"
+           :fill-rule "nonzero"}]])
+
+(defn LogoutIcon [props]
+  [:> Logout props])
+
+(defn ManageSearchIcon [props]
+  [:> ManageSearch props])
+
+(defn MarkunreadMailboxIcon [props]
+  [:> MarkunreadMailbox props])
+
+(defn MenuIcon [props]
+  [:> Menu props])
+
+(defn MonetizationOnIcon [props]
+  [:> MonetizationOn props])
+
+(defn MoreHorizIcon [props]
+  [:> MoreHoriz props])
+
+(defn MoreVertIcon [props]
+  [:> MoreVert props])
+
+(defn NoteAddIcon [props]
+  [:> NoteAdd props])
+
+(defn NoteOutlinedIcon [props]
+  [:> NoteOutlined props])
+
+(defn NotificationsNoneIcon [props]
+  [:> NotificationsNone props])
+
+(defn PeopleIcon [props]
+  [:> People props])
+
+(defn PersonIcon [props]
+  [:> Person props])
+
+(defn PersonSearchIcon [props]
+  [:> PersonSearch props])
+
+(defn PictureAsPdfIcon [props]
+  [:> PictureAsPdf props])
+
+(defn PlaylistAddCheckIcon [props]
+  [:> PlaylistAddCheck props])
+
+(defn PlaylistAddIcon [props]
+  [:> PlaylistAdd props])
+
+(defn PopUpTableIcon [props]
+  [:svg (handle-props
+         (merge {:viewBox "0 0 18 18"
+                 :version "1.1"
+                 :xlmns   "http://www.w3.org/2000/svg"}
+                props))
+   [:rect {:id "bounding-box-18"
+           :fill "rgba(0, 0, 0, 1)"
+           :opacity "0"
+           #_#_:x "0"
+           #_#_:y "0"
+           :width "18"
+           :height "18"}]
+   [:path {:d "M0 2V6H2V2H6V0H2C0.9 0 0 0.9 0 2ZM2 12H0V16C0 17.1 0.9 18 2 18H6V16H2V12ZM16 16H12V18H16C17.1 18 18 17.1 18 16V12H16V16ZM16 0H12V2H16V6H18V2C18 0.9 17.1 0 16 0Z"}]
+   [:path {:d "M13 4H8V6H13V4Z"}]
+   [:path {:d "M13 12H8V14H13V12Z"}]
+   [:path {:d "M13 8H8V10H13V8Z"}]
+   [:path {:d "M7 4H5V6H7V4Z"}]
+   [:path {:d "M7 12H5V14H7V12Z"}]
+   [:path {:d "M7 8H5V10H7V8Z"}]])
+
+(defn PublishIcon [props]
+  [:> Publish props])
+
+(defn QueryStatsIcon [props]
+  [:> QueryStats props])
+
+(defn RefreshIcon [props]
+  [:> Refresh props])
+
+(defn RemoveIcon [props]
+  [:> Remove props])
+
+(defn ReportProblemIcon [props]
+  [:> ReportProblemOutlined props])
+
+(defn SaveIcon [props]
+  [:> Save props])
+
+(defn SearchIcon [props]
+  [:> Search props])
+
+(defn SettingsIcon [props]
+  [:svg (handle-props props)
+   [:rect {:id "bounding-box-24" :fill "#FFF" :opacity "0"
+           :x "0" :y "0" :width "24" :height "24"}]
+   [:path {:d         "M17,13 C19.209139,13 21,14.790861 21,17 C21,19.209139 19.209139,21 17,21 C15.1364348,21 13.570521,19.7256022 13.1262135,18.0007613 L3,18 L3,16 L13.1259548,16.0002435 C13.5699129,14.2748927 15.1360729,13 17,13 Z M17,15 C15.8954305,15 15,15.8954305 15,17 C15,18.1045695 15.8954305,19 17,19 C18.1045695,19 19,18.1045695 19,17 C19,15.8954305 18.1045695,15 17,15 Z M7,3 C8.86392711,3 10.4300871,4.27489272 10.8740452,6.00024347 L21,6 L21,8 L10.8737865,8.00076134 C10.429479,9.72560224 8.86356525,11 7,11 C4.790861,11 3,9.209139 3,7 C3,4.790861 4.790861,3 7,3 Z M7,5 C5.8954305,5 5,5.8954305 5,7 C5,8.1045695 5.8954305,9 7,9 C8.1045695,9 9,8.1045695 9,7 C9,5.8954305 8.1045695,5 7,5 Z"
+           :id        "settings"
+           :fill      "#2B2D33"
+           :fill-rule "nonzero"}]])
+
+(defn ShareIcon [props]
+  [:> Share props])
+
+(defn StarBorderIcon [props]
+  [:> StarBorder props])
+
+(defn StarIcon [props]
+  [:> Star props])
+
+(defn SubdirectoryArrowRightIcon [props]
+  [:> SubdirectoryArrowRight props])
+
+(defn SummarizeIcon [props]
+  [:> Summarize props])
+
+(defn TableChartIcon [props]
+  [:> TableChart props])
+
+(defn TrendingFlatIcon [props]
+  [:> TrendingFlat props])
+
+(defn TroubleshootIcon [props]
+  [:> Troubleshoot props])
+
+(defn TimerIcon [props]
+  [:> Timer props])
+
+(defn TuneIcon [props]
+  [:> Tune props])
+
+(defn UnfoldLessIcon [props]
+  [:> UnfoldLess props])
+
+(defn UnfoldMoreIcon [props]
+  [:> UnfoldMore props])
+
+(defn UpdateIcon [props]
+  [:> Update props])
+
+(defn UploadIcon [props]
+  [:> Upload props])
+
