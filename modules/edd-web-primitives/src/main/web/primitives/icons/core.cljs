@@ -75,6 +75,7 @@
    ["@mui/icons-material/Refresh" :default Refresh]
    ["@mui/icons-material/Remove" :default Remove]
    ["@mui/icons-material/ReportProblemOutlined" :default ReportProblemOutlined]
+   ["@mui/icons-material/RocketLaunch" :default RocketLaunch]
    ["@mui/icons-material/Save" :default Save]
    ["@mui/icons-material/Search" :default Search]
    ["@mui/icons-material/Share" :default Share]
@@ -423,6 +424,9 @@
 
 (defn ReportProblemIcon [props]
   [:> ReportProblemOutlined props])
+
+(defn RocketLaunchIcon [props]
+  [:> RocketLaunch props])
 
 (defn SaveIcon [props]
   [:> Save props])

@@ -8,7 +8,7 @@
     [AccountBalanceIcon AccountBalanceWalletIcon AccountCircleIcon
      AccountTreeIcon AddIcon AdminPanelSettingsIcon AllColapseIcon
      AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon
-     ArrowDropDownIcon ArrowDropUpIcon ArrowLeftIcon ArrowRightIcon
+     ArrowDropDownIcon ArrowDropUpCircleIcon ArrowDropUpIcon ArrowLeftIcon ArrowRightAltIcon ArrowRightIcon
      ArrowUpwardIcon AssignmentIndIcon BlockIcon BusinessIcon
      CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon
      CalculateIcon CheckCircleOutlineOutlinedIcon ChevronRightIcon
@@ -27,7 +27,7 @@
      PersonIcon PersonSearchIcon PictureAsPdfIcon
      PlaylistAddCheckIcon PlaylistAddIcon PopUpTableIcon
      PublishIcon QueryStatsIcon RefreshIcon RemoveIcon
-     ReportProblemIcon SaveIcon SearchIcon SettingsIcon ShareIcon
+     ReportProblemIcon RocketLaunchIcon SaveIcon SearchIcon SettingsIcon ShareIcon
      StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      SummarizeIcon TableChartIcon TimerIcon TrendingFlatIcon
      TroubleshootIcon TuneIcon UnfoldLessIcon UnfoldMoreIcon
@@ -39,6 +39,8 @@
   "## Account Balance Wallet Icon" [AccountBalanceWalletIcon])
 
 (defcard-rg :account-circle-icon "## Account Circle Icon" [AccountCircleIcon])
+
+(defcard-rg :account-tree-icon "## Account Tree Icon" [AccountTreeIcon])
 
 (defcard-rg :add-icon "## Add Icon" [AddIcon])
 
@@ -55,9 +57,13 @@
 
 (defcard-rg :arrow-drop-down-icon "## Arrow Drop Down Icon" [ArrowDropDownIcon])
 
+(defcard-rg :arrow-drop-up-circle-icon "## Arrow Drop Up Circle Icon" [ArrowDropUpCircleIcon])
+
 (defcard-rg :arrow-drop-up-icon "## Arrow Drop Up Icon" [ArrowDropUpIcon])
 
 (defcard-rg :arrow-left-icon "## Arrow Left Icon" [ArrowLeftIcon])
+
+(defcard-rg :arrow-right-alt-icon "## Arrow Right Alt Icon" [ArrowRightAltIcon])
 
 (defcard-rg :arrow-right-icon "## Arrow Right Icon" [ArrowRightIcon])
 
@@ -113,6 +119,8 @@
 (defcard-rg :equalizer-icon "## Equalizer Icon" [EqualizerIcon])
 
 (defcard-rg :error-outline-icon "## Error Outline Icon" [ErrorOutlineIcon])
+
+(defcard-rg :error-icon "## Error Icon" [ErrorIcon])
 
 (defcard-rg :event-icon "## Event Icon" [EventIcon])
 
@@ -208,6 +216,8 @@
 
 (defcard-rg :report-problem-icon "## Report Problem Icon" [ReportProblemIcon])
 
+(defcard-rg :rocket-launch-icon "## Rocket Launch Icon" [RocketLaunchIcon])
+
 (defcard-rg :save-icon "## Save Icon" [SaveIcon])
 
 (defcard-rg :search-icon "## Search Icon" [SearchIcon])
@@ -227,6 +237,8 @@
 (defcard-rg :summarize-icon "## Summarize Icon" [SummarizeIcon])
 
 (defcard-rg :table-chart-icon "## Table Chart Icon" [TableChartIcon])
+
+(defcard-rg :timer-icon "## Timer Icon" [TimerIcon])
 
 (defcard-rg :trending-flat-icon "## TrendingFlatIcon" [TrendingFlatIcon])
 
