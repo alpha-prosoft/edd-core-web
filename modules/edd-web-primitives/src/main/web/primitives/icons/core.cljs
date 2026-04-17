@@ -96,6 +96,7 @@
    ["@mui/icons-material/Insights" :default Insights]
    ["@mui/icons-material/Handyman" :default Handyman]
    ["@mui/icons-material/GppGood" :default GppGood]
+   ["@mui/icons-material/OpenInNew" :default OpenInNew]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -247,23 +248,23 @@
 (defn EqualizerIcon [props]
   [:> Equalizer props])
 
-(defn ErrorOutlineIcon [props]
-  [:> ErrorOutline props])
-
 (defn ErrorIcon [props]
   [:> Error props])
 
+(defn ErrorOutlineIcon [props]
+  [:> ErrorOutline props])
+
 (defn EventIcon [props]
   [:> Event props])
-
-(defn ExposureIcon [props]
-  [:> Exposure props])
 
 (defn ExpandLessIcon [props]
   [:> ExpandLess props])
 
 (defn ExpandMoreIcon [props]
   [:> ExpandMore props])
+
+(defn ExposureIcon [props]
+  [:> Exposure props])
 
 (defn FindInPageIcon [props]
   [:> FindInPage props])
@@ -371,6 +372,9 @@
 (defn NotificationsNoneIcon [props]
   [:> NotificationsNone props])
 
+(defn OpenInNewIcon [props]
+  [:> OpenInNew props])
+
 (defn PeopleIcon [props]
   [:> People props])
 
@@ -461,14 +465,14 @@
 (defn TableChartIcon [props]
   [:> TableChart props])
 
+(defn TimerIcon [props]
+  [:> Timer props])
+
 (defn TrendingFlatIcon [props]
   [:> TrendingFlat props])
 
 (defn TroubleshootIcon [props]
   [:> Troubleshoot props])
-
-(defn TimerIcon [props]
-  [:> Timer props])
 
 (defn TuneIcon [props]
   [:> Tune props])

@@ -31,7 +31,7 @@
      StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      SummarizeIcon TableChartIcon TimerIcon TrendingFlatIcon
      TroubleshootIcon TuneIcon UnfoldLessIcon UnfoldMoreIcon
-     UpdateIcon UploadIcon]]))
+     UpdateIcon UploadIcon OpenInNewIcon]]))
 
 (defcard-rg :account-balance-icon "## Account Balance Icon" [AccountBalanceIcon])
 
@@ -118,9 +118,9 @@
 
 (defcard-rg :equalizer-icon "## Equalizer Icon" [EqualizerIcon])
 
-(defcard-rg :error-outline-icon "## Error Outline Icon" [ErrorOutlineIcon])
-
 (defcard-rg :error-icon "## Error Icon" [ErrorIcon])
+
+(defcard-rg :error-outline-icon "## Error Outline Icon" [ErrorOutlineIcon])
 
 (defcard-rg :event-icon "## Event Icon" [EventIcon])
 
@@ -191,6 +191,8 @@
 (defcard-rg :note-outlined-icon "## Note Outlined Icon" [NoteOutlinedIcon])
 
 (defcard-rg :notifications-none-icon "## Notifications None Icon" [NotificationsNoneIcon])
+
+(defcard-rg :open-in-new-icon "## Open In New Icon" [OpenInNewIcon])
 
 (defcard-rg :people-icon "## People Icon" [PeopleIcon])
 
