@@ -1,6 +1,7 @@
 (ns edd.i18n
   (:require [edd.db :as db]
             [re-frame.db :as re-frame-db]
+            [reagent.ratom :as ratom]
             [clojure.string :as str]))
 
 (defn deep-merge
@@ -48,9 +49,19 @@
 
     :else s))
 
+(defn- non-reactive-db
+  "Read app-db without subscribing to it. Calling `tr` inside a Reagent
+   render must not couple that component to every db change — language and
+   translations are effectively static at runtime, so a non-reactive read
+   is correct."
+  []
+  (binding [ratom/*ratom-context* nil]
+    @re-frame-db/app-db))
+
 (defn tr
   [& args]
-  (let [lang (get @re-frame-db/app-db ::db/selected-language)
+  (let [app-db (non-reactive-db)
+        lang (get app-db ::db/selected-language)
         [message-spec params] (if (map? (first args))
                                 [(first args) nil]
                                 [args nil])
@@ -64,7 +75,7 @@
                [message-key]
                message-key)
         prop (vec (concat [lang] prop))
-        val (get-in (get @re-frame-db/app-db ::db/translations)
+        val (get-in (get app-db ::db/translations)
                     prop
                     (str "{tr " prop "}"))]
     (when-not (string? val)
