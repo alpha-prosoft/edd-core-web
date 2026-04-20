@@ -1,10 +1,12 @@
 (ns web.widgets.frame.page
   (:require [re-frame.core :as rf]
             [edd.subs :as subs]
+            [edd.db :as edd-db]
             [reagent.core :as r]
             [edd.events :as events]
             [edd.util :as util]
             [edd.i18n :refer [tr]]
+            [clojure.string :as str]
             [clojure.walk :refer [keywordize-keys]]
             ["@mui/material/styles" :refer [createTheme, ThemeProvider]]
             ["@mui/material/AppBar" :default AppBar]
@@ -16,6 +18,32 @@
             ["@mui/icons-material/KeyboardArrowRight" :default KeyboardArrowRightIcon]
             ["@mui/icons-material/Menu" :default MenuIcon]
             [web.widgets.snackbar-alert.views :as snackbar-alert.views]))
+
+(rf/reg-sub
+ ::env-prefix
+ (fn [db]
+   (let [hosted-zone
+         (get-in db [::edd-db/config :PublicHostedZoneName])
+
+         first-label
+         (some-> hosted-zone (str/split #"\.") first str/lower-case)]
+     (cond
+       (nil? first-label)                  nil
+       (str/starts-with? first-label "dev")  :dev
+       (str/starts-with? first-label "test") :test
+       :else                                 nil))))
+
+(defn- menu-button-sx [env]
+  (case env
+    :dev  {:bgcolor   "error.main"
+           :color     "common.white"
+           :mr        1
+           "&:hover"  {:bgcolor "error.dark"}}
+    :test {:bgcolor   "info.main"
+           :color     "common.white"
+           :mr        1
+           "&:hover"  {:bgcolor "info.dark"}}
+    nil))
 
 (defn menu-item
   [{:keys [classes]} item]
@@ -77,10 +105,13 @@
 
          [:> Toolbar
           (when-not (hide-menu)
-            [:> IconButton {:edge     "start"
-                            :bel      "Menu"
-                            :on-click #(rf/dispatch [::events/toggle-drawer])}
-             [:> MenuIcon]])
+            (let [env @(rf/subscribe [::env-prefix])]
+              [:> IconButton (cond-> {:edge     "start"
+                                      :bel      "Menu"
+                                      :on-click #(rf/dispatch [::events/toggle-drawer])}
+                               (some? (menu-button-sx env))
+                               (assoc :sx (menu-button-sx env)))
+               [:> MenuIcon]]))
 
           (cond
             app-bar (app-bar)
