@@ -29,9 +29,9 @@
   (when (and (some? on-expand-func) expanded?) (on-expand-func))
   expanded?)
 
-(defn RawAccordion [{:keys [expanded? control-position on-click on-change on-expand-func
+(defn RawAccordion [{:keys [expanded? control-position control-sx on-click on-change on-expand-func
                             elevation style disabled summary-style summary-class-name details-style]
-                     :or   {control-position :left elevation 0 disabled false}
+                     :or   {control-position :left elevation 0 disabled false control-sx {}}
                      :as   props} content]
   [:> Accordion
    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
@@ -46,7 +46,8 @@
             :children  (r/as-element [:> Grid {:container true :size 12 :alignItems "center"}
                                       [:> Grid {:sx (merge
                                                      {:position "absolute" :top "0px"}
-                                                     (when (= control-position :right) {:right "0px"}))}
+                                                     (when (= control-position :right) {:right "0px"})
+                                                     control-sx)}
                                        [:> IconButton
                                         (merge
                                          {:on-click on-click
