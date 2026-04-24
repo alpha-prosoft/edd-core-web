@@ -21,6 +21,7 @@
             ["@mui/material/Typography" :default Typography]
             ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
             ["@mui/icons-material/TaskAlt" :default TaskAlt]
+            ["@mui/icons-material/Close" :default CloseIcon]
             [reagent.core :as r]))
 
 (defn login-on-key-enter [event]
@@ -58,14 +59,14 @@
              :xs   12}
     button]])
 
-(defn cacnelbutton []
-  [:> Button {:full-width true
-              :variant    "outlined"
-              :key        "cancel"
-              :on-click   #(rf/dispatch [::events/close-dialog])
-              :color      "secondary"
-              :tab-index  4}
-   (tr :cancel)])
+(defn dialog-close-button []
+  [:> IconButton {:on-click #(rf/dispatch [::events/close-dialog])
+                  :aria-label "close"
+                  :sx       {:position "absolute"
+                             :right    8
+                             :top      8
+                             :color    "grey.500"}}
+   [:> CloseIcon {}]])
 
 (defn login-dialog-actions [form-type]
   (let [loading? @(rf/subscribe [::subs/loading?])]
@@ -88,23 +89,16 @@
                :xs   12}
       [:> Grid {:container true
                 :spacing   2}
-       [:> Grid {:item true
-                 :sm true
-                 :xs 12
-                 :sx {:display {:xs "none"
-                                :md "block"}}}
-        (cacnelbutton)]
-
        (when (some #(= % form-type) [:login])
          [:> Grid {:item true :sm true :xs 12}
           [:> Button {:full-width true
                       :variant    "outlined"
+                      :color      "primary"
                       :key        "login"
                       :disabled   (or loading?
                                       @(rf/subscribe [::subs/username-invalid?])
                                       @(rf/subscribe [::subs/password-invalid?]))
-                      :on-click   #(rf/dispatch [::events/do-login])
-                      :color      "secondary"}
+                      :on-click   #(rf/dispatch [::events/do-login])}
            (if loading?
              [:> CircularProgress {:size 20 :color "inherit"}]
              (tr :login))]])
@@ -171,14 +165,7 @@
                       :color      "secondary"}
            (if loading?
              [:> CircularProgress {:size 20 :color "inherit"}]
-             (tr :reset-password))]])
-
-       [:> Grid {:item true
-                 :sm true
-                 :xs 12
-                 :sx {:display {:xs "block"
-                                :md "none"}}}
-        (cacnelbutton)]]]]))
+             (tr :reset-password))]])]]]))
 
 (defn Username []
   (let [loading? @(rf/subscribe [::subs/loading?])]
@@ -264,7 +251,9 @@
                 :fullWidth       true
                 :onClose         #(rf/dispatch [::events/close-dialog])
                 :aria-labelledby "form-dialog-title"}
-     [:> DialogTitle (tr form-type)]
+     [:> DialogTitle {:sx {:padding-right "48px"}}
+      (tr form-type)
+      [dialog-close-button]]
      [:> DialogContent {}
       [:> Grid {:container true :direction "column" :spacing 1}
        (when (some #(= % form-type) [:register :login :forgot-password])
@@ -288,7 +277,23 @@
           [:> Alert {:severity "error"}
            (if (string? error-message)
              error-message
-             (str (tr (or error-message :unknown-error))))]])]]
+             (str (tr (or error-message :unknown-error))))]])
+
+       (when (= form-type :login)
+         [:> Grid {:item true :sx {:text-align "center"}}
+          [:> Typography {:variant "body2"}
+           (tr :no-account?) " "
+           [:> Link {:sx       {:cursor "pointer"}
+                     :on-click #(rf/dispatch [::events/open-dialog :register])}
+            (tr :create-account)]]])
+
+       (when (= form-type :register)
+         [:> Grid {:item true :sx {:text-align "center"}}
+          [:> Typography {:variant "body2"}
+           (tr :have-account?) " "
+           [:> Link {:sx       {:cursor "pointer"}
+                     :on-click #(rf/dispatch [::events/open-dialog :login])}
+            (tr :go-to-login)]]])]]
      [:> DialogActions (login-dialog-actions form-type)]]))
 
 (defn logout-button []

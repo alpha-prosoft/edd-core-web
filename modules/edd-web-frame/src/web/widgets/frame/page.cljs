@@ -86,7 +86,8 @@
 (defn page
   [{:keys [app-bar
            page-config
-           hide-menu] :as ctx}]
+           hide-menu
+           placeholder] :as ctx}]
 
   (if @(rf/subscribe [::subs/ready])
     (let [{:keys [xs
@@ -122,7 +123,7 @@
        [:> Grid {:item true
                  :xs xs
                  :md md}
-        (util/placeholder ctx)]
+        ((or placeholder util/placeholder) ctx)]
        (snackbar-alert.views/revoke-alert)
        (drawer ctx)])
     [:> Grid {:container  true

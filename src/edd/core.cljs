@@ -33,7 +33,10 @@
     [:routes
      [:vector :any]]
     [:languages
-     [:vector keyword?]]]))
+     [:vector keyword?]]
+    [:placeholder
+     {:optional true}
+     fn?]]))
 
 (defn init
   [{:keys [translations

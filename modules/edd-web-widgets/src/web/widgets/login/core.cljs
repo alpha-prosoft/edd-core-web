@@ -6,8 +6,32 @@
             [re-frame.core :as rf]
             [edd.db :as edd-db]))
 
+(defn store-auth!
+  "Persist auth tokens to localStorage under the \"auth\" key."
+  [auth]
+  (-> js/window
+      (.-localStorage)
+      (.setItem "auth" (.stringify js/JSON (clj->js auth)))))
+
+(defn- restore-auth-from-query!
+  "If the URL contains an ?id_token=... query param, store it as auth in
+   localStorage and remove the param from the URL via history.replaceState.
+   Blocking: completes synchronously before init proceeds."
+  []
+  (let [location  (.-location js/window)
+        url       (js/URL. (.-href location))
+        params    (.-searchParams url)
+        id-token  (.get params "id_token")]
+    (when (and id-token (seq id-token))
+      (store-auth! {:id-token id-token})
+      (.delete params "id_token")
+      (-> js/window
+          (.-history)
+          (.replaceState nil "" (.toString url))))))
+
 (defn init
   [{:keys [config]}]
+  (restore-auth-from-query!)
   (rf/dispatch [::events/initialize-db]))
 
 (defn get-config
@@ -175,18 +199,15 @@
                       (throw (ex-info status %))
                       (.json %)))))
          (.then (fn [%]
-                  (let [response (-> %
-                                     (js->clj :keywordize-keys true)
-                                     (:AuthenticationResult))
-                        auth {:id-token      (:IdToken response)
-                              :refresh-token (:RefreshToken response)
-                              :access-token  (:AccessToken response)}
-                        auth-string (.stringify js/JSON (clj->js auth))]
-                    (-> js/window
-                        (.-localStorage)
-                        (.setItem "auth" auth-string))
-                    (rf/dispatch (conj on-success
-                                       auth)))))
+                   (let [response (-> %
+                                      (js->clj :keywordize-keys true)
+                                      (:AuthenticationResult))
+                         auth {:id-token      (:IdToken response)
+                               :refresh-token (:RefreshToken response)
+                               :access-token  (:AccessToken response)}]
+                     (store-auth! auth)
+                     (rf/dispatch (conj on-success
+                                        auth)))))
          (.catch (fn [e]
                    (-> (ex-data e)
                        (.json)
