@@ -1,6 +1,6 @@
 (ns edd.client-utils
   (:require
-    [edd.json :as edd.json]))
+   [edd.json :as edd.json]))
 
 (def interaction-id
   #?(:cljs (if (and (exists? js/params)

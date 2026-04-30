@@ -156,10 +156,22 @@
 
 (defn map-response-body [response]
   (cond
-    (= ":invalid" (get-in response [:error :jwt])) (handle-invalid-jwt)
-    (= "Wrong version" (:error response)) (handle-versioning-error response)
-    (contains? response :error) (json/parse-custom-fields response)
-    :else {:result (json/parse-custom-fields (:result response))}))
+    (= ":invalid"
+       (get-in response [:error :jwt]))
+    (handle-invalid-jwt)
+
+    (= "Wrong version"
+       (:error response))
+    (handle-versioning-error response)
+
+    (contains? response :error)
+    (json/parse-custom-fields response)
+
+    (contains? response :exception)
+    response
+
+    :else
+    {:result (json/parse-custom-fields (:result response))}))
 
 (defn filter-results [values response-filter items bodies]
   (vec
@@ -322,9 +334,9 @@
                           (do
                             (when (some? record-call-failure-func)
                               (record-call-failure-func
-                                (.toString e)
-                                {:request body-str
-                                 :service service}))
+                               (.toString e)
+                               {:request body-str
+                                :service service}))
                             (rf/dispatch (conj on-failure (.toString e)))
                             false)
                           (do
