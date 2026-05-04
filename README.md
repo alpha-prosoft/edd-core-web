@@ -163,3 +163,60 @@ Example translation structure:
       :user {:first-name "First Name"
              :last-name "Last Name"}}}
 ```
+
+## Declarative query dependencies (`::client/deps`)
+
+The `::edd.client/deps` re-frame effect resolves a graph of remote queries and
+then dispatches a single `:on-success` (or `:on-failure`) event with the
+combined result map. Independent deps in the same wave are fetched in parallel;
+deps with `:depends-on` wait for their inputs and can use them to build their
+query.
+
+### Spec
+
+`:deps` is a map of `{dep-key dep-spec}`. Each spec:
+
+| Key            | Required | Description                                                                 |
+| -------------- | -------- | --------------------------------------------------------------------------- |
+| `:service`     | yes      | Keyword identifying the target service (same as for `::client/call`).       |
+| `:query`       | yes      | A literal query map, **or** a fn `resolved-deps -> query map`.              |
+| `:depends-on`  | no       | Vector of dep keys that must resolve first; their results pass to `:query`. |
+| `:retry`       | no       | Retry config, same shape as for `::client/call`.                            |
+
+Validated with malli (`edd.client/DepsEffectSchema`); invalid specs throw with a
+humanized error.
+
+### Usage
+
+```clojure
+(rf/reg-event-fx
+ ::open-profile
+ (fn [_ _]
+   {::client/deps
+    {:deps {:user    {:service :user-svc
+                      :query   {:query-id :get-current-user}}
+
+            :profile {:service    :user-svc
+                      :depends-on [:user]
+                      :query      (fn [{:keys [user]}]
+                                    {:query-id :get-profile
+                                     :user-id  (:id user)})}}
+     :on-success [::profile-loaded]
+     :on-failure [::profile-load-failed]}}))
+
+(rf/reg-event-db
+ ::profile-loaded
+ (fn [db [_ {:keys [user profile]}]]
+   (assoc db :user user :profile profile)))
+```
+
+### Semantics
+
+- The `:on-success` event is dispatched once with the resolved-deps map
+  appended, e.g. `[::profile-loaded {:user {...} :profile {...}}]`.
+- The `:on-failure` event is dispatched on the first dep that fails, with the
+  failure value appended.
+- Each dep's result is the `:result` field of the response, just like a single
+  `::client/call`.
+- Cycles in `:depends-on` and references to unknown keys are detected up-front
+  and throw.

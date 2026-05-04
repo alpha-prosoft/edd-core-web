@@ -3,6 +3,8 @@
    [reagent.core :as r]
    [re-frame.core :as rf]
    [goog.object :as g]
+   [malli.core :as m]
+   [malli.error :as me]
    [edd.json :as json]
    [edd.db :as db]
    [clojure.string :as string]
@@ -586,3 +588,135 @@
  :after-timeout
  (fn [{:keys [id event]}]
    (after-timeout id event)))
+
+(def DepSpecSchema
+  [:map
+   [:service keyword?]
+   [:query [:or fn? map?]]
+   [:depends-on {:optional true} [:vector keyword?]]
+   [:retry {:optional true} [:map]]])
+
+(def DepsSchema
+  [:map-of keyword? DepSpecSchema])
+
+(def DepsEffectSchema
+  [:map
+   [:deps DepsSchema]
+   [:on-success {:optional true} vector?]
+   [:on-failure {:optional true} vector?]])
+
+(defn- explain-deps! [schema value label]
+  (when-not (m/validate schema value)
+    (let [explanation
+          (m/explain schema value)
+
+          humanized
+          (me/humanize explanation)]
+      (throw (js/Error. (str label " " (pr-str humanized)))))))
+
+(defn- validate-depends-on! [deps]
+  (let [all-keys
+        (set (keys deps))]
+    (doseq [[k {:keys [depends-on]}] deps
+            :let [missing (vec (remove all-keys depends-on))]
+            :when (seq missing)]
+      (throw (js/Error.
+              (str ":depends-on for " k " references unknown deps: " missing))))))
+
+(defn topo-batches [deps]
+  (loop [remaining deps
+         resolved  #{}
+         batches   []]
+    (if (empty? remaining)
+      batches
+      (let [ready
+            (into {}
+                  (filter (fn [[_ {:keys [depends-on]}]]
+                            (every? resolved (or depends-on []))))
+                  remaining)
+
+            ready-keys
+            (set (keys ready))]
+        (when (empty? ready-keys)
+          (throw (ex-info "Circular dependency in :deps"
+                          {:remaining (vec (keys remaining))})))
+        (recur (apply dissoc remaining ready-keys)
+               (into resolved ready-keys)
+               (conj batches ready))))))
+
+(defn- fetch-query [{:keys [service] :as props}]
+  (let [body-str
+        (get-body-str props :query)
+
+        uri
+        (get-uri props :query)
+
+        record!
+        (get-record-call-func)
+
+        record-err!
+        (get-record-call-failure-func)
+
+        start-time
+        (system-time)]
+    (-> (js/Promise.resolve (fetch uri (post-params body-str)))
+        (.then (fn [r]
+                 (-> (.json r)
+                     (.then (fn [body]
+                              {:status (.-status r)
+                               :body   (js->clj body :keywordize-keys true)})))))
+        (.then (fn [{:keys [body]}]
+                 (when record!
+                   (record! "query"
+                            {:took     (.toFixed (- (system-time) start-time) timeout-rounding)
+                             :request  body-str
+                             :service  service
+                             :response (select-keys body [:invocation-id :request-id :interaction-id])}))
+                 (let [parsed (map-response-body body)]
+                   (if (some? (:result parsed))
+                     parsed
+                     (throw (ex-info "Query failed" {:response parsed}))))))
+        (.catch (fn [e]
+                  (when record-err!
+                    (record-err! (.toString e) {:request body-str :service service}))
+                  (throw e))))))
+
+(defn- resolve-single-dep [resolved [k {:keys [query] :as spec}]]
+  (let [query-map
+        (if (fn? query) (query resolved) query)
+
+        call-spec
+        (-> spec
+            (assoc :query query-map)
+            (dissoc :depends-on))]
+    (.then (fetch-query call-spec)
+           (fn [body] [k (:result body)]))))
+
+(defn- resolve-batches [deps]
+  (let [batches
+        (topo-batches deps)]
+    (reduce
+     (fn [p batch]
+       (.then p
+              (fn [acc]
+                (-> (js/Promise.all
+                     (mapv #(resolve-single-dep acc %) batch))
+                    (.then (fn [pairs]
+                             (reduce (fn [c [k v]] (assoc c k v))
+                                     acc
+                                     pairs)))))))
+     (js/Promise.resolve {})
+     batches)))
+
+(rf/reg-fx
+ ::deps
+ (fn [{:keys [deps on-success on-failure] :as effect}]
+   (explain-deps! DepsEffectSchema effect "Invalid ::deps effect:")
+   (validate-depends-on! deps)
+   (-> (resolve-batches deps)
+       (.then (fn [resolved]
+                (when on-success
+                  (rf/dispatch (conj on-success resolved)))))
+       (.catch (fn [err]
+                 (when on-failure
+                   (rf/dispatch (conj on-failure err))))))))
