@@ -2,7 +2,7 @@
   connection: local
   tasks:  
   - include_role:
-      name: ewp-deploy-lib/resolve-params
+      name: glms-deploy-lib/resolve-params
     vars:
       stacks:
        - type: "BASE"

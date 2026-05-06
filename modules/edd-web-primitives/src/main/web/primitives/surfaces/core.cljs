@@ -29,18 +29,27 @@
   (when (and (some? on-expand-func) expanded?) (on-expand-func))
   expanded?)
 
-(defn RawAccordion [{:keys [expanded? control-position control-sx on-click on-change on-expand-func
-                            elevation style disabled summary-style summary-class-name details-style]
+(defn RawAccordion [{:keys [expanded? control-position  on-click on-change on-expand-func
+                            elevation  disabled
+                            style sx
+                            control-sx
+                            summary-style summary-sx
+                            summary-class-name
+                            details-style details-sx]
                      :or   {control-position :left elevation 0 disabled false control-sx {}}
                      :as   props} content]
   [:> Accordion
    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
     :elevation elevation
-    :sx        (merge {:width "100%"} style)
+    :sx        (merge
+                {:width "100%"}
+                (or sx style))
     :onChange  on-change}
 
    [:> AccordionSummary
-    (merge {:sx        (merge {} summary-style)
+    (merge {:sx        (merge
+                        {}
+                        (or summary-sx summary-style))
             :container true
             :component Grid
             :children  (r/as-element [:> Grid {:container true :size 12 :alignItems "center"}
@@ -65,7 +74,7 @@
                                          (:header props))]])}
            (when (some? summary-class-name) {:class-name summary-class-name}))]
    [:> AccordionDetails
-    {:sx (merge {:padding "0px"} details-style)}
+    {:sx (merge {:padding "0px"} (or details-sx details-style))}
     content]])
 
 (defn RawHeadlessAccordion [{:keys [id expanded? elevation sx styles details-sx details-styles]
