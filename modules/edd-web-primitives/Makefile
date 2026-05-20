@@ -16,3 +16,6 @@ clean:
 
 run:
 	shadow-cljs watch devcards -A:dev
+
+push:
+	git push origin HEAD:refs/for/master%topic=env/${ENV}

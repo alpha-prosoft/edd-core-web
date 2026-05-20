@@ -1,6 +1,7 @@
 (ns web.primitives.text-editor.core
   (:require
-   ["suneditor-react/dist" :default SunEditor]
+   ["react" :refer [useEffect useRef]]
+   ["suneditor" :default suneditor :refer [plugins]]
    ["@mui/material/Button" :default Button]
    ["@mui/material/IconButton" :default IconButton]
    [re-frame.core :as rf]
@@ -25,8 +26,12 @@
                                        :display    "block"
                                        :font-size  "13px"
                                        :overflow   "hidden"}
-             :class-name              "sun-editor-editable"
-             :dangerouslySetInnerHTML {:__html (sanitize-html (:set-contents props))}}]
+             :class-name              "sun-editor-editable"}
+    (reagent.core/create-element
+     "div"
+     #js {:dangerouslySetInnerHTML
+          #js {:__html (sanitize-html (:set-contents props))}})]
+
    (let [edit-icon-position (:edit-icon-position props)]
      [RawGrid {:sx (merge
                     {:position "absolute"}
@@ -43,21 +48,68 @@
         (when (:id props) {:id (str "edit-button-" (:id props))}))
        [EditIcon]]])])
 
-(defn- edit-mode [{:keys [on-change] :as props} set-read-only-mode]
+(defn SunEditorNative
+  [{:keys [set-contents setOptions on-change on-paste on-drop disable scope-id]}]
+  (let [el-ref (useRef nil)
+        instance-ref (useRef nil)]
+
+    (useEffect
+     (fn []
+       (let [filtered-plugins (let [excluded #{"exportPDF" "fileUpload" "layout" "template" "math"}
+                                    filtered (js-obj)]
+                                (doseq [key (js->clj (js/Reflect.ownKeys plugins))]
+                                  (when-not (excluded key)
+                                    (aset filtered key (aget plugins key))))
+                                filtered)
+             callback-events {:onChange (fn [params]
+                                          (when on-change
+                                            (on-change (.-data params))))
+                              :onPaste  (fn [params]
+                                          (when on-paste
+                                            (on-paste (.-event params) (.-data params))))
+                              :onDrop   (fn [params]
+                                          (when on-drop
+                                            (on-drop (.-event params))))}
+             opts (clj->js (merge {:plugins filtered-plugins
+                                   :value   (or set-contents "")
+                                   :events  callback-events}
+                                  setOptions))
+             suneditor-api (or (when (.-create suneditor) suneditor)
+                               (when (and (.-default suneditor)
+                                          (.-create (.-default suneditor)))
+                                 (.-default suneditor)))
+             _ (when-not suneditor-api
+                 (throw (js/Error. "SunEditor API.create unavailable")))
+             instance (.create suneditor-api (.-current el-ref) opts)]
+         (set! (.-current instance-ref) instance)
+
+         (when disable
+           (.readOnly instance true))
+
+         (fn []
+           (when-let [editor (.-current instance-ref)]
+             (.destroy editor)
+             (set! (.-current instance-ref) nil)))))
+     #js [set-contents disable scope-id])
+
+    [:textarea {:ref el-ref}]))
+
+(defn- edit-mode [{:keys [on-change editor-scope-id] :as props} set-read-only-mode]
   [RawGrid (merge
             {:container true
-             :size 12}
-            (when (:id props) {:id (str "editor-" (:id props))}))
-   [:> SunEditor
+             :size 12
+             :id   (str "editor-" editor-scope-id)})
+   [:f> SunEditorNative
     (merge
-     {:on-paste      (fn [event clean-data] (handle-on-paste event clean-data props))
-      :on-drop       (fn [] (handle-on-drop props))
-      :setOptions    {:buttonList    sun-editor-button-list
-                      :resizingBar   false
-                      :showPathLabel false}
-      :enableToolbar (not (:disable props))}
-     props
-     {:on-change #(on-change (sanitize-html %))})]
+     {:on-paste   (fn [event clean-data] (handle-on-paste event clean-data props))
+      :on-drop    (fn [] (handle-on-drop props))
+      :scope-id   editor-scope-id
+      :setOptions {:buttonList    sun-editor-button-list
+                   :statusbar   false}
+      :on-change #(on-change (sanitize-html %))
+      :disable    (:disable props)
+      :set-contents (:set-contents props)}
+     props)]
    [RawGrid {:container true
              :size 12
              :sx {:border          "solid 1px #dadada"
@@ -91,10 +143,12 @@
   (r/with-let [uuid (str (random-uuid))
                editor-id (keyword (str "rich-text-editor-mode-" uuid))]
     (let [editor-mode @(rf/subscribe [::model/get-editor-mode editor-id])
+          editor-scope-id (or (:id props) uuid)
           set-read-only-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :read-only-mode]))
           set-edit-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :edit-mode]))]
       [RawTextEditor (merge
                       {:editor-mode        editor-mode
+                       :editor-scope-id    editor-scope-id
                        :set-read-only-mode set-read-only-mode
                        :set-edit-mode      set-edit-mode}
                       props)])))

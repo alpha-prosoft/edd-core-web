@@ -11,7 +11,8 @@
     {"devcards-marked" {:target :npm :require "marked"}
      "devcards-syntax-highlighter" {:target :npm :require "highlight.js/lib/core"}
      "highlight.js" {:target :npm :require "highlight.js/lib/core"}}
-    :entry-keys ["module" "browser" "main"]}
+    :entry-keys ["module" "browser" "main"]
+    :npm-module {:transpile ["suneditor"]}}
    :compiler-options
    {:infer-externs    :auto
     :closure-warnings {:global-this :off}
@@ -24,7 +25,7 @@
     :http-root        "resources/public"
     :http-handler     shadow.http.push-state/handle
     :push-state/index "index.html"
-    :preloads   [devtools.preload day8.re-frame-10x.preload.react-18]
+    :preloads   [devtools.preload day8.re-frame-10x.preload]
     :after-load       web.start-ui/init}
    :dev
    {:compiler-options {:devcards true}}

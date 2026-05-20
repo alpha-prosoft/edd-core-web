@@ -2,13 +2,13 @@
 
 (def sun-editor-button-list
   [["undo" "redo"]
-   ["font" "fontSize" "formatBlock"]
+   ["font" "fontSize" "blockStyle"]
    ["blockquote"]
    ["bold" "underline" "italic" "strike" "subscript" "superscript"]
    ["removeFormat"]
-   ["fontColor" "hiliteColor"]
+   ["fontColor" "backgroundColor"]
    ["outdent" "indent"]
-   ["align" "horizontalRule" "list" "table"]
+   ["align" "hr" "list" "table"]
    ["link" "image"]
    ["fullScreen"]
    ["preview" "print"]])
