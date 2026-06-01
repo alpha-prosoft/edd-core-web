@@ -40,6 +40,13 @@
         (utils/decode-user-name (:id-token user))))))
 
 (rf/reg-sub
+ ::user-id
+ (fn [db]
+   (let [user (get-in db [::edd-db/user])]
+     (when (some? user)
+       (utils/decode-user-id (:id-token user))))))
+
+(rf/reg-sub
  ::user
  (fn [db]
    (get-in db [::edd-db/user])))
@@ -47,7 +54,8 @@
 (rf/reg-sub
  ::logged-in
  (fn [db]
-   (some? (get-in db [::edd-db/user]))))
+   (let [user (get-in db [::edd-db/user])]
+     (boolean (some-> user :id-token utils/decode-token-claims)))))
 
 (rf/reg-sub
  ::confirmation-visible

@@ -28,10 +28,21 @@
    :missing-number?     (nil? (re-seq #"[0-9]" password))
    :missing-length-8?   (< (count password) 8)})
 
+(defn decode-token-claims [id-token]
+  (when-not (str/blank? id-token)
+    (try
+      (let [payload
+            (second (str/split id-token #"\."))]
+        (when-not (str/blank? payload)
+          (json-parser false true (b64/decodeString payload))))
+      (catch :default _ nil))))
+
 (defn decode-user-name [id-token]
-  (let [decoded (b64/decodeString
-                  (second
-                    (clojure.string/split id-token #"\.")))]
-    (when (some? id-token)
-      (-> (json-parser false true decoded)
-          (:email)))))
+  (:email (decode-token-claims id-token)))
+
+(defn decode-user-id [id-token]
+  (let [claims
+        (decode-token-claims id-token)]
+    (or (:custom:user-id claims)
+        (:user-id claims)
+        (:sub claims))))

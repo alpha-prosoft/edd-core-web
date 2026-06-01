@@ -82,7 +82,15 @@
 
 (defn request-code
   [db]
-  [:amplify-resend-confirmation-code {:username (::db/username db)}])
+  [:amplify-resend-confirmation-code {:username   (::db/username db)
+                                      :on-success [::resend-code-succeeded]
+                                      :on-failure [::register-failed]}])
+
+(rf/reg-event-db
+ ::resend-code-succeeded
+ (fn [db _]
+   (assoc db ::db/error-message-visible false
+          ::db/error-message "")))
 
 (rf/reg-event-fx
  ::login-failed

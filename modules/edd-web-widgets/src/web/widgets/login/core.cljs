@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [web.widgets.login.events :as events]
             [web.widgets.login.db :as db]
+            [web.widgets.login.utils :as utils]
             [re-frame.core :as rf]
             [edd.db :as edd-db]))
 
@@ -13,9 +14,18 @@
       (.-localStorage)
       (.setItem "auth" (.stringify js/JSON (clj->js auth)))))
 
+(defn valid-id-token?
+  "True when the id-token is a structurally valid, decodable JWT. Expiry is
+   not checked here — an expired but well-formed token still decodes and is
+   handled by the refresh flow."
+  [id-token]
+  (some? (utils/decode-token-claims id-token)))
+
 (defn- restore-auth-from-query!
   "If the URL contains an ?id_token=... query param, store it as auth in
    localStorage and remove the param from the URL via history.replaceState.
+   The token is only stored when it is a decodable JWT, so a malformed value
+   in the URL is dropped instead of poisoning storage.
    Blocking: completes synchronously before init proceeds."
   []
   (let [location  (.-location js/window)
@@ -23,15 +33,35 @@
         params    (.-searchParams url)
         id-token  (.get params "id_token")]
     (when (and id-token (seq id-token))
-      (store-auth! {:id-token id-token})
+      (when (valid-id-token? id-token)
+        (store-auth! {:id-token id-token}))
       (.delete params "id_token")
       (-> js/window
           (.-history)
           (.replaceState nil "" (.toString url))))))
 
+(defn discard-invalid-stored-auth!
+  "Clears the stored auth blob when it is corrupt or carries an id-token that
+   is not a decodable JWT, so a malformed token can never be hydrated into the
+   app and crash the UI. A missing id-token or a structurally valid (incl.
+   expired) one is left untouched."
+  []
+  (try
+    (let [storage  (.-localStorage js/window)
+          raw      (.getItem storage "auth")
+          parsed   (when (and raw (seq raw))
+                     (js->clj (.parse js/JSON raw) :keywordize-keys true))
+          id-token (:id-token parsed)]
+      (when (and (some? id-token)
+                 (not (valid-id-token? id-token)))
+        (.removeItem storage "auth")))
+    (catch :default _
+      (-> js/window (.-localStorage) (.removeItem "auth")))))
+
 (defn init
   [{:keys [config]}]
   (restore-auth-from-query!)
+  (discard-invalid-stored-auth!)
   (rf/dispatch [::events/initialize-db]))
 
 (defn get-config
@@ -216,11 +246,14 @@
                                                    (match-error-message body))))))))))))
 
 (defn auth []
-  (let [auth-string (-> js/window
-                        (.-localStorage)
-                        (.getItem "auth"))]
-    (-> (.parse js/JSON auth-string)
-        (js->clj :keywordize-keys true))))
+  (try
+    (let [auth-string (-> js/window
+                          (.-localStorage)
+                          (.getItem "auth"))]
+      (when (and auth-string (seq auth-string))
+        (-> (.parse js/JSON auth-string)
+            (js->clj :keywordize-keys true))))
+    (catch :default _ nil)))
 
 (defn amplify-refresh-credentials
   ([{:keys [do-post-with-retry post-for attempt body-str] :as interrupted-call}]
