@@ -38,11 +38,10 @@
                     (when (some? getOptionSelected)
                       {:isOptionEqualToValue getOptionSelected}))])
 
-(defn RawAlert [{:keys [id severity title title-props] :as props} content]
-  [:> Alert (merge {:severity  severity}
-                   (when (some? id)
-                     {:id id})
-                   (dissoc props :title-props))
+(defn RawAlert [{:keys [severity title title-props] :as props} content]
+  [:> Alert (merge {:severity severity
+                    :color    severity}
+                   (dissoc props :title :title-props))
    (when (some? title)
      [:> AlertTitle (if (some? title-props) title-props {}) title])
    (r/as-element content)])

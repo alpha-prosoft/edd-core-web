@@ -1,0 +1,14 @@
+name: sast-and-secret-scan
+
+on:
+  push:
+    branches: [staging]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  call-workflow-passing-data:
+    uses: raiffeisen-group-open-source/rbi-opensource-actions/.github/workflows/scan.yml@master
+    secrets:
+      PUBLIC_TOKEN: ${{ secrets.PUBLIC_TOKEN }}
+      PUBLIC_USERNAME: ${{ secrets.PUBLIC_USERNAME }}
