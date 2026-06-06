@@ -232,12 +232,16 @@
                    (let [response (-> %
                                       (js->clj :keywordize-keys true)
                                       (:AuthenticationResult))
-                         auth {:id-token      (:IdToken response)
-                               :refresh-token (:RefreshToken response)
-                               :access-token  (:AccessToken response)}]
-                     (store-auth! auth)
-                     (rf/dispatch (conj on-success
-                                        auth)))))
+                         id-token (:IdToken response)]
+                     (if (valid-id-token? id-token)
+                       (let [auth {:id-token      id-token
+                                   :refresh-token (:RefreshToken response)
+                                   :access-token  (:AccessToken response)}]
+                         (store-auth! auth)
+                         (rf/dispatch (conj on-success auth)))
+                       (rf/dispatch (conj on-failure
+                                          {:message :unknown-error
+                                           :type    "NoAuthenticationResult"}))))))
          (.catch (fn [e]
                    (-> (ex-data e)
                        (.json)
@@ -280,11 +284,16 @@
                                       (rf/dispatch [::events/open-dialog :login])))))
                         (.json %)))))
            (.then (fn [%]
-                    (let [response (-> %
+                    (let [id-token (-> %
                                        (js->clj :keywordize-keys true)
-                                       (:id_token))
-                          auth {:id-token response}]
-                      (rf/dispatch [::events/login-succeeded auth]))))
+                                       (:id_token))]
+                      (if (valid-id-token? id-token)
+                        (rf/dispatch [::events/login-succeeded {:id-token id-token}])
+                        (do
+                          (-> js/window
+                              (.-localStorage)
+                              (.setItem "auth" "{}"))
+                          (rf/dispatch [::events/open-dialog :login]))))))
            (.then (when (some? interrupted-call)
                     (do-post-with-retry post-for attempt body-str))))
        (rf/dispatch [::events/open-dialog :login]))))

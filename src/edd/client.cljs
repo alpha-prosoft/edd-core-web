@@ -8,7 +8,6 @@
    [edd.json :as json]
    [edd.db :as db]
    [clojure.string :as string]
-   [re-frame.db :as re-frame-db]
    [edd.client-utils :as utils]))
 
 (def timeout-rounding 0)
@@ -33,16 +32,16 @@
                    (MockHeaders. {"versionid" "mock-response"}))))
 
 (defn get-config []
-  (-> @re-frame-db/app-db ::db/config))
+  (-> (db/non-reactive-db) ::db/config))
 
 (defn get-record-call-failure-func []
-  (-> @re-frame-db/app-db ::db/record-call-failure-func))
+  (-> (db/non-reactive-db) ::db/record-call-failure-func))
 
 (defn get-record-call-func []
-  (-> @re-frame-db/app-db ::db/record-call-func))
+  (-> (db/non-reactive-db) ::db/record-call-func))
 
 (defn get-handle-expired-jwt-func []
-  (-> @re-frame-db/app-db ::db/on-expired-jwt-func))
+  (-> (db/non-reactive-db) ::db/on-expired-jwt-func))
 
 (defn get-proxy-or-host [host]
   (let [{:keys [proxies use-proxy-for]} (get-config)
@@ -69,7 +68,7 @@
 
 (defn service-uri [service path]
   (let [hosted-zone-name (-> (get-config) :HostedZoneName)
-        realm (-> @re-frame-db/app-db ::db/user :realm)
+        realm (-> (db/non-reactive-db) ::db/user :realm)
         stage (stage-for-realm realm)
         host (get-proxy-or-host (str "api." hosted-zone-name))]
     (str "https://"
@@ -79,29 +78,38 @@
          "/"
          (name service) path)))
 
-(defn add-user
+(defn assign-request-meta
   [req]
-  (let [db @re-frame-db/app-db]
-    (assoc req
-           :user
-           {:selected-role (get-in db [::db/user :selected-role])})))
+  (let [db
+        (db/non-reactive-db)
+
+        with-user
+        (assoc req
+               :user
+               {:selected-role (get-in db [::db/user :selected-role])})
+
+        with-meta
+        (assoc-in with-user
+                  [:meta :language]
+                  (::db/selected-language db))]
+    with-meta))
 
 (defn make-headers
   []
-  (let [db @re-frame-db/app-db]
+  (let [db (db/non-reactive-db)]
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"
      "Content-Type"    "application/json"}))
 
 (defn make-get-headers
   []
-  (let [db @re-frame-db/app-db]
+  (let [db (db/non-reactive-db)]
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"}))
 
 (defn make-put-headers
   []
-  (let [db @re-frame-db/app-db]
+  (let [db (db/non-reactive-db)]
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"}))
 
@@ -282,7 +290,7 @@
               :commands {:request-id     (random-uuid)
                          :interaction-id utils/interaction-id
                          :commands       commands})]
-    (clj->js (json/encode-custom-fields (add-user ref))
+    (clj->js (json/encode-custom-fields (assign-request-meta ref))
              {:keyword-fn convert-keyword->js})))
 
 (defn do-post-with-retry
