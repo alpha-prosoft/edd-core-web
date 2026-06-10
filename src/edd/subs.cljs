@@ -92,3 +92,20 @@
  ::error-pages
  (fn [db]
    (::db/error-pages db)))
+
+(rf/reg-sub
+ ::request-features
+ (fn [db]
+   (get-in db [::db/meta :request-features])))
+
+(rf/reg-sub
+ ::get-request-feature
+ :<- [:request-features]
+ (fn [request-features [_ feature-key]]
+   (get request-features feature-key)))
+
+(rf/reg-sub
+ ::request-feature-enabled?
+ :<- [::request-features]
+ (fn [request-features [_ feature-key]]
+   (boolean (get request-features feature-key))))

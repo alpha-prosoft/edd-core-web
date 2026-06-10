@@ -2,6 +2,7 @@
   (:require
    ["react" :refer [StrictMode]]
    [edd.events :as events]
+   [edd.subs :as subs]
    [edd.i18n :as i18n]
    [edd.json :as json]
    [malli.core :as m]
@@ -37,6 +38,20 @@
     [:placeholder
      {:optional true}
      fn?]]))
+
+(defn ^:export activate-request-feature [feature-key-name feature-value]
+  (let [feature-key (keyword feature-key-name)]
+    (rf/dispatch [::events/activate-request-feature feature-key feature-value])))
+
+(defn ^:export deactivate-request-feature
+  ([] (rf/dispatch [::events/deactivate-request-feature]))
+  ([feature-key] (rf/dispatch [::events/deactivate-request-feature (keyword feature-key)])))
+
+(defn ^:export print-features []
+  (let [request-features @(rf/subscribe [::subs/request-features])]
+    (if (some? request-features)
+      (cljs.pprint/pprint request-features)
+      (print (str "Request-features were not set")))))
 
 (defn init
   [{:keys [translations

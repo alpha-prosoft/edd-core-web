@@ -89,9 +89,11 @@
                {:selected-role (get-in db [::db/user :selected-role])})
 
         with-meta
-        (assoc-in with-user
-                  [:meta :language]
-                  (::db/selected-language db))]
+        (assoc with-user
+               :meta
+               (merge
+                {:language (::db/selected-language db)}
+                (::db/meta db)))]
     with-meta))
 
 (defn make-headers

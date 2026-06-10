@@ -32,4 +32,5 @@
    ::error                    nil
    ::record-call-failure-func nil
    ::record-call-func         nil
-   ::on-expired-jwt-func      nil})
+   ::on-expired-jwt-func      nil
+   ::meta                     {}})

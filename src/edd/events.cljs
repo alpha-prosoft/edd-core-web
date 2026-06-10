@@ -318,3 +318,15 @@
  :edd.events-remove-user
  (fn [db]
    (assoc-in db [::db/user] nil)))
+
+(rf/reg-event-db
+ ::activate-request-feature
+ (fn [db [_ key value]]
+   (assoc-in db [::db/meta :request-features key] value)))
+
+(rf/reg-event-db
+ ::deactivate-request-feature
+ (fn [db [_ key]]
+   (if (some? key)
+     (update-in db [::db/meta :request-features]  #(dissoc % key))
+     (assoc-in db [::db/meta :request-features] {}))))
