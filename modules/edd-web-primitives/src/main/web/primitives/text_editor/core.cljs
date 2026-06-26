@@ -83,9 +83,6 @@
              instance (.create suneditor-api (.-current el-ref) opts)]
          (set! (.-current instance-ref) instance)
 
-         (when disable
-           (.readOnly instance true))
-
          (fn []
            (when-let [editor (.-current instance-ref)]
              (.destroy editor)
@@ -128,11 +125,12 @@
                    (when (:id props) {:id (str "discard-button-" (:id props))})) "Discard"]])]])
 
 (defn RawTextEditor
-  [{:keys [editor-mode set-read-only-mode set-edit-mode]
+  [{:keys [editor-mode set-read-only-mode set-edit-mode disable]
     :or   {editor-mode :edit-mode}
     :as   props}]
   (if
-   (= :read-only-mode editor-mode)
+   (or (= :read-only-mode editor-mode)
+       disable)
     (read-only-mode props set-edit-mode)
     (edit-mode props set-read-only-mode)))
 
