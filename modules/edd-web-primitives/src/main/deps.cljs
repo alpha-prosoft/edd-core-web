@@ -17,4 +17,4 @@
             :react-dom            "18.3.1"
             :react-number-format  "5.4.4"
             :suneditor            "3.1.4"
-            :dompurify            "3.2.7"}}
+            :dompurify            "3.4.11"}}
