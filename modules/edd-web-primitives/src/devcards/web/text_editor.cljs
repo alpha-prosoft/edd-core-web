@@ -16,7 +16,7 @@
        :set-contents (:value @data-atom)
        :editor-mode  :edit-mode
        :on-change    (fn [x] (swap! data-atom merge {:draft x}))}]))
-  (r/atom {:draft "" :value "Content"}))
+  (r/atom {:draft nil :value nil}))
 
 (defcard-rg :text-editor-with-action-buttons
   "## Text editor with action buttons"

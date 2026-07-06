@@ -4,6 +4,7 @@
    ["suneditor" :default suneditor :refer [plugins]]
    ["@mui/material/Button" :default Button]
    ["@mui/material/IconButton" :default IconButton]
+   [clojure.string :as str]
    [re-frame.core :as rf]
    [reagent.core :as r]
    [dompurify :as dompurify]
@@ -105,9 +106,14 @@
                    (aset "sizeUnit" "px"))
                  info))))))
 
+(def default-value "<p><span style=\"font-family: Arial; font-size: 14px;\">\u200B</span><br></p>")
+
 (defn SunEditorNative
   [{:keys [set-contents setOptions on-change on-paste on-drop disable scope-id]}]
-  (let [el-ref (useRef nil)
+  (let [set-contents (if (str/blank? set-contents)
+                       default-value
+                       set-contents)
+        el-ref (useRef nil)
         instance-ref (useRef nil)]
 
     (useEffect
@@ -129,7 +135,7 @@
                                             (on-drop (.-event params))))
                               :onImageUploadBefore ensure-original-image-width-in-px}
              merged-options (merge {:plugins filtered-plugins
-                                    :value   (or set-contents "")}
+                                    :value   set-contents}
                                    setOptions)
              merged-options (update merged-options :events (fn [events]
                                                              (merge (or events {}) callback-events)))

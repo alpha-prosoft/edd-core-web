@@ -63,8 +63,7 @@
    :font {:items sun-editor-font-list}
    :image {:defaultWidth "auto"
            :defaultHeight "auto"}
-   :fontSize   {:unitMap {:px {:default-size 14
-                               :inc     1
+   :fontSize   {:unitMap {:px {:inc     1
                                :min     8
                                :max     72
                                :list    sun-editor-font-size-list}}}})
