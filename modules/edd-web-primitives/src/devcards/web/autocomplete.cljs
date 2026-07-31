@@ -6,7 +6,7 @@
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.utils :refer [apply-stiles]]
-   [web.primitives.components :refer [RawAutocomplete RawCheckbox RawMenuItem]]))
+   [web.primitives.components :refer [RawAutocomplete RawCheckbox]]))
 
 (def months-list [{:id 0 :name "January"}
                   {:id 1 :name "February"}
@@ -117,14 +117,14 @@
                                (let [item (js->clj _option :keywordize-keys true)
                                      value (js->clj _value :keywordize-keys true)]
                                  (= item value)))
-       :renderOption         (fn [state option]
+       :renderOption         (fn [option-props option state]
                                (let [item (js->clj option :keywordize-keys true)
-                                     clj-state (js->clj state :keywordize-keys true)]
-                                 (r/as-element [RawMenuItem (merge
-                                                             {:key (:id item)}
-                                                             (dissoc clj-state :aria-selected))
-                                                [RawCheckbox {:checked (:aria-selected clj-state)
-                                                              :label   (str (get-in item [:name] ""))}]])))}]))
+                                     option-state (js->clj state :keywordize-keys true)
+                                     option-props-map (js->clj option-props :keywordize-keys true)]
+                                 (r/as-element
+                                  [:li option-props-map
+                                   [RawCheckbox {:checked (:selected option-state)
+                                                 :label   (str (get-in item [:name] ""))}]])))}]))
 
   (r/atom {:selected
            [{:id 3 :name "April"}

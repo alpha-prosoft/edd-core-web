@@ -63,11 +63,6 @@
                        {:marginLeft             "-14px"
                         "&.MuiFormLabel-filled" {:top "9px"}
                         "&.Mui-focused"         {:top "9px"}}}}}
-                    :MuiGridListTile
-                    {:styleOverrides
-                     {:tile
-                      {:overflow "inherit"}}}
-
                     :MuiTypography
                     {:styleOverrides
                      {:h1        {:fontSize      "34px"
@@ -139,13 +134,13 @@
                       {:borderRadius  "8px"
                        :color         "inherit"
                        :textTransform "none"
-                       :minWidth      "8rem"}
+                       :minWidth      "8rem"
+                       "&.MuiButton-contained.MuiButton-colorSecondary"
+                       {:color "#fff"}
+                       "&.MuiButton-text.MuiButton-colorSecondary"
+                       {:color "#037080"}}
                       :outlined
-                      {:border "solid 1px #2b2d33"}
-                      :containedSecondary
-                      {:color "#fff"}
-                      :textSecondary
-                      {:color "#037080"}}}
+                      {:border "solid 1px #2b2d33"}}}
 
                     :MuiToggleButton
                     {:styleOverrides

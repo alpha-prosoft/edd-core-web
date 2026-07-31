@@ -7,6 +7,7 @@
    ["@mui/material/Grid" :default Grid]
    ["@mui/material/List" :default List]
    ["@mui/material/ListItem" :default ListItem]
+   ["@mui/material/ListItemButton" :default ListItemButton]
    ["@mui/material/ListItemText" :default ListItemText]
    ["@mui/material/ListItemIcon" :default ListItemIcon]
    ["@mui/material/ListSubheader" :default ListSubheader]
@@ -51,13 +52,31 @@
           child)))
 
 (defn RawListItem [{:keys [button] :as props} & children]
-  (into [:> ListItem
-         (-> props
-             (dissoc :button :disableTouchRipple)
-             (cond-> (true? button) (assoc-in [:sx :cursor] "pointer"))
-             (cond-> (true? button) (assoc :button "true")))]
-        (for [child children]
-          child)))
+  (if (true? button)
+    (let [list-item-props (merge
+                           {:disablePadding true}
+                           (select-keys props [:align-items
+                                               :dense
+                                               :disable-gutters
+                                               :disable-padding
+                                               :divider
+                                               :secondary-action]))
+          list-item-button-props (-> props
+                                     (dissoc :align-items
+                                             :button
+                                             :dense
+                                             :disable-gutters
+                                             :disable-padding
+                                             :divider
+                                             :secondary-action)
+                                     (update :sx #(merge {:cursor "pointer"} %)))]
+      [:> ListItem list-item-props
+       (into [:> ListItemButton list-item-button-props]
+             (for [child children]
+               child))])
+    (into [:> ListItem (dissoc props :button :disableTouchRipple)]
+          (for [child children]
+            child))))
 
 (defn RawListItemText [props content]
   [:> ListItemText props content])

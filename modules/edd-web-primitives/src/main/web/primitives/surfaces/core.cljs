@@ -117,7 +117,7 @@
 
   [:> CardActionArea {:on-click on-click}
    (when (some? header)
-     [:> CardHeader (merge {:titleTypographyProps {:variant "h3"}} header)])
+     [:> CardHeader (merge {:slotProps {:title {:variant "h3"}}} header)])
    (when (some? media)
      [:> CardMedia media])
    [:> CardContent content-props content]])
@@ -131,7 +131,7 @@
             {:elevation elevation})
 
      (when (and (nil? on-click) (some? header))
-       [:> CardHeader (merge {:titleTypographyProps {:variant "h3"}} header)])
+       [:> CardHeader (merge {:slotProps {:title {:variant "h3"}}} header)])
      (when (and (nil? on-click) (some? media))
        [:> CardMedia media])
 

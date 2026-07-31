@@ -39,34 +39,37 @@
     :or   {read-only                false
            read-only-with-underline false}
     :as   props}]
-  [utils/adapted-text-field
-   (merge {:full-width true :color "primary" :variant "standard"}
-          (dissoc props :transform-func :read-only-with-underline)
-          {:InputProps
-           (merge
-            input-props
-            InputProps
-            (when read-only
-              {:disableUnderline true
-               :readOnly         true})
+  (let [base-slot-props (:slotProps props)
+        merged-input-slot-props (merge
+                                 {}
+                                 (:input base-slot-props)
+                                 input-props
+                                 InputProps
+                                 (when read-only
+                                   {:disableUnderline true
+                                    :readOnly         true})
 
-            (when read-only-with-underline
-              {:disableUnderline true
-               :readOnly         true
-               :sx               read-only-underline})
+                                 (when read-only-with-underline
+                                   {:disableUnderline true
+                                    :readOnly         true
+                                    :sx               read-only-underline})
 
-            (when (some? prefix)
-              {:startAdornment (r/as-element
-                                [:> InputAdornment {:position "start"} prefix])})
+                                 (when (some? prefix)
+                                   {:startAdornment (r/as-element
+                                                     [:> InputAdornment {:position "start"} prefix])})
 
-            (when (some? suffix)
-              {:endAdornment (r/as-element
-                              [:> InputAdornment {:position "end"} suffix])}))}
+                                 (when (some? suffix)
+                                   {:endAdornment (r/as-element
+                                                   [:> InputAdornment {:position "end"} suffix])}))]
+    [utils/adapted-text-field
+     (merge {:full-width true :color "primary" :variant "standard"}
+            (dissoc props :transform-func :read-only-with-underline :input-props :InputProps)
+            {:slotProps (assoc (or base-slot-props {}) :input merged-input-slot-props)}
 
-          {:on-change (fn [event] (utils/handle-input-change event
-                                                             (get props :on-change
-                                                                  (fn [] (println "BLL")))
-                                                             (get props :transform-func (fn [val] val))))})])
+            {:on-change (fn [event] (utils/handle-input-change event
+                                                               (get props :on-change
+                                                                    (fn [] (println "BLL")))
+                                                               (get props :transform-func (fn [val] val))))})]))
 
 (defn switch-with-two-values [{:keys [id label-placement disabled left-label left-value right-label right-value value]
                                :or   {label-placement "end" disabled false} :as props}]
@@ -202,6 +205,27 @@
     :as   props}]
   (let [component-min-date (or minDate min-date "1900-01-01")
         component-max-date (or maxDate max-date "2099-12-31")
+        picker-props (dissoc props
+                             :allowSameDateSelection
+                             :clear-text
+                             :clearText
+                             :error
+                             :helper-text
+                             :id
+                             :invalid?
+                             :invalid-date-message
+                             :label
+                             :mask
+                             :max-date
+                             :maxDate
+                             :min-date
+                             :minDate
+                             :required
+                             :set-focused
+                             :set-touched
+                             :slotProps
+                             :value
+                             :variant)
 
         value
         (if (and (not invalid?) (string/blank? value))
@@ -213,13 +237,11 @@
      {:dateAdapter AdapterDateFns}
      [:> DesktopDatePicker
       (merge
-       props
-       {:format                 "dd.MM.yyyy"
-        :allowSameDateSelection true
-        :label                  label
-        :mask                   "__.__.____"
-        :clearable              true
-        :clear-text             "Clear"
+       picker-props
+       {:format     "dd.MM.yyyy"
+        :label      label
+        :clearable  true
+        :localeText {:clearButtonLabel "Clear"}
 
         :value value
 
@@ -410,7 +432,36 @@
         formatting-func (get props :formatting-func)
         style (cond-> {}
                 read-only-with-underline (merge read-only-underline)
-                read-only-with-red-number-color (merge {:color "red"}))]
+                read-only-with-red-number-color (merge {:color "red"}))
+        base-slot-props (:slotProps props)
+        extra-input-slot-props (when
+                                (or (some? (or prefix suffix)) read-only read-only-with-underline read-only-with-red-number-color)
+                                 (merge
+                                  {}
+                                  (when read-only
+                                    {:disableUnderline true
+                                     :readOnly         true})
+
+                                  {:style style}
+
+                                  (when read-only-with-underline
+                                    {:disableUnderline true
+                                     :readOnly         true})
+
+                                  (when (some? prefix)
+                                    {:startAdornment (r/as-element
+                                                      [:> InputAdornment {:position "start"} prefix])})
+
+                                  (when (some? suffix)
+                                    {:endAdornment (r/as-element
+                                                    [:> InputAdornment {:position "end"} suffix])})))
+        merged-slot-props (if (some? extra-input-slot-props)
+                            (assoc (or base-slot-props {})
+                                   :input
+                                   (merge {}
+                                          (:input base-slot-props)
+                                          extra-input-slot-props))
+                            base-slot-props)]
     [utils/adapted-text-field
      (merge
       {:full-width true
@@ -418,6 +469,8 @@
        :variant    "standard"
        :autoFocus  auto-focus}
       (dissoc props :formatting-func :read-only-with-underline :read-only-with-red-number-color)
+      (when (some? merged-slot-props)
+        {:slotProps merged-slot-props})
       {:default-value (cond
                         (and read-only contains-comma-or-letter?) default-value
                         (some? separator) (pprint/cl-format nil (str "~,,'" separator ":D") (/ default-value 100))
@@ -429,28 +482,7 @@
                          (get props :on-change
                               (fn [] (println "BLL")))
                          formatting-func
-                         separator))}
-      (when
-       (or (some? (or prefix suffix)) read-only read-only-with-underline read-only-with-red-number-color)
-        {:InputProps
-         (merge
-          (when read-only
-            {:disableUnderline true
-             :readOnly         true})
-
-          {:style style}
-
-          (when read-only-with-underline
-            {:disableUnderline true
-             :readOnly         true})
-
-          (when (some? prefix)
-            {:startAdornment (r/as-element
-                              [:> InputAdornment {:position "start"} prefix])})
-
-          (when (some? suffix)
-            {:endAdornment (r/as-element
-                            [:> InputAdornment {:position "end"} suffix])}))}))]))
+                         separator))})]))
 
 (defn RawPercentField
   [{:keys [prefix suffix read-only read-only-with-underline default-value auto-focus]
@@ -458,27 +490,30 @@
            read-only-with-underline false
            auto-focus               false}
     :as   props}]
-  (let [contains-percent-or-letter? (some? (re-matches #".*[A-Za-z\%].*" (str default-value)))]
+  (let [contains-percent-or-letter? (some? (re-matches #".*[A-Za-z\%].*" (str default-value)))
+        base-slot-props (:slotProps props)
+        merged-input-slot-props (merge
+                                 {}
+                                 (:input base-slot-props)
+                                 (when read-only
+                                   {:disableUnderline true
+                                    :readOnly         true})
+
+                                 (when read-only-with-underline
+                                   {:disableUnderline true
+                                    :readOnly         true
+                                    :style            read-only-underline})
+
+                                 (when (some? prefix)
+                                   {:startAdornment (r/as-element
+                                                     [:> InputAdornment {:position "start"} prefix])})
+
+                                 {:endAdornment (r/as-element
+                                                 [:> InputAdornment {:position "end"} suffix])})]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard" :autoFocus auto-focus}
             (dissoc props :transform-func :read-only-with-underline)
-            {:InputProps
-             (merge
-              (when read-only
-                {:disableUnderline true
-                 :readOnly         true})
-
-              (when read-only-with-underline
-                {:disableUnderline true
-                 :readOnly         true
-                 :style            read-only-underline})
-
-              (when (some? prefix)
-                {:startAdornment (r/as-element
-                                  [:> InputAdornment {:position "start"} prefix])})
-
-              {:endAdornment (r/as-element
-                              [:> InputAdornment {:position "end"} suffix])})}
+            {:slotProps {:input merged-input-slot-props}}
 
             {:on-change (fn [event] (utils/handle-input-change-with-percent-formatting event
                                                                                        (get props :on-change

@@ -19,7 +19,7 @@
    ["@mui/icons-material/CallMade" :default CallMade]
    ["@mui/icons-material/Cached" :default Cached]
    ["@mui/icons-material/Chat" :default Chat]
-   ["@mui/icons-material/ChatBubbleOutline" :default ChatBubbleOutline]
+   ["@mui/icons-material/ChatBubbleOutlined" :default ChatBubbleOutlined]
    ["@mui/icons-material/CheckCircleOutlineOutlined" :default CheckCircleOutlineOutlined]
    ["@mui/icons-material/ChromeReaderMode" :default ChromeReaderMode]
    ["@mui/icons-material/Clear" :default Clear]
@@ -35,7 +35,7 @@
    ["@mui/icons-material/Edit" :default Edit]
    ["@mui/icons-material/EmojiPeople" :default EmojiPeople]
    ["@mui/icons-material/Error" :default Error]
-   ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
+   ["@mui/icons-material/ErrorOutlined" :default ErrorOutlined]
    ["@mui/icons-material/ExpandLess" :default ExpandLess]
    ["@mui/icons-material/ExpandMore" :default ExpandMore]
    ["@mui/icons-material/Exposure" :default Exposure]
@@ -45,7 +45,7 @@
    ["@mui/icons-material/FormatAlignLeftOutlined" :default FormatAlignLeftOutlined]
    ["@mui/icons-material/Forward" :default Forward]
    ["@mui/icons-material/GetApp" :default GetApp]
-   ["@mui/icons-material/HelpOutline" :default HelpOutline]
+   ["@mui/icons-material/HelpOutlined" :default HelpOutlined]
    ["@mui/icons-material/Home" :default Home]
    ["@mui/icons-material/HomeOutlined" :default HomeOutlined]
    ["@mui/icons-material/Info" :default Info]
@@ -195,7 +195,7 @@
   [:> CallMade props])
 
 (defn ChatBubbleOutlineIcon [props]
-  [:> ChatBubbleOutline props])
+  [:> ChatBubbleOutlined props])
 
 (defn ChatIcon [props]
   [:> Chat props])
@@ -252,7 +252,7 @@
   [:> Error props])
 
 (defn ErrorOutlineIcon [props]
-  [:> ErrorOutline props])
+  [:> ErrorOutlined props])
 
 (defn EventIcon [props]
   [:> Event props])
@@ -285,7 +285,7 @@
   [:> Handyman props])
 
 (defn HelpOutlineIcon [props]
-  [:> HelpOutline props])
+  [:> HelpOutlined props])
 
 (defn HierarchyIcon [props]
   [:svg (merge {:viewBox "0 0 14 14"
