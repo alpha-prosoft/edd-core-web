@@ -2,7 +2,8 @@
   (:require
    ["@mui/material/Box" :default Box]
    ["@mui/material/Grid" :default Grid]
-   ["@mui/material/Stack" :default Stack]))
+   ["@mui/material/Stack" :default Stack]
+   [web.primitives.utils :as utils]))
 
 ;; MUI v9 Grid only accepts these flex-layout props natively:
 ;;   container, size, spacing, columnSpacing, rowSpacing, columns,
@@ -52,7 +53,8 @@
                               (reduce dissoc props layout-only-keys)
                                (some? size) (assoc :size size)
                                (seq sx)     (assoc :sx sx)
-                               valid-grid-direction? (assoc :direction normalized-direction))]
+                               valid-grid-direction? (assoc :direction normalized-direction))
+        grid-props (utils/handle-root-styles-migration grid-props)]
     (into
      [:> Grid grid-props]
      (for [child children]

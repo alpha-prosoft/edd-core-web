@@ -27,7 +27,7 @@
      PersonIcon PersonSearchIcon PictureAsPdfIcon
      PlaylistAddCheckIcon PlaylistAddIcon PopUpTableIcon
      PublishIcon QueryStatsIcon RefreshIcon RemoveIcon
-     ReportProblemIcon RocketLaunchIcon SaveIcon SearchIcon SettingsIcon ShareIcon
+     ReportProblemIcon RocketLaunchIcon RocketLaunchOutlinedIcon SaveIcon SearchIcon SettingsIcon ShareIcon
      StarBorderIcon StarIcon SubdirectoryArrowRightIcon
      SummarizeIcon TableChartIcon TimerIcon TrendingFlatIcon
      TroubleshootIcon TuneIcon UnfoldLessIcon UnfoldMoreIcon
@@ -219,6 +219,8 @@
 (defcard-rg :report-problem-icon "## Report Problem Icon" [ReportProblemIcon])
 
 (defcard-rg :rocket-launch-icon "## Rocket Launch Icon" [RocketLaunchIcon])
+
+(defcard-rg :rocket-launch-outlined-icon "## Rocket Launch Outlined Icon" [RocketLaunchOutlinedIcon])
 
 (defcard-rg :save-icon "## Save Icon" [SaveIcon])
 

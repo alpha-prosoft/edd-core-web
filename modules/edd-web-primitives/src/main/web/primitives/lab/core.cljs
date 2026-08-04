@@ -21,12 +21,18 @@
                                              (let [item (js->clj _option :keywordize-keys true)
                                                    value (js->clj _value :keywordize-keys true)]
                                                (= item value)))}
-                    (-> props
-                        (dissoc :error)
-                        (dissoc :options)
-                        (dissoc :FormHelperTextProps)
-                        (dissoc :getOptionSelected)
-                        (dissoc :helper-text))
+                        ;; These are consumed by autocomplete-text-field and should not leak
+                        ;; into Autocomplete root props.
+                    (dissoc props
+                            :label
+                            :variant
+                            :required
+                            :error
+                            :options
+                            :helperText
+                            :FormHelperTextProps
+                            :getOptionSelected
+                            :helper-text)
                     (when (some? getOptionSelected)
                       {:isOptionEqualToValue getOptionSelected}))])
 

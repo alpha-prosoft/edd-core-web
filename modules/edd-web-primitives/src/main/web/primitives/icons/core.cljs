@@ -97,6 +97,7 @@
    ["@mui/icons-material/Handyman" :default Handyman]
    ["@mui/icons-material/GppGood" :default GppGood]
    ["@mui/icons-material/OpenInNew" :default OpenInNew]
+   ["@mui/icons-material/RocketLaunchOutlined" :default RocketLaunchOutlined]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -431,6 +432,9 @@
 
 (defn RocketLaunchIcon [props]
   [:> RocketLaunch props])
+
+(defn RocketLaunchOutlinedIcon [props]
+  [:> RocketLaunchOutlined props])
 
 (defn SaveIcon [props]
   [:> Save props])

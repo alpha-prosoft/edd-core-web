@@ -1,6 +1,7 @@
 (ns web.primitives.feedback.core
   (:require
    [reagent.core :as r]
+   [web.primitives.utils :as utils]
 
    ["@mui/material/Alert" :default Alert]
    ["@mui/material/Dialog" :default Dialog]
@@ -15,7 +16,9 @@
 (defn RawDialog [{:keys [title actions dividers]
                   :or   {dividers false} :as props} content]
   [:> Dialog
-   (dissoc props :dividers :title :actions)
+   (->  props
+        (dissoc :dividers :title :actions)
+        (utils/handle-paper-props-migration))
    [:> DialogTitle title]
    [:> DialogContent {:dividers dividers} content]
    (when (some? actions)

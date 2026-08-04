@@ -23,7 +23,8 @@
    ["@mui/material/TableContainer" :default TableContainer]
    ["@mui/material/TableHead" :default TableHead]
    ["@mui/material/TableRow" :default TableRow]
-   ["@mui/material/Chip" :default Chip]))
+   ["@mui/material/Chip" :default Chip]
+   [web.primitives.utils :as utils]))
 
 (defn RawBadge [{:keys [color]
                  :or   {color "primary"}
@@ -35,8 +36,17 @@
                {:badge-content "0"}))
    (:content props)])
 
-(defn RawTooltip [{:keys [container-style no-grid] :as props :or {no-grid false}} content]
-  [:> Tooltip (merge {:arrow true} (dissoc props :container-style :no-grid))
+(defn RawTooltip [{:keys [container-style no-grid arrow]
+                   :as props
+                   :or {no-grid false
+                        arrow true}} content]
+  [:> Tooltip
+   (merge
+    {:arrow arrow}
+    (-> props
+        (dissoc :container-style
+                :no-grid)
+        (utils/handle-paper-props-migration)))
    (if no-grid
      content
      [:> Grid {:sx (merge {:width "fit-content"}
@@ -44,7 +54,7 @@
       content])])
 
 (defn RawTypography [props content]
-  [:> Typography props content])
+  [:> Typography (utils/handle-root-styles-migration  props) content])
 
 (defn RawList [props & children]
   (into [:> List (merge {:component "nav"} props)]
