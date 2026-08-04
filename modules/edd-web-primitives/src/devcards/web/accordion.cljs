@@ -1,7 +1,5 @@
 (ns web.accordion
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.components :refer [RawGrid EddAccordion RawHeadlessAccordion RawCard RawTextField RawButton]]

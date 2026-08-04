@@ -1,7 +1,5 @@
 (ns web.start-ui
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [devcards.core :as dc]
    [marked :as marked]
    [web.date-picker]

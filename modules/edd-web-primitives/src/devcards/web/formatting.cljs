@@ -1,8 +1,6 @@
 (ns web.formatting
   (:require
    [reagent.core :as r]
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [clojure.edn :as edn]
    [devcards.core :refer-macros (defcard-rg)]
 

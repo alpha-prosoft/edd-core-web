@@ -342,8 +342,14 @@
     (date-picker-with-state props)))
 
 (defn RawButton
-  [props inner-text]
-  [:> Button props inner-text])
+  [{:keys [component href nativeButton] :as props} inner-text]
+  [:> Button
+   (cond-> props
+     (and (nil? nativeButton)
+          (or (some? component)
+              (some? href)))
+     (assoc :nativeButton false))
+   inner-text])
 
 (defn RawFab
   ([props icon]

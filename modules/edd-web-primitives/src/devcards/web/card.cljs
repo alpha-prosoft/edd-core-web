@@ -1,7 +1,5 @@
 (ns web.card
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
 
    [devcards.core :refer-macros (defcard-rg)]
    [web.primitives.utils :refer [apply-stiles]]

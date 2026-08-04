@@ -18,7 +18,8 @@
   [:> Dialog
    (->  props
         (dissoc :dividers :title :actions)
-        (utils/handle-paper-props-migration))
+        (utils/handle-paper-props-migration)
+        (utils/handle-transition-props-migration))
    [:> DialogTitle title]
    [:> DialogContent {:dividers dividers} content]
    (when (some? actions)

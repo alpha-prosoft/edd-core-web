@@ -10,36 +10,53 @@
    component])
 
 (defn handle-paper-props-migration [{:keys [PopperProps popper-props] :as props}]
-  (cond->
-   (dissoc props
-           :PopperProps
-           :popper-props)
-    (or (some? PopperProps)
-        (some? popper-props))
-    (assoc-in [:slotProps :paper] (merge PopperProps popper-props))))
+  (if (map? props)
+    (cond->
+     (dissoc props
+             :PopperProps
+             :popper-props)
+      (or (some? PopperProps)
+          (some? popper-props))
+      (assoc-in [:slotProps :paper] (merge PopperProps popper-props)))
+    props))
 
 (defn handle-tab-indicator-props-migration [{:keys [TabIndicatorProps tab-indicator-props] :as props}]
-  (cond->
-   (dissoc props
-           :TabIndicatorProps
-           :tab-indicator-props)
-    (or (some? TabIndicatorProps)
-        (some? tab-indicator-props))
-    (assoc-in [:slotProps :tabIndicator] (merge TabIndicatorProps tab-indicator-props))))
+  (if (map? props)
+    (cond->
+     (dissoc props
+             :TabIndicatorProps
+             :tab-indicator-props)
+      (or (some? TabIndicatorProps)
+          (some? tab-indicator-props))
+      (assoc-in [:slotProps :tabIndicator] (merge TabIndicatorProps tab-indicator-props)))
+    props))
 
 (defn handle-root-styles-migration [{:keys [text-align flex-direction align-items overflow
                                             text-overflow white-space] :as props}]
-  (cond->
-   (dissoc props
-           :text-align
-           :flex-direction
-           :align-items
-           :overflow
-           :text-overflow
-           :white-space)
-    (some? text-align) (assoc-in [:sx :text-align] text-align)
-    (some? flex-direction) (assoc-in [:sx :flex-direction] flex-direction)
-    (some? align-items) (assoc-in [:sx :align-items] align-items)
-    (some? overflow) (assoc-in [:sx :overflow] overflow)
-    (some? text-overflow) (assoc-in [:sx :text-overflow] text-overflow)
-    (some? white-space) (assoc-in [:sx :white-space] white-space)))
+  (if (map? props)
+    (cond->
+     (dissoc props
+             :text-align
+             :flex-direction
+             :align-items
+             :overflow
+             :text-overflow
+             :white-space)
+      (some? text-align) (assoc-in [:sx :text-align] text-align)
+      (some? flex-direction) (assoc-in [:sx :flex-direction] flex-direction)
+      (some? align-items) (assoc-in [:sx :align-items] align-items)
+      (some? overflow) (assoc-in [:sx :overflow] overflow)
+      (some? text-overflow) (assoc-in [:sx :text-overflow] text-overflow)
+      (some? white-space) (assoc-in [:sx :white-space] white-space))
+    props))
+
+(defn handle-transition-props-migration [{:keys [TransitionProps transition-props] :as props}]
+  (if (map? props)
+    (cond->
+     (dissoc props
+             :TransitionProps
+             :transition-props)
+      (or (some? TransitionProps)
+          (some? transition-props))
+      (assoc-in [:slotProps :transition] (merge TransitionProps transition-props)))
+    props))

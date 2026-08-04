@@ -1,7 +1,5 @@
 (ns web.radio
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
 
    [web.primitives.components :refer [RawRadioGroup]]

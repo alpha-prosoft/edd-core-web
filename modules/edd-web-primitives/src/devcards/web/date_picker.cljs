@@ -1,7 +1,5 @@
 (ns web.date-picker
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
    [reagent.core :as r]
    [cljs-time.core :as time]

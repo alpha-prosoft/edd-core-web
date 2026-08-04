@@ -1,7 +1,5 @@
 (ns web.number-field
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [web.primitives.components :refer [RawNumberField RawPercentField]]
 
    [clojure.string :as str]

@@ -1,7 +1,5 @@
 (ns web.icon
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
    [web.primitives.utils :refer [apply-stiles]]
    [web.primitives.icons.core :refer

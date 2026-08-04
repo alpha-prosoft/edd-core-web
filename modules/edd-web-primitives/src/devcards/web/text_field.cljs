@@ -1,7 +1,5 @@
 (ns web.text-field
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [web.primitives.components :refer [RawTextField]]
    [web.primitives.icons.core :refer [ChatIcon]]
 

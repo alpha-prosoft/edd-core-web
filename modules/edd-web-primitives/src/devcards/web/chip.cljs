@@ -1,7 +1,5 @@
 (ns web.chip
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [devcards.core :refer-macros (defcard-rg)]
    [reagent.core :as r]
 

@@ -1,7 +1,5 @@
 (ns web.menu
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [reagent.core :as r]
    [devcards.core :refer-macros (defcard-rg)]
    [web.primitives.utils :refer [apply-stiles]]

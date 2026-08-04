@@ -1,7 +1,5 @@
 (ns web.button
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [web.primitives.components :refer [RawButton]]
    [devcards.core :refer-macros (defcard-rg)]
    [web.primitives.utils :refer [apply-stiles]]))

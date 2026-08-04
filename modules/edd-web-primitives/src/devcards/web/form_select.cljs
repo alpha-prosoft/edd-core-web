@@ -1,7 +1,5 @@
 (ns web.form-select
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [reagent.core :as r]
    [devcards.core :refer-macros (defcard-rg)]
    [clojure.string :as str]

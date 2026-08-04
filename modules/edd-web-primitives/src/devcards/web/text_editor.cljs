@@ -1,7 +1,5 @@
 (ns web.text-editor
   (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
    [reagent.core :as r]
    [web.primitives.components :refer [EddTextEditor]]
    [devcards.core :refer-macros (defcard-rg)]
