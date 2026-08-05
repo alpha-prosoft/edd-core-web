@@ -15,6 +15,7 @@
    ["@mui/material/CardActionArea" :default CardActionArea]
    ["@mui/material/ClickAwayListener" :default ClickAwayListener]
    ["@mui/material/Grid" :default Grid]
+   ["@mui/material/IconButton" :default IconButton]
 
    [web.primitives.icons.core :refer [ExpandMoreIcon ExpandLessIcon]]
 
@@ -49,18 +50,21 @@
     (merge {:sx        (merge
                         {}
                         (or summary-sx summary-style))
-            :disabled   disabled
-            :on-click   on-click
+            :container true
+            :nativeButton false
+            :component Grid
             :children  (r/as-element [:> Grid {:container true :size 12 :sx {:alignItems "center"}}
                                       [:> Grid {:sx (merge
                                                      {:position "absolute" :top "0px"}
                                                      (when (= control-position :right) {:right "0px"})
                                                      control-sx)}
-                                       [:> Grid
+                                       [:> IconButton
                                         (merge
-                                         {:sx (if (= control-position :right)
-                                                {:marginRight "-1.1rem"}
-                                                {:marginLeft "-1.1rem"})}
+                                         {:on-click on-click
+                                          :disabled disabled
+                                          :sx       (if (= control-position :right)
+                                                      {:marginRight "-1.1rem"}
+                                                      {:marginLeft "-1.1rem"})}
                                          (when (:id props) {:id (:id props)}))
                                         (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
                                       [:> Grid {:size 12 :sx (if (= control-position :right)

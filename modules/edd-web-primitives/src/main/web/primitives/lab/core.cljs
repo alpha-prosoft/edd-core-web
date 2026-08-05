@@ -13,7 +13,7 @@
 
    [web.primitives.lab.utils :refer [autocomplete-text-field]]))
 
-(defn RawAutocomplete [{:keys [options getOptionSelected] :as props}]
+(defn RawAutocomplete [{:keys [options getOptionSelected render-tags] :as props}]
   [:> Autocomplete (merge
                     {:options              (if options options [])
                      :renderInput          (fn [input-params] (r/as-element [autocomplete-text-field input-params props]))
@@ -33,6 +33,8 @@
                             :FormHelperTextProps
                             :getOptionSelected
                             :helper-text)
+                    (when (some? render-tags)
+                      {:render-value render-tags})
                     (when (some? getOptionSelected)
                       {:isOptionEqualToValue getOptionSelected}))])
 
