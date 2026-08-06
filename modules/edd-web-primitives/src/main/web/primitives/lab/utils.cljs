@@ -20,6 +20,8 @@
   ;; IMPORTANT: never call (clj->js x) on a CLJS map before (merge ...) –
   ;; clj->js produces a plain JS object, which is not ISeqable, causing a crash.
   (let [slot-props         (-> input-params .-slotProps)
+        field-id           (-> input-params .-id)
+        label-id           (when field-id (str "autocomplete-text-field-" field-id "-label"))
         ;; Support both MUI v9 params (.slotProps.*) and legacy params
         ;; (.InputProps / .inputProps / .InputLabelProps).
         base-input-slot    (or (when slot-props (-> slot-props .-input))
@@ -28,6 +30,18 @@
                                (gobj/get input-params "inputProps"))
         input-label-slot   (or (when slot-props (-> slot-props .-inputLabel))
                                (gobj/get input-params "InputLabelProps"))
+        input-label-slot*  (cond
+                             (and input-label-slot label-id)
+                             (js/Object.assign #js {} input-label-slot #js {:id label-id})
+
+                             input-label-slot
+                             input-label-slot
+
+                             label-id
+                             #js {:id label-id}
+
+                             :else
+                             nil)
         use-slot-props?    (some? slot-props)
         input-ref          (when html-input-slot (.-ref html-input-slot))
         html-input-slot*   (when html-input-slot
@@ -46,7 +60,7 @@
                                                    (.-endAdornment base-input-slot)])})
                              base-input-slot)]
     [:> TextField
-     (cond-> {:id          (-> input-params .-id)
+     (cond-> {:id          field-id
               :inputRef    input-ref
               :label       label
               :size        (-> input-params .-size)
@@ -60,7 +74,7 @@
        (assoc :slotProps
               (cond-> {:input      merged-input-slot
                        :htmlInput  html-input-slot*
-                       :inputLabel input-label-slot}
+                       :inputLabel input-label-slot*}
                 ;; FormHelperTextProps is already a CLJS map; pass it directly
                 ;; into slotProps.formHelperText (MUI v9 replaces the direct prop).
                 (some? FormHelperTextProps)
@@ -69,7 +83,7 @@
        (not use-slot-props?)
        (assoc :InputProps merged-input-slot
               :inputProps html-input-slot*
-              :InputLabelProps input-label-slot)
+              :InputLabelProps input-label-slot*)
 
        (and (not use-slot-props?) (some? FormHelperTextProps))
        (assoc :FormHelperTextProps FormHelperTextProps))]))
