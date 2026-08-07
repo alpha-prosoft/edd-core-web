@@ -32,7 +32,7 @@
     props))
 
 (defn handle-root-styles-migration [{:keys [text-align flex-direction align-items overflow
-                                            text-overflow white-space display] :as props}]
+                                            text-overflow white-space display color] :as props}]
   (if (map? props)
     (cond->
      (dissoc props
@@ -42,14 +42,16 @@
              :align-items
              :overflow
              :text-overflow
-             :white-space)
+             :white-space
+             :color)
       (some? text-align) (assoc-in [:sx :text-align] text-align)
       (some? flex-direction) (assoc-in [:sx :flex-direction] flex-direction)
       (some? align-items) (assoc-in [:sx :align-items] align-items)
       (some? overflow) (assoc-in [:sx :overflow] overflow)
       (some? text-overflow) (assoc-in [:sx :text-overflow] text-overflow)
       (some? white-space) (assoc-in [:sx :white-space] white-space)
-      (some? display) (assoc-in [:sx :display] display))
+      (some? display) (assoc-in [:sx :display] display)
+      (some? color) (assoc-in [:sx :color] color))
     props))
 
 (defn handle-transition-props-migration [{:keys [TransitionProps transition-props] :as props}]

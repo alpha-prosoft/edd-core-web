@@ -35,11 +35,11 @@
 (def read-only-underline {:border-bottom "1px solid #00000042"})
 
 (defn RawTextField
-  [{:keys [prefix suffix read-only read-only-with-underline input-props InputProps]
+  [{:keys [prefix suffix read-only read-only-with-underline input-props InputProps FormHelperTextProps]
     :or   {read-only                false
            read-only-with-underline false}
     :as   props}]
-  (let [base-slot-props (:slotProps props)
+  (let [base-slot-props (:slotProps props {})
         merged-input-slot-props (merge
                                  {}
                                  (:input base-slot-props)
@@ -63,8 +63,14 @@
                                                    [:> InputAdornment {:position "end"} suffix])}))]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard"}
-            (dissoc props :transform-func :read-only-with-underline :input-props :InputProps)
-            {:slotProps (assoc (or base-slot-props {}) :input merged-input-slot-props)}
+            (dissoc props :transform-func :read-only-with-underline :input-props :InputProps :FormHelperTextProps)
+            {:slotProps (merge
+                         {}
+                         (when (some? merged-input-slot-props)
+                           {:input merged-input-slot-props})
+                         (when (some? FormHelperTextProps)
+                           {:formHelperText FormHelperTextProps})
+                         base-slot-props)}
 
             {:on-change (fn [event] (utils/handle-input-change event
                                                                (get props :on-change
@@ -263,13 +269,14 @@
             :required    required
             :on-blur     #(comp (set-touched) (set-focused false))}
            (when invalid?
-             {:helper-text invalid-date-message}))
+             {:helper-text invalid-date-message})
+           (get-in props [:slotProps :textField] {}))
           :openPickerButton   {:id (str id :openPickerButton)}
           :switchViewButton   {:id (str id :switchViewButton)}
           :previousIconButton {:id (str id :previousIconButton)}
           :nextIconButton     {:id (str id :nextIconButton)}}
 
-         slotProps)
+         (dissoc slotProps :textField))
 
         :on-close  #(comp (set-touched) (set-focused false))
         :on-change #(utils/handle-date-picker-date-change

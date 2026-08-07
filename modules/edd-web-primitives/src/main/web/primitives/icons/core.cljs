@@ -45,7 +45,7 @@
    ["@mui/icons-material/FormatAlignLeftOutlined" :default FormatAlignLeftOutlined]
    ["@mui/icons-material/Forward" :default Forward]
    ["@mui/icons-material/GetApp" :default GetApp]
-   ["@mui/icons-material/HelpOutlined" :default HelpOutlined]
+   ["@mui/icons-material/HelpOutlineOutlined" :default HelpOutlined]
    ["@mui/icons-material/Home" :default Home]
    ["@mui/icons-material/HomeOutlined" :default HomeOutlined]
    ["@mui/icons-material/Info" :default Info]
