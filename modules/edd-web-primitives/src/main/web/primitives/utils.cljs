@@ -9,15 +9,15 @@
    [:> CssBaseline]
    component])
 
-(defn handle-paper-props-migration [{:keys [PopperProps popper-props] :as props}]
+(defn handle-paper-props-migration [{:keys [PaperProps paper-props] :as props}]
   (if (map? props)
     (cond->
      (dissoc props
-             :PopperProps
-             :popper-props)
-      (or (some? PopperProps)
-          (some? popper-props))
-      (assoc-in [:slotProps :paper] (merge PopperProps popper-props)))
+             :PaperProps
+             :paper-props)
+      (or (some? PaperProps)
+          (some? paper-props))
+      (assoc-in [:slotProps :paper] (merge PaperProps paper-props)))
     props))
 
 (defn handle-tab-indicator-props-migration [{:keys [TabIndicatorProps tab-indicator-props] :as props}]
@@ -32,10 +32,11 @@
     props))
 
 (defn handle-root-styles-migration [{:keys [text-align flex-direction align-items overflow
-                                            text-overflow white-space] :as props}]
+                                            text-overflow white-space display] :as props}]
   (if (map? props)
     (cond->
      (dissoc props
+             :display
              :text-align
              :flex-direction
              :align-items
@@ -47,7 +48,8 @@
       (some? align-items) (assoc-in [:sx :align-items] align-items)
       (some? overflow) (assoc-in [:sx :overflow] overflow)
       (some? text-overflow) (assoc-in [:sx :text-overflow] text-overflow)
-      (some? white-space) (assoc-in [:sx :white-space] white-space))
+      (some? white-space) (assoc-in [:sx :white-space] white-space)
+      (some? display) (assoc-in [:sx :display] display))
     props))
 
 (defn handle-transition-props-migration [{:keys [TransitionProps transition-props] :as props}]

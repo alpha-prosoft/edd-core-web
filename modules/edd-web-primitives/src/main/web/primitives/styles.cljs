@@ -134,13 +134,14 @@
                       {:borderRadius  "8px"
                        :color         "inherit"
                        :textTransform "none"
-                       :minWidth      "8rem"
-                       "&.MuiButton-contained.MuiButton-colorSecondary"
-                       {:color "#fff"}
-                       "&.MuiButton-text.MuiButton-colorSecondary"
-                       {:color "#037080"}}
+                       :minWidth      "8rem"}
                       :outlined
-                      {:border "solid 1px #2b2d33"}}}
+                      {:border "solid 1px #2b2d33"}}
+                     :variants
+                     [{:props {:variant "contained" :color "secondary"}
+                       :style {:color "#fff"}}
+                      {:props {:variant "text" :color "secondary"}
+                       :style {:color "#037080"}}]}
 
                     :MuiToggleButton
                     {:styleOverrides

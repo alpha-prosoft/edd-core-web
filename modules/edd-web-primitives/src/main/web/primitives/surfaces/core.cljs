@@ -29,8 +29,8 @@
   (when (and (some? on-expand-func) expanded?) (on-expand-func))
   expanded?)
 
-(defn RawAccordion [{:keys [expanded? control-position  on-click on-change on-expand-func
-                            elevation  disabled
+(defn RawAccordion [{:keys [expanded? control-position on-click on-change on-expand-func
+                            elevation disabled
                             style sx
                             control-sx
                             summary-style summary-sx
@@ -47,32 +47,32 @@
     :onChange  on-change}
 
    [:> AccordionSummary
-    (merge {:sx        (merge
-                        {}
-                        (or summary-sx summary-style))
-            :container true
+    (merge {:sx           (merge
+                           {}
+                           (or summary-sx summary-style))
+            :container    true
             :nativeButton false
-            :component Grid
-            :children  (r/as-element [:> Grid {:container true :size 12 :sx {:alignItems "center"}}
-                                      [:> Grid {:sx (merge
-                                                     {:position "absolute" :top "0px"}
-                                                     (when (= control-position :right) {:right "0px"})
-                                                     control-sx)}
-                                       [:> IconButton
-                                        (merge
-                                         {:on-click on-click
-                                          :disabled disabled
-                                          :sx       (if (= control-position :right)
-                                                      {:marginRight "-1.1rem"}
-                                                      {:marginLeft "-1.1rem"})}
-                                         (when (:id props) {:id (:id props)}))
-                                        (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
-                                      [:> Grid {:size 12 :sx (if (= control-position :right)
-                                                               {:paddingRight "2.5rem"}
-                                                               {:paddingLeft "2.5rem"})}
-                                       (if (and expanded? (contains? props :header-expanded))
-                                         (:header-expanded props)
-                                         (:header props))]])}
+            :component    Grid
+            :children     (r/as-element [:> Grid {:container true :size 12 :sx {:alignItems "center"}}
+                                         [:> Grid {:sx (merge
+                                                        {:position "absolute" :top "0px"}
+                                                        (when (= control-position :right) {:right "0px"})
+                                                        control-sx)}
+                                          [:> IconButton
+                                           (merge
+                                            {:on-click on-click
+                                             :disabled disabled
+                                             :sx       (if (= control-position :right)
+                                                         {:marginRight "-1.1rem"}
+                                                         {:marginLeft "-1.1rem"})}
+                                            (when (:id props) {:id (:id props)}))
+                                           (if expanded? [ExpandLessIcon {}] [ExpandMoreIcon {}])]]
+                                         [:> Grid {:size 12 :sx (if (= control-position :right)
+                                                                  {:paddingRight "2.5rem"}
+                                                                  {:paddingLeft "2.5rem"})}
+                                          (if (and expanded? (contains? props :header-expanded))
+                                            (:header-expanded props)
+                                            (:header props))]])}
            (when (some? summary-class-name) {:class-name summary-class-name}))]
    [:> AccordionDetails
     {:sx (merge {:padding "0px"} (or details-sx details-style))}
@@ -126,13 +126,19 @@
 (defn RawCard [{:keys [header media actions on-click elevation content-props action-props]
                 :or   {elevation 3 content-props {} action-props {}}
                 :as   props} content]
-  (let [card-props (dissoc props :on-click :header :media :actions :content-props :action-props)]
+  (let [header-slot-props (or (:slotProps header)
+                              {:title (or
+                                       (:titleTypographyProps header)
+                                       {:variant "h3"})})
+
+        card-props (dissoc props :on-click :header :media :actions :content-props :action-props :titleTypographyProps)
+        header (when (some? header) (dissoc header :titleTypographyProps))]
     [:> Card
      (merge card-props
             {:elevation elevation})
 
      (when (and (nil? on-click) (some? header))
-       [:> CardHeader (merge {:slotProps {:title {:variant "h3"}}} header)])
+       [:> CardHeader (merge {:slotProps header-slot-props} header)])
      (when (and (nil? on-click) (some? media))
        [:> CardMedia media])
 

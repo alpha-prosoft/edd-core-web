@@ -39,8 +39,7 @@
                       {:isOptionEqualToValue getOptionSelected}))])
 
 (defn RawAlert [{:keys [id severity title title-props] :as props} content]
-  [:> Alert (merge {:severity severity
-                    :color    severity}
+  [:> Alert (merge {:severity  severity}
                    (when (some? id)
                      {:id id})
                    (dissoc props :title-props))
