@@ -209,16 +209,16 @@
 
                     :MuiAlert
                     {:styleOverrides
-                     {:message         {:width "100%"}
-                      :root            {:width "100%"}
-                      :standardSuccess {:backgroundColor   "#eaf7f2"
-                                        "& .MuiAlert-icon" {:color "#47ba89"}}
-                      :standardError   {:backgroundColor   "#fce8ea"
-                                        "& .MuiAlert-icon" {:color "#e83244"}}
-                      :standardWarning {:backgroundColor   "#fdeee8"
-                                        "& .MuiAlert-icon" {:color "#f66732"}}
-                      :standardInfo    {:backgroundColor   "#e5f8ff"
-                                        "& .MuiAlert-icon" {:color "#1a4d82"}}}}
+                     {:message {:width "100%"}
+                      :root    {:width "100%"
+                                "&.MuiAlert-standard.MuiAlert-colorSuccess" {:backgroundColor   "#eaf7f2"
+                                                                             "& .MuiAlert-icon" {:color "#47ba89"}}
+                                "&.MuiAlert-standard.MuiAlert-colorError"   {:backgroundColor   "#fce8ea"
+                                                                             "& .MuiAlert-icon" {:color "#e83244"}}
+                                "&.MuiAlert-standard.MuiAlert-colorWarning" {:backgroundColor   "#fdeee8"
+                                                                             "& .MuiAlert-icon" {:color "#f66732"}}
+                                "&.MuiAlert-standard.MuiAlert-colorInfo"    {:backgroundColor   "#e5f8ff"
+                                                                             "& .MuiAlert-icon" {:color "#1a4d82"}}}}}
 
                     :MuiDialogTitle
                     {:styleOverrides
