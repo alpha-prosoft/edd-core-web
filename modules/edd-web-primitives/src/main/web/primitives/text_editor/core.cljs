@@ -10,7 +10,7 @@
    [dompurify :as dompurify]
    [web.primitives.icons.core :refer [EditIcon]]
    [web.primitives.layout.core :refer [RawGrid]]
-   [web.primitives.text-editor.utils :refer [deep-merge sun-editor-default-options normalize-sun-editor-options handle-on-paste handle-on-drop handle-on-save]]
+   [web.primitives.text-editor.utils :refer [copied-cell-payload deep-merge handle-on-drop handle-on-paste handle-on-save maybe-normalize-paste-artifacts! normalize-sun-editor-options resolve-selected-single-cell sun-editor-default-options]]
    [web.primitives.text-editor.model :as model]))
 
 (defn sanitize-html [value]
@@ -106,7 +106,83 @@
                    (aset "sizeUnit" "px"))
                  info))))))
 
-(def default-value "<p><span style=\"font-family: Arial; font-size: 14px;\">\u200B</span><br></p>")
+(def default-value "<p><br></p>")
+
+(defn- extract-font-size-value [font-size]
+  (when (string? font-size)
+    (let [trimmed (str/trim font-size)]
+      (or (second (re-matches #"^(\d+(?:\.\d+)?)px$" trimmed))
+          trimmed))))
+
+(defn- sync-font-size-label! [scope-id]
+  (when scope-id
+    (let [container (.querySelector js/document (str "#editor-" scope-id))
+          editable (when container (.querySelector container ".sun-editor-editable"))
+          label-el (when container (.querySelector container ".se-btn-tool-font-size .se-txt"))
+          selection (.getSelection js/window)
+          node (when selection (.-anchorNode selection))
+          element (cond
+                    (nil? node) nil
+                    (= (.-nodeType node) js/Node.TEXT_NODE) (.-parentElement node)
+                    :else node)
+          active-el (if (and editable element (.contains editable element))
+                      element
+                      editable)
+          font-size (when active-el (.-fontSize (.getComputedStyle js/window active-el)))
+          value (extract-font-size-value font-size)]
+      (when (and label-el value)
+        (set! (.-textContent label-el) value)))))
+
+(defn- maybe-copy-single-table-cell! [event editable]
+  (let [selection (.getSelection js/window)
+        has-range? (and selection (pos? (.-rangeCount selection)))
+        has-text-selection? (and has-range? (not (.-isCollapsed selection)))
+        single-cell (resolve-selected-single-cell editable selection)]
+    (when (and single-cell (not has-text-selection?))
+      (let [clipboard-data (.-clipboardData event)
+            {:keys [text html]} (copied-cell-payload single-cell)]
+        (when clipboard-data
+          (.setData clipboard-data "text/plain" text)
+          (.setData clipboard-data "text/html" html)
+          (.preventDefault event))))))
+
+(defn- copy-single-table-cell-manually! [editable]
+  (let [selection (.getSelection js/window)
+        single-cell (resolve-selected-single-cell editable selection)]
+    (when single-cell
+      (let [{:keys [text html]} (copied-cell-payload single-cell)
+            navigator-clipboard (some-> js/navigator .-clipboard)
+            can-write-items? (and navigator-clipboard
+                                  (exists? js/ClipboardItem)
+                                  (exists? js/Blob))]
+        (cond
+          can-write-items?
+          (.write navigator-clipboard
+                  #js [(js/ClipboardItem.
+                        #js {"text/plain" (js/Blob. #js [text] #js {:type "text/plain"})
+                             "text/html"  (js/Blob. #js [html] #js {:type "text/html"})})])
+
+          navigator-clipboard
+          (.writeText navigator-clipboard text)
+
+          :else
+          (js/Promise.reject (js/Error. "Clipboard API unavailable")))))))
+
+(defn- maybe-handle-copy-button-click! [event editable]
+  (let [target (.-target event)
+        copy-button (when target
+                      (.closest target "button.se-btn-tool-copy,button[data-command='copy']"))
+        selection (.getSelection js/window)
+        single-cell (resolve-selected-single-cell editable selection)]
+    (when (and copy-button single-cell)
+      ;; Avoid SunEditor's built-in failed-copy message for the single-cell case.
+      (.preventDefault event)
+      (.stopPropagation event)
+      (.then (copy-single-table-cell-manually! editable)
+             (fn [_] true)
+             (fn [_]
+               ;; Keep focus stable and let user still use keyboard copy if browser blocks clipboard write.
+               (.focus editable))))))
 
 (defn SunEditorNative
   [{:keys [set-contents setOptions on-change on-paste on-drop disable scope-id]}]
@@ -126,13 +202,16 @@
                                 filtered)
              callback-events {:onChange (fn [params]
                                           (when on-change
-                                            (on-change (.-data params))))
+                                            (on-change (.-data params)))
+                                          (js/setTimeout #(sync-font-size-label! scope-id) 0))
                               :onPaste  (fn [params]
                                           (when on-paste
-                                            (on-paste (.-event params) (.-data params))))
+                                            (on-paste (.-event params) (.-data params)))
+                                          (js/setTimeout #(sync-font-size-label! scope-id) 0))
                               :onDrop   (fn [params]
                                           (when on-drop
-                                            (on-drop (.-event params))))
+                                            (on-drop (.-event params)))
+                                          (js/setTimeout #(sync-font-size-label! scope-id) 0))
                               :onImageUploadBefore ensure-original-image-width-in-px}
              merged-options (merge {:plugins filtered-plugins
                                     :value   set-contents}
@@ -146,10 +225,39 @@
                                  (.-default suneditor)))
              _ (when-not suneditor-api
                  (throw (js/Error. "SunEditor API.create unavailable")))
-             instance (.create suneditor-api (.-current el-ref) opts)]
+             instance (.create suneditor-api (.-current el-ref) opts)
+             schedule-sync (fn [] (js/setTimeout #(sync-font-size-label! scope-id) 0))
+             container (when scope-id (.querySelector js/document (str "#editor-" scope-id)))
+             editable (when scope-id (.querySelector js/document (str "#editor-" scope-id " .sun-editor-editable")))
+             listener (fn [] (schedule-sync))
+             copy-listener (fn [event] (maybe-copy-single-table-cell! event editable))
+             click-listener (fn [event] (maybe-handle-copy-button-click! event editable))
+             paste-listener (fn [event] (maybe-normalize-paste-artifacts! event editable))]
          (set! (.-current instance-ref) instance)
+         (schedule-sync)
+
+         (when editable
+           (.addEventListener editable "keyup" listener)
+           (.addEventListener editable "mouseup" listener)
+           (.addEventListener editable "input" listener)
+           (.addEventListener editable "copy" copy-listener)
+           (.addEventListener editable "paste" paste-listener true))
+
+         (when container
+           ;; Toolbar buttons are outside editable area, so listen on the editor container.
+           (.addEventListener container "click" click-listener true)
+           (.addEventListener container "paste" paste-listener true))
 
          (fn []
+           (when editable
+             (.removeEventListener editable "keyup" listener)
+             (.removeEventListener editable "mouseup" listener)
+             (.removeEventListener editable "input" listener)
+             (.removeEventListener editable "copy" copy-listener)
+             (.removeEventListener editable "paste" paste-listener true))
+           (when container
+             (.removeEventListener container "click" click-listener true)
+             (.removeEventListener container "paste" paste-listener true))
            (when-let [editor (.-current instance-ref)]
              (.destroy editor)
              (set! (.-current instance-ref) nil)))))
