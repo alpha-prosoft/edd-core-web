@@ -57,6 +57,36 @@
       (and (seq legacy-default-font) (not has-font-family-style?))
       (assoc :defaultStyle (append-style-declaration base-style (str "font-family: " legacy-default-font ";"))))))
 
+(defn sync-li-style-marker [html]
+  (let [container (.createElement js/document "div")]
+    (set! (.-innerHTML container) (or html ""))
+    ;; Normalize list-item formatting to span-only styles.
+    (doseq [li (array-seq (.querySelectorAll container "li"))]
+      (let [style (some-> (.getAttribute li "style") str/trim)
+            marker (some-> (.getAttribute li "data-se-li-style") str/trim)]
+        (when (or (seq style) (seq marker))
+          (let [li-style (or style marker)
+                first-span (.querySelector li "span")
+                carrier (or first-span
+                            (let [span (.createElement js/document "span")
+                                  fragment (.createDocumentFragment js/document)]
+                              (loop [child (.-firstChild li)]
+                                (when child
+                                  (let [next (.-nextSibling child)]
+                                    (.appendChild fragment child)
+                                    (recur next))))
+                              (.appendChild span fragment)
+                              (.appendChild li span)
+                              span))
+                span-style (some-> (.getAttribute carrier "style") str/trim)
+                merged-style (if (str/blank? span-style)
+                               li-style
+                               (str li-style ";" span-style))]
+            (.setAttribute carrier "style" merged-style)))
+        (.removeAttribute li "style")
+        (.removeAttribute li "data-se-li-style")))
+    (.-innerHTML container)))
+
 (def sun-editor-default-options
   {:buttonList sun-editor-button-list
    :statusbar  false

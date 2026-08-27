@@ -10,11 +10,12 @@
    [dompurify :as dompurify]
    [web.primitives.icons.core :refer [EditIcon]]
    [web.primitives.layout.core :refer [RawGrid]]
-   [web.primitives.text-editor.utils :refer [copied-cell-payload deep-merge handle-on-drop handle-on-paste handle-on-save maybe-normalize-paste-artifacts! normalize-sun-editor-options resolve-selected-single-cell sun-editor-default-options]]
+   [web.primitives.text-editor.utils :refer [copied-cell-payload deep-merge handle-on-drop handle-on-paste handle-on-save maybe-normalize-paste-artifacts! normalize-sun-editor-options resolve-selected-single-cell sun-editor-default-options sync-li-style-marker]]
    [web.primitives.text-editor.model :as model]))
 
 (defn sanitize-html [value]
-  (dompurify/sanitize value {:USE_PROFILES ["html"]}))
+  (dompurify/sanitize value #js {:USE_PROFILES #js {:html true}
+                                 :ADD_ATTR     #js ["style" "target" "data-se-li-style"]}))
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [RawGrid {:container true
@@ -31,7 +32,7 @@
      "div"
      #js {:class "se-container se-wrapper"
           :dangerouslySetInnerHTML
-          #js {:__html (sanitize-html (:set-contents props))}})]
+          #js {:__html (sanitize-html (sync-li-style-marker (:set-contents props)))}})]
 
    (let [edit-icon-position (:edit-icon-position props)]
      [RawGrid {:sx (merge
@@ -188,7 +189,7 @@
   [{:keys [set-contents setOptions on-change on-paste on-drop disable scope-id]}]
   (let [set-contents (if (str/blank? set-contents)
                        default-value
-                       set-contents)
+                       (sync-li-style-marker set-contents))
         el-ref (useRef nil)
         instance-ref (useRef nil)]
 
@@ -201,9 +202,10 @@
                                     (aset filtered key (aget plugins key))))
                                 filtered)
              callback-events {:onChange (fn [params]
-                                          (when on-change
-                                            (on-change (.-data params)))
-                                          (js/setTimeout #(sync-font-size-label! scope-id) 0))
+                                          (let [normalized-data (sync-li-style-marker (.-data params))]
+                                            (when on-change
+                                              (on-change normalized-data))
+                                            (js/setTimeout #(sync-font-size-label! scope-id) 0)))
                               :onPaste  (fn [params]
                                           (when on-paste
                                             (on-paste (.-event params) (.-data params)))
@@ -266,15 +268,14 @@
     [:textarea {:ref el-ref}]))
 
 (defn- edit-mode [{:keys [on-change editor-scope-id] :as props} set-read-only-mode]
-  (let [sun-editor-props (merge
-                          {:on-paste     (fn [event clean-data] (handle-on-paste event clean-data props))
-                           :on-drop      (fn [] (handle-on-drop props))
-                           :scope-id     editor-scope-id
-                           :on-change    #(on-change (sanitize-html %))
-                           :disable      (:disable props)
-                           :set-contents (:set-contents props)
-                           :call-plugin  {:image {:float "none"}}}
-                          props)]
+  (let [sun-editor-props (-> props
+                             (assoc :on-paste (fn [event clean-data] (handle-on-paste event clean-data props))
+                                    :on-drop (fn [] (handle-on-drop props))
+                                    :scope-id editor-scope-id
+                                    :on-change #(on-change (sanitize-html (sync-li-style-marker %)))
+                                    :disable (:disable props)
+                                    :set-contents (:set-contents props)
+                                    :call-plugin {:image {:float "none"}}))]
     [RawGrid (merge
               {:container true
                :size      12
