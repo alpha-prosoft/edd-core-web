@@ -1,0 +1,25 @@
+name: sast
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "5 20 * * 6"
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+  sast:
+    uses: raiffeisen/glms-gh-actions/.github/workflows/sast.yaml@main
+    with:
+      run_checkov: false
+      run_shellcheck: false
+      run_clj_holmes: true
+      run_python_sast: false
+      run_scala_scan: false
+    secrets: inherit

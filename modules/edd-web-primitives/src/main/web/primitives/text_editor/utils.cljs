@@ -241,6 +241,19 @@
       (and editable selected-cell (.contains editable selected-cell)) selected-cell
       :else nil)))
 
+(defn- clipboard-has-multi-cell-selection? [html text]
+  (let [text (or text "")
+        tabular-text? (str/includes? text "\t")
+        html (or html "")
+        tabular-html?
+        (when (seq html)
+          (let [container (.createElement js/document "div")]
+            (set! (.-innerHTML container) html)
+            (let [table (.querySelector container "table")
+                  cells (when table (.querySelectorAll table "td,th"))]
+              (and cells (> (.-length cells) 1)))))]
+    (or tabular-text? tabular-html?)))
+
 (defn- single-block-wrapper-tag [cell]
   (let [child (.-firstElementChild cell)
         tag (some-> child .-tagName str/lower-case)
@@ -309,14 +322,16 @@
         html (or html-raw "")
         text (or text-raw "")
         marker-paste? (str/includes? html single-cell-copy-marker)
+        multi-cell-clipboard? (clipboard-has-multi-cell-selection? html-raw text-raw)
         html-normalized (normalize-leading-paste-html html)
         text-normalized (normalize-leading-paste-text text)
-        selected-cell-paste? (boolean (resolve-paste-target-cell editable event))
+        selected-cell-paste? (and (not multi-cell-clipboard?)
+                                  (boolean (resolve-paste-target-cell editable event)))
         should-normalize? (or marker-paste?
                               selected-cell-paste?
                               (not= html html-normalized)
                               (not= text text-normalized))]
-    (when should-normalize?
+    (when (and should-normalize? (not multi-cell-clipboard?))
       (when-not (replace-selected-table-cell-paste! editable event html-normalized text-normalized marker-paste?)
         (stop-event! event)
         (if (and (seq html-normalized) (not (str/blank? html-normalized)))
@@ -334,4 +349,14 @@
 
 (defn handle-on-save
   [props set-read-only-mode]
-  (comp (:on-save props) set-read-only-mode))
+  (fn [event]
+    (let [on-save (:on-save props)]
+      (if on-save
+        (let [result (on-save event)
+              then-fn (when result (.-then result))]
+          (if (fn? then-fn)
+            (.then result
+                   (fn [_] (set-read-only-mode))
+                   (fn [_] nil))
+            (set-read-only-mode)))
+        (set-read-only-mode)))))

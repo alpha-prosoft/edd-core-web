@@ -159,6 +159,27 @@
             (finally
               (.remove editable))))))))
 
+(deftest multi-cell-paste-is-not-normalized-into-single-target-cell
+  (testing "tabular clipboard content bypasses single-cell replacement logic"
+    (with-stubbed-exec-command
+      (fn []
+        (let [editable (mount-selected-cell-editable!
+                        "se-selected-cell-focus"
+                        "<div><span>old</span></div>")
+              target-cell (.querySelector editable "td")
+              inner-target (.querySelector target-cell "span")
+              text-node (.-firstChild inner-target)
+              prevented? (atom false)
+              table-html "<table><tbody><tr><td>A1</td><td>B1</td></tr></tbody></table>"
+              event (clipboard-event inner-target table-html "A1\tB1" prevented?)]
+          (try
+            (set-collapsed-selection! text-node 1)
+            (sut/maybe-normalize-paste-artifacts! event editable)
+            (is (false? @prevented?))
+            (is (str/includes? (.-innerHTML target-cell) "old"))
+            (finally
+              (.remove editable))))))))
+
 
 
 

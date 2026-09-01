@@ -15,7 +15,9 @@
 
 (defn sanitize-html [value]
   (dompurify/sanitize value #js {:USE_PROFILES #js {:html true}
-                                 :ADD_ATTR     #js ["style" "target" "data-se-li-style"]}))
+                                 :ADD_ATTR     #js ["style" "target" "data-se-li-style"]
+                                 ;; Keep temporary/local image URLs visible right after save.
+                                 :ALLOWED_URI_REGEXP #"^(?:(?:https?|mailto|tel|ftp|file|blob|data):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))"}))
 
 (defn- read-only-mode [props set-edit-mode-funk]
   [RawGrid {:container true
@@ -107,7 +109,47 @@
                    (aset "sizeUnit" "px"))
                  info))))))
 
-(def default-value "<p><br></p>")
+(def default-editor-wrapper-style "font-family: Amalia; font-size: 14px;")
+
+(def default-value "<p>\u200B</p>")
+
+(defn- blank-text-node? [node]
+  (and (= (.-nodeType node) js/Node.TEXT_NODE)
+       (str/blank? (or (.-nodeValue node) ""))))
+
+(defn- default-wrapper-root? [node]
+  (let [style (some-> (.getAttribute node "style") str/lower-case)]
+    (and node
+         (= (.-nodeType node) js/Node.ELEMENT_NODE)
+         (= "div" (some-> (.-tagName node) str/lower-case))
+         (string? style)
+         (str/includes? style "font-family: amalia")
+         (str/includes? style "font-size: 14px"))))
+
+(defn- unwrap-default-editor-style [value]
+  (let [content (or value "")
+        container (.createElement js/document "div")]
+    (set! (.-innerHTML container) content)
+    (let [nodes (->> (array-seq (.-childNodes container))
+                     (remove blank-text-node?))
+          only-node (first nodes)]
+      (if (and (= 1 (count nodes))
+               (default-wrapper-root? only-node))
+        (.-innerHTML only-node)
+        content))))
+
+(defn- wrap-with-default-editor-style [value]
+  (let [content (or value "")
+        container (.createElement js/document "div")]
+    (set! (.-innerHTML container) content)
+    (let [nodes (->> (array-seq (.-childNodes container))
+                     (remove blank-text-node?))
+          only-node (first nodes)
+          already-wrapped? (and (= 1 (count nodes))
+                                (default-wrapper-root? only-node))]
+      (if already-wrapped?
+        content
+        (str "<div style=\"" default-editor-wrapper-style "\">" content "</div>")))))
 
 (defn- extract-font-size-value [font-size]
   (when (string? font-size)
@@ -187,9 +229,11 @@
 
 (defn SunEditorNative
   [{:keys [set-contents setOptions on-change on-paste on-drop disable scope-id]}]
-  (let [set-contents (if (str/blank? set-contents)
-                       default-value
-                       (sync-li-style-marker set-contents))
+  (let [set-contents (-> (if (str/blank? set-contents)
+                           default-value
+                           set-contents)
+                         (unwrap-default-editor-style)
+                         (sync-li-style-marker))
         el-ref (useRef nil)
         instance-ref (useRef nil)]
 
@@ -202,10 +246,12 @@
                                     (aset filtered key (aget plugins key))))
                                 filtered)
              callback-events {:onChange (fn [params]
-                                          (let [normalized-data (sync-li-style-marker (.-data params))]
+                                          (let [normalized-data (-> (.-data params)
+                                                                    (sync-li-style-marker))]
                                             (when on-change
                                               (on-change normalized-data))
                                             (js/setTimeout #(sync-font-size-label! scope-id) 0)))
+
                               :onPaste  (fn [params]
                                           (when on-paste
                                             (on-paste (.-event params) (.-data params)))
@@ -272,7 +318,7 @@
                              (assoc :on-paste (fn [event clean-data] (handle-on-paste event clean-data props))
                                     :on-drop (fn [] (handle-on-drop props))
                                     :scope-id editor-scope-id
-                                    :on-change #(on-change (sanitize-html (sync-li-style-marker %)))
+                                    :on-change #(on-change (sanitize-html (wrap-with-default-editor-style (sync-li-style-marker %))))
                                     :disable (:disable props)
                                     :set-contents (:set-contents props)
                                     :call-plugin {:image {:float "none"}}))]
