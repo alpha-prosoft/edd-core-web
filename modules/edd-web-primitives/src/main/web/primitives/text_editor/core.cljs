@@ -109,7 +109,8 @@
                    (aset "sizeUnit" "px"))
                  info))))))
 
-(def default-editor-wrapper-style "font-family: Amalia; font-size: 14px;")
+(def default-editor-wrapper-style "font-family: Amalia; font-size: 14px; width: 100%;")
+(def default-table-style "font-size: 14px; max-width: 100%;")
 
 (def default-value "<p>\u200B</p>")
 
@@ -138,18 +139,32 @@
         (.-innerHTML only-node)
         content))))
 
+(defn- apply-default-table-style! [container]
+  (doseq [table (array-seq (.querySelectorAll container "table"))]
+    (let [current-style (or (.getAttribute table "style") "")
+          normalized-style (str/lower-case current-style)
+          with-font-size (if (str/includes? normalized-style "font-size:")
+                           current-style
+                           (str current-style (when-not (str/blank? current-style) " ") "font-size: 14px;"))
+          with-default-style (if (str/includes? (str/lower-case with-font-size) "max-width:")
+                               with-font-size
+                               (str with-font-size " " default-table-style))]
+      (.setAttribute table "style" (str/trim with-default-style)))))
+
 (defn- wrap-with-default-editor-style [value]
   (let [content (or value "")
         container (.createElement js/document "div")]
     (set! (.-innerHTML container) content)
-    (let [nodes (->> (array-seq (.-childNodes container))
+    (apply-default-table-style! container)
+    (let [normalized-content (.-innerHTML container)
+          nodes (->> (array-seq (.-childNodes container))
                      (remove blank-text-node?))
           only-node (first nodes)
           already-wrapped? (and (= 1 (count nodes))
                                 (default-wrapper-root? only-node))]
       (if already-wrapped?
-        content
-        (str "<div style=\"" default-editor-wrapper-style "\">" content "</div>")))))
+        normalized-content
+        (str "<div style=\"" default-editor-wrapper-style "\">" normalized-content "</div>")))))
 
 (defn- extract-font-size-value [font-size]
   (when (string? font-size)
