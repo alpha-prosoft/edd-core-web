@@ -19,6 +19,10 @@
                                  ;; Keep temporary/local image URLs visible right after save.
                                  :ALLOWED_URI_REGEXP #"^(?:(?:https?|mailto|tel|ftp|file|blob|data):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))"}))
 
+(defn- editable-element-id [scope-id]
+  (when scope-id
+    (str "text-editor-editable-" scope-id)))
+
 (defn- read-only-mode [props set-edit-mode-funk]
   [RawGrid {:container true
             :size 12
@@ -300,6 +304,7 @@
          (schedule-sync)
 
          (when editable
+           (set! (.-id editable) (editable-element-id scope-id))
            (.addEventListener editable "keyup" listener)
            (.addEventListener editable "mouseup" listener)
            (.addEventListener editable "input" listener)
