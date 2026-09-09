@@ -178,7 +178,7 @@
 
 (defn- sync-font-size-label! [scope-id]
   (when scope-id
-    (let [container (.querySelector js/document (str "#editor-" scope-id))
+    (let [container (.getElementById js/document (str "editor-" scope-id))
           editable (when container (.querySelector container ".sun-editor-editable"))
           label-el (when container (.querySelector container ".se-btn-tool-font-size .se-txt"))
           selection (.getSelection js/window)
@@ -294,8 +294,8 @@
                  (throw (js/Error. "SunEditor API.create unavailable")))
              instance (.create suneditor-api (.-current el-ref) opts)
              schedule-sync (fn [] (js/setTimeout #(sync-font-size-label! scope-id) 0))
-             container (when scope-id (.querySelector js/document (str "#editor-" scope-id)))
-             editable (when scope-id (.querySelector js/document (str "#editor-" scope-id " .sun-editor-editable")))
+             container (when scope-id (.getElementById js/document (str "editor-" scope-id)))
+             editable (when container (.querySelector container ".sun-editor-editable"))
              listener (fn [] (schedule-sync))
              copy-listener (fn [event] (maybe-copy-single-table-cell! event editable))
              click-listener (fn [event] (maybe-handle-copy-button-click! event editable))
