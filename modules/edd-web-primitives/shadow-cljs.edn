@@ -1,5 +1,5 @@
 {:deps   true
- :nrepl  {:port 3333}
+ :nrepl  {:port 3334}
  :builds
  {:devcards
   {:target     :browser

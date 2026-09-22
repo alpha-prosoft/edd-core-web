@@ -13,6 +13,7 @@
    ["@mui/icons-material/ArrowUpward" :default ArrowUpward]
    ["@mui/icons-material/ArrowRightAlt" :default ArrowRightAlt]
    ["@mui/icons-material/AssignmentInd" :default AssignmentInd]
+   ["@mui/icons-material/AssignmentReturnOutlined" :default AssignmentReturnOutlined]
    ["@mui/icons-material/Block" :default Block]
    ["@mui/icons-material/Business" :default Business]
    ["@mui/icons-material/Calculate" :default Calculate]
@@ -179,6 +180,15 @@
 
 (defn AssignmentIndIcon [props]
   [:> AssignmentInd props])
+
+(defn AssignmentReturnOutlinedIcon [props]
+  [:> AssignmentReturnOutlined props])
+
+;; Figma `icon/assign_to` is Material's `assignment_return` (outlined)
+;; mirrored horizontally, so the arrow points into the clipboard.
+(defn AssignToIcon [{:keys [style] :as props}]
+  [:> AssignmentReturnOutlined (assoc props
+                                      :style (merge {:transform "scaleX(-1)"} style))])
 
 (defn BlockIcon [props]
   [:> Block props])

@@ -7,7 +7,8 @@
      AccountTreeIcon AddIcon AdminPanelSettingsIcon AllColapseIcon
      AllExpandIcon ArrowDownwardIcon ArrowDropDownCircleIcon
      ArrowDropDownIcon ArrowDropUpCircleIcon ArrowDropUpIcon ArrowLeftIcon ArrowRightAltIcon ArrowRightIcon
-     ArrowUpwardIcon AssignmentIndIcon BlockIcon BusinessIcon
+     ArrowUpwardIcon AssignmentIndIcon AssignmentReturnOutlinedIcon
+     AssignToIcon BlockIcon BusinessIcon
      CallMadeIcon CachedIcon ChatBubbleOutlineIcon ChatIcon
      CalculateIcon CheckCircleOutlineOutlinedIcon ChevronRightIcon
      ChromeReaderModeIcon ClearIcon CloseIcon ContentCopyIcon
@@ -68,6 +69,11 @@
 (defcard-rg :arrow-upward-icon "## Arrow Upward Icon" [ArrowUpwardIcon])
 
 (defcard-rg :assignment-ind-icon "## Assignment Ind Icon" [AssignmentIndIcon])
+
+(defcard-rg :assignment-return-outlined-icon
+  "## Assignment Return Outlined Icon" [AssignmentReturnOutlinedIcon])
+
+(defcard-rg :assign-to-icon "## Assign To Icon" [AssignToIcon])
 
 (defcard-rg :block-icon "## Block Icon" [BlockIcon])
 
