@@ -49,8 +49,7 @@
   [{:keys [classes]} item]
   (let [_lang @(rf/subscribe [::subs/selected-language])]
     [:> Grid {:on-click   #(rf/dispatch [::events/navigate item])
-              :item true
-              :xs   12}
+              :size 12}
      [:> Button {:on-click   #(rf/dispatch [::events/navigate item])
                  :key        (:key item)
                  :class-name (:nested classes)
@@ -67,17 +66,14 @@
 
     (if drawer
       (drawer ctx)
-      [:> Grid {:container true}
-       [:> Grid {:item true
-                 :xs   12}]
-       [:> Grid {:item true
-                 :xs   1}]
-       [:> Grid {:item true
-                 :xs   10}
+      [:> Grid {:container true :sx {:width "100%"}}
+       [:> Grid {:size 12}]
+       [:> Grid {:size 1}]
+       [:> Grid {:size 10}
         (into
          [:> Grid {:container true
-                   :item      true
-                   :spacing   1}]
+                   :spacing   1
+                   :sx {:width "100%"}}]
          (map
           (fn [item]
             (menu-item ctx item))
@@ -97,10 +93,8 @@
           page-config]
       [:> Grid {:container  true
                 :spacing 1
-                :justify-content "center"}
-       [:> Grid {:item       true
-                 :xs xs
-                 :md md}
+                :sx {:justify-content "center" :width "100%"}}
+       [:> Grid {:size {:xs xs :md md}}
         [:> AppBar {:color      :secondary
                     :position   "static"}
 
@@ -118,19 +112,14 @@
             app-bar (app-bar)
             :else ":app-bar placeholder")]]]
 
-       [:> Grid {:item true
-                 :xs 12}]
-       [:> Grid {:item true
-                 :xs xs
-                 :md md}
+       [:> Grid {:size 12}]
+       [:> Grid {:size {:xs xs :md md}}
         ((or placeholder util/placeholder) ctx)]
        (snackbar-alert.views/revoke-alert)
        (drawer ctx)])
     [:> Grid {:container  true
-              :justify-content "center"}
-     [:> Grid {:item true
-               :xs 6
-               :md 12}
+              :sx {:justify-content "center" :width "100%"}}
+     [:> Grid {:size {:xs 6 :md 12}}
       "Loading..."]]))
 
 (defn body

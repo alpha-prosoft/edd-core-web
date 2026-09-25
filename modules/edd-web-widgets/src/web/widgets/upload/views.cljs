@@ -73,27 +73,24 @@
                      :sx (merge {:border "2px dashed #ccc"
                                  :border-radius "5px"
                                  :padding "10px"
-                                 :background-color "#eee"}
-                                grid-styles)
-                     :align-items "center"}
+                                 :background-color "#eee"
+                                 :align-items "center"
+                                 :width "100%"}
+                                grid-styles)}
 
-            [:> Grid {:item true
-                      :xs 1}
+            [:> Grid {:size 1}
              [:svg
               {:focusable "false",
                :aria-hidden "true",
                :viewBox "0 0 24 24",
                :data-testid "AddIcon"}
               [:path {:d "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"}]]]
-            [:> Grid {:item true
-                      :xs 11
-                      :container true
-                      :align-items "center"}
-             [:> Grid {:item true
-                       :xs 12}
+            [:> Grid {:container true
+                      :size 11
+                      :sx {:align-items "center"}}
+             [:> Grid {:size 12}
               [:> Typography {:variant "body1" :color "textPrimary"} label]]
-             [:> Grid {:item true
-                       :xs 12}
+             [:> Grid {:size 12}
 
               [:> Typography {:variant "caption" :color "textSecondary"}
                formats-label]

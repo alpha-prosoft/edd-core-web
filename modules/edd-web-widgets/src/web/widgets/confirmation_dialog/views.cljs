@@ -19,15 +19,15 @@
      [:> DialogTitle message]
 
      [:> DialogActions
-      [:> Grid {:container true :spacing 2}
-       [:> Grid {:item true :xs true}
+      [:> Grid {:container true :spacing 2 :sx {:width "100%"}}
+       [:> Grid {:size "grow"}
         [:> Button
          (merge
            button-props
            proceed-button-props
            {:on-click #(rf/dispatch [::events/on-proceed])})
          proceed-text]]
-       [:> Grid {:item true :xs true}
+       [:> Grid {:size "grow"}
         [:> Button
          (merge
            button-props

@@ -19,7 +19,7 @@
             ["@mui/material/InputAdornment" :default InputAdornment]
             ["@mui/material/Link" :default Link]
             ["@mui/material/Typography" :default Typography]
-            ["@mui/icons-material/ErrorOutline" :default ErrorOutline]
+            ["@mui/icons-material/ErrorOutlined" :default ErrorOutline]
             ["@mui/icons-material/TaskAlt" :default TaskAlt]
             ["@mui/icons-material/Close" :default CloseIcon]
             [reagent.core :as r]))
@@ -49,14 +49,10 @@
 
 (defn wrap-dialog-button
   [button]
-  [:> Grid {:item        true
-            :container   true
-            :direction   "column"
-            :align-items "center"
-            :xs          12
-            :md          4}
-   [:> Grid {:item true
-             :xs   12}
+  [:> Grid {:container   true
+            :size {:xs 12 :md 4}
+            :sx {:align-items "center" :flex-direction "column"}}
+   [:> Grid {:size 12}
     button]])
 
 (defn dialog-close-button []
@@ -72,12 +68,10 @@
   (let [loading? @(rf/subscribe [::subs/loading?])]
     [:> Grid {:container true
               :spacing   2
-              :sx        {:padding "0 16px 10px 0" :margin "-24px 0 0 0"}}
+              :sx        {:padding "16px 16px 10px 16px" :margin "-24px 0 0 0" :width "100%"}}
      (when (some #(= % form-type) [:login])
-       [:> Grid {:item       true
-                 :xs         12
-                 :sm         12
-                 :text-align "end"}
+       [:> Grid {:size {:xs 12 :sm 12}
+                 :sx {:text-align "end"}}
         [:> Link {:sx        {:cursor "pointer"}
                   :key       "forgot-password"
                   :on-click  #(rf/dispatch [::events/forgot-password])
@@ -85,12 +79,12 @@
                   :tab-index 3}
          (tr :forgot-password)]])
 
-     [:> Grid {:item true
-               :xs   12}
+     [:> Grid {:size 12}
       [:> Grid {:container true
-                :spacing   2}
+                :spacing   2
+                :sx {:width "100%"}}
        (when (some #(= % form-type) [:login])
-         [:> Grid {:item true :sm true :xs 12}
+         [:> Grid {:size {:xs 12 :sm "grow"}}
           [:> Button {:full-width true
                       :variant    "outlined"
                       :color      "primary"
@@ -104,7 +98,7 @@
              (tr :login))]])
 
        (when (some #(= % form-type) [:register])
-         [:> Grid {:item true :sm true :xs 12}
+         [:> Grid {:size {:xs 12 :sm "grow"}}
           [:> Button {:full-width true
                       :variant    "outlined"
                       :key        "register"
@@ -118,7 +112,7 @@
              (tr :register))]])
 
        (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
-         [:> Grid {:item true :sm 6 :xs 12}
+         [:> Grid {:size {:xs 12 :sm 6}}
           [:> Button {:full-width true
                       :variant    "outlined"
                       :key        "resend-code"
@@ -129,7 +123,7 @@
            (tr :resend-code)]])
 
        (when (some #(= % form-type) [:confirm-login])
-         [:> Grid {:item true :sm true :xs 12}
+         [:> Grid {:size {:xs 12 :sm "grow"}}
           [:> Button {:full-width true
                       :variant    "outlined"
                       :key        "confirm-login"
@@ -141,7 +135,7 @@
              (tr :login))]])
 
        (when (some #(= % form-type) [:confirm-password-reset])
-         [:> Grid {:item true :sm true :xs 12}
+         [:> Grid {:size {:xs 12 :sm "grow"}}
           [:> Button {:full-width true
                       :variant    "outlined"
                       :key        "confirm-password-code"
@@ -155,7 +149,7 @@
              (tr :confirm-reset-password))]])
 
        (when (some #(= % form-type) [:forgot-password])
-         [:> Grid {:item true :sm true :xs 12}
+         [:> Grid {:size {:xs 12 :sm "grow"}}
           [:> Button {:full-width true
                       :variant    "outlined"
                       :key        "confirm-login"
@@ -200,7 +194,7 @@
                    :label         (tr :password)
                    :on-change     #(rf/dispatch [::events/password-change (-> % .-target .-value)])
                    :type          (if show-password? "input" "password")
-                   :InputProps    {:endAdornment (password-visibility-icon-button show-password?)}
+                   :slotProps     {:input {:endAdornment (password-visibility-icon-button show-password?)}}
                    :fullWidth     true
                    :tab-index     1
                    :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
@@ -218,12 +212,12 @@
                    :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
 
 (defn password-requirement [label checked?]
-  [:> Grid {:container true :spacing 1 :align-items "center"}
-   [:> Grid {:item true}
+  [:> Grid {:container true :spacing 1 :sx {:align-items "center" :width "100%"}}
+   [:> Grid {}
     (if checked?
       [:> TaskAlt {:color "success"}]
       [:> ErrorOutline {:color "warning"}])]
-   [:> Grid {:item true :xs true}
+   [:> Grid {:size "grow"}
     [:> Typography {:variant "subtitle2"}
      label]]])
 
@@ -232,14 +226,14 @@
                 missing-lower-case?
                 missing-number?
                 missing-length-8?]} @(rf/subscribe [::subs/password-invalid-explanation])]
-    [:> Grid {:container true :spacing 2}
-     [:> Grid {:item true :xs 12}
+    [:> Grid {:container true :spacing 2 :sx {:width "100%"}}
+     [:> Grid {:size 12}
       (password-requirement (tr :password-requirements :upper-case) (not missing-upper-case?))]
-     [:> Grid {:item true :xs 12}
+     [:> Grid {:size 12}
       (password-requirement (tr :password-requirements :lower-case) (not missing-lower-case?))]
-     [:> Grid {:item true :xs 12}
+     [:> Grid {:size 12}
       (password-requirement (tr :password-requirements :number) (not missing-number?))]
-     [:> Grid {:item true :xs 12}
+     [:> Grid {:size 12}
       (password-requirement (tr :password-requirements :length) (not missing-length-8?))]]))
 
 (defn login-dialog []
@@ -255,32 +249,32 @@
       (tr form-type)
       [dialog-close-button]]
      [:> DialogContent {}
-      [:> Grid {:container true :direction "column" :spacing 1}
+      [:> Grid {:container true :spacing 1 :sx {:flex-direction "column" :width "100%"}}
        (when (some #(= % form-type) [:register :login :forgot-password])
-         [:> Grid {:item true :xs true}
+         [:> Grid {:size "grow"}
           [Username]])
 
        (when (some #(= % form-type) [:register :login :confirm-password-reset])
-         [:> Grid {:item true} (password-field)])
+         [:> Grid {} (password-field)])
 
        (when (some #(= % form-type) [:register :confirm-password-reset])
-         [:> Grid {:item true}
-          [:> Grid {:container true}
-           [:> Grid {:item true}
+         [:> Grid {}
+          [:> Grid {:container true :sx {:width "100%"}}
+           [:> Grid {}
             (password-checks)]]])
 
        (when (some #(= % form-type) [:confirm-login :confirm-password-reset])
-         [:> Grid {:item true} (confirm-login)])
+         [:> Grid {} (confirm-login)])
 
        (when show-error?
-         [:> Grid {:item true}
+         [:> Grid {}
           [:> Alert {:severity "error"}
            (if (string? error-message)
              error-message
              (str (tr (or error-message :unknown-error))))]])
 
        (when (= form-type :login)
-         [:> Grid {:item true :sx {:text-align "center"}}
+         [:> Grid {:sx {:text-align "center"}}
           [:> Typography {:variant "body2"}
            (tr :no-account?) " "
            [:> Link {:sx       {:cursor "pointer"}
@@ -288,7 +282,7 @@
             (tr :create-account)]]])
 
        (when (= form-type :register)
-         [:> Grid {:item true :sx {:text-align "center"}}
+         [:> Grid {:sx {:text-align "center"}}
           [:> Typography {:variant "body2"}
            (tr :have-account?) " "
            [:> Link {:sx       {:cursor "pointer"}
@@ -297,18 +291,18 @@
      [:> DialogActions (login-dialog-actions form-type)]]))
 
 (defn logout-button []
-  [:> Grid {:item true}
+  [:> Grid {}
    [:> Button {:on-click #(rf/dispatch [::events/logout])}
     (tr :logout)]])
 
 (defn register-button []
-  [:> Grid {:item true}
+  [:> Grid {}
    [:> Button {:on-click #(rf/dispatch [::events/open-dialog :register])}
     (tr :register)]
    (login-dialog)])
 
 (defn login-button []
-  [:> Grid {:item true}
+  [:> Grid {}
    [:> Button {:on-click #(rf/dispatch [::events/open-dialog :login])}
     (tr :login)]])
 
@@ -320,8 +314,8 @@
         init? @(rf/subscribe [::subs/init?])]
     (when init?
       [:> Grid {:container       true
-                :justify-content :flex-end
-                :spacing         3}
+                :spacing         3
+                :sx {:justify-content :flex-end :width "100%"}}
        (when logged?
          (logout-button))
        (when (and enable-register

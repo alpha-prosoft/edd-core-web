@@ -4,7 +4,7 @@
     ["@mui/material/Zoom" :default Zoom]))
 
 (defn ContentSwitcher [{:keys [checked?]} content checked-content]
-  [:> Grid {:container true}
+  [:> Grid {:container true :sx {:width "100%"}}
    [:> Zoom {:in checked?
               :style (cond-> {:transitionDelay (if checked? "500ms" "0ms")}
                              (false? checked?) (assoc :display "none"))}
