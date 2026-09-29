@@ -1,0 +1,12 @@
+/*
+ * Fixes on top of the stock SunEditor stylesheet (vendor/suneditor.min.css).
+ *
+ * The vendor files are copied unmodified from node_modules by `make suneditor-css`
+ * and must never be edited. Put every change here instead, with a short reason
+ * and the ticket, so it survives SunEditor upgrades. Loaded after the vendor CSS.
+ */
+
+/* CARS-7586: long select menus (font, size, format) scroll instead of overflowing the page. */
+.sun-editor .se-select-menu.se-select-menu-scroll {
+  overflow-y: auto;
+}

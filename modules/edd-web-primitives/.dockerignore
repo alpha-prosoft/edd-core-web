@@ -2,3 +2,5 @@ node_modules
 target
 .cpcache
 .git
+.clj-kondo/.cache
+.clj-kondo/imports

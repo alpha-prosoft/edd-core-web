@@ -11,6 +11,7 @@
    ["@mui/material/ToggleButtonGroup" :default ToggleButtonGroup]
    ["@mui/material/ToggleButton" :default ToggleButton]
 
+   [web.primitives.utils :as utils]
    [web.primitives.lab.utils :refer [autocomplete-text-field]]))
 
 (defn RawAutocomplete [{:keys [options getOptionSelected render-tags] :as props}]
@@ -23,16 +24,17 @@
                                                (= item value)))}
                         ;; These are consumed by autocomplete-text-field and should not leak
                         ;; into Autocomplete root props.
-                    (dissoc props
-                            :label
-                            :variant
-                            :required
-                            :error
-                            :options
-                            :helperText
-                            :FormHelperTextProps
-                            :getOptionSelected
-                            :helper-text)
+                    (utils/with-el-id-as-id
+                      (dissoc props
+                              :label
+                              :variant
+                              :required
+                              :error
+                              :options
+                              :helperText
+                              :FormHelperTextProps
+                              :getOptionSelected
+                              :helper-text))
                     (when (some? render-tags)
                       {:render-value render-tags})
                     (when (some? getOptionSelected)
@@ -41,27 +43,27 @@
 (defn RawAlert [{:keys [severity title title-props] :as props} content]
   [:> Alert (merge {:severity severity
                     :color    severity}
-                   (dissoc props :title :title-props))
+                   (utils/with-el-id-as-testid (dissoc props :title :title-props)))
    (when (some? title)
      [:> AlertTitle (if (some? title-props) title-props {}) title])
    (r/as-element content)])
 
 (defn RawSkeleton [props]
-  [:> Skeleton props])
+  [:> Skeleton (utils/with-el-id-as-testid props)])
 
 (defn RawToggleButtonGroup [props & children]
   (into
-   [:> ToggleButtonGroup props]
+   [:> ToggleButtonGroup (utils/with-el-id-as-testid props)]
    (for [child children]
      (r/as-element child))))
 
 (defn RawToggleButton [props content]
-  [:> ToggleButton props content])
+  [:> ToggleButton (utils/with-el-id-as-testid props) content])
 
 (defn RawTimelineDot [{:keys [variant] :as props} & children]
   (into
    [:> TimelineDot (merge
-                    props
+                    (utils/with-el-id-as-testid props)
                     (when (= "default" variant)
                       {:variant "filled"}))]
    (for [child children]
@@ -69,12 +71,12 @@
 
 (defn RawSimpleTreeView [props & children]
   (into
-   [:> SimpleTreeView props]
+   [:> SimpleTreeView (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawTreeItem [props & children]
   (into
-   [:> TreeItem props]
+   [:> TreeItem (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))

@@ -1,0 +1,3 @@
+#kaocha/v1
+{:tests [{:id         :it
+          :test-paths ["src/it"]}]}

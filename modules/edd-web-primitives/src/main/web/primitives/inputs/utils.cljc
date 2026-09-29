@@ -96,19 +96,24 @@
           (not (js/isNaN (.getTime date))))))
 
 #?(:cljs
-   (defn validate-date-min-max-date [{:keys [component-min-date component-max-date disablePast disable-past
-                                             set-date-input-invalid on-change]
-                                      :or   {on-change #(print "date: " %)}} date]
-     (let [date-invalid? (and
-                          (some? date)
-                          (date? date)
-                          (or (t/before? date (time-fmt/parse-local-date component-min-date))
-                              (t/after? date (time-fmt/parse-local-date component-max-date))
-                              (and (or disablePast disable-past) (t/before? date (t/today)))))]
-       (set-date-input-invalid date-invalid?)
-       (when (and
-              (not date-invalid?)
-              (date? date))
+   (defn date-out-of-range? [{:keys [component-min-date component-max-date disablePast disable-past]} date]
+     (or (t/before? date (time-fmt/parse-local-date component-min-date))
+         (t/after? date (time-fmt/parse-local-date component-max-date))
+         (and (or disablePast disable-past) (t/before? date (t/today))))))
+
+#?(:cljs
+   (defn validate-date-min-max-date [{:keys [set-date-input-invalid on-change]
+                                      :or   {on-change #(print "date: " %)}
+                                      :as   props} date]
+     (let [complete-date?
+           (and (some? date) (date? date))
+
+           out-of-range?
+           (and complete-date? (date-out-of-range? props date))]
+
+       (set-date-input-invalid out-of-range?)
+
+       (when complete-date?
          (on-change (time-fmt/unparse date-formatter date))))))
 
 #?(:cljs
@@ -139,6 +144,7 @@
    (dissoc :left-value)
    (dissoc :right-value)
    (dissoc :label-placement)
+   (dissoc :el-id)
    (dissoc :value)))
 
 #?(:clj (defn string-to-float [value]

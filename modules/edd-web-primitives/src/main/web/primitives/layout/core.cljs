@@ -54,7 +54,8 @@
                                (some? size) (assoc :size size)
                                (seq sx)     (assoc :sx sx)
                                valid-grid-direction? (assoc :direction normalized-direction))
-        grid-props (utils/handle-root-styles-migration grid-props)]
+        grid-props (utils/handle-root-styles-migration grid-props)
+        grid-props (utils/with-el-id-as-testid grid-props)]
     (into
      [:> Grid grid-props]
      (for [child children]
@@ -62,12 +63,12 @@
 
 (defn RawBox [props & children]
   (into
-   [:> Box props]
+   [:> Box (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawStack [props & children]
   (into
-   [:> Stack props]
+   [:> Stack (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))

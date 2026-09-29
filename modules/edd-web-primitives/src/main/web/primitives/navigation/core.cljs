@@ -15,18 +15,18 @@
 (defn RawTabs [props]
   (let [props (utils/handle-tab-indicator-props-migration props)]
     (into
-     [adapted-RawTabs (dissoc props :children)]
+     [adapted-RawTabs (utils/with-el-id-as-testid (dissoc props :children))]
      (map (fn [item-props] (r/as-element [adapted-RawTab item-props])) (:tabs props)))))
 
 (defn RawLink [props content]
-  [(r/adapt-react-class Link) props content])
+  [(r/adapt-react-class Link) (utils/with-el-id-as-testid props) content])
 
 (defn RawDrawer [props content]
-  [:> Drawer props content])
+  [:> Drawer (utils/with-el-id-as-testid props) content])
 
 (defn RawSwipeableDrawer [props content]
   [:> SwipeableDrawer
    (merge
     {:onOpen (fn [])}
-    props)
+    (utils/with-el-id-as-testid props))
    content])

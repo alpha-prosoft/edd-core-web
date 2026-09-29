@@ -1,6 +1,7 @@
 (ns web.primitives.utils
   (:require
    [web.primitives.styles :as styles]
+   [web.primitives.testing.el-id :as el-id]
    ["@mui/material/CssBaseline" :default CssBaseline]
    ["@mui/material/styles" :refer [ThemeProvider createTheme]]))
 
@@ -8,6 +9,33 @@
   [:> ThemeProvider {:theme (createTheme (clj->js styles/theme))}
    [:> CssBaseline]
    component])
+
+(defn el-id->string
+  "Resolve the value a user passed as :el-id (keyword, vector, fn vector or
+   string) into the id rendered into the DOM."
+  [el-id]
+  (el-id/el-id el-id))
+
+(defn merge-el-id [props target-key]
+  (if (map? props)
+    (let [el-id
+          (:el-id props)
+
+          resolved
+          (el-id->string el-id)
+
+          without-el-id
+          (dissoc props :el-id)]
+      (if (and (some? resolved) (not (contains? without-el-id target-key)))
+        (assoc without-el-id target-key resolved)
+        without-el-id))
+    props))
+
+(defn with-el-id-as-id [props]
+  (merge-el-id props :id))
+
+(defn with-el-id-as-testid [props]
+  (merge-el-id props :data-testid))
 
 (defn handle-paper-props-migration [{:keys [PaperProps paper-props] :as props}]
   (if (map? props)

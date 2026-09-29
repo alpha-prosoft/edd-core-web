@@ -111,153 +111,127 @@ Example:
 ```
 
 
-## Devcards testing
-### How to write components
-Sadly devcards dont work very well with re-frame because of its global app-db.
-It is doable but require some hacking. We can go simpler way - write components
-in a little bit different way.
+## UI testing with the UI SDK
 
-Currently components are using re-frame subscribers and dispatch function right
-in the function body:
+UI tests drive a real browser with Playwright. They never use CSS
+selectors, MUI class names or XPath. Instead:
 
-```clojurescript
-(defn main-panel
-  [classes]
-  (let [logged-in @(rf/subscribe [::umsubs/user-is-logged-in])]
-    ...
-     [:> Select
-            {:value     @(rf/subscribe [::subs/selected-consolidation-point])
-             :on-change #(rf/dispatch [::events/consolidation-point-selected (-> % .-target .-value)])}])
-    ...
-  )
+1. Every primitive accepts an `:el-id`.
+2. The app defines its element ids once in `elements.cljc`, shared by the
+   views (ClojureScript) and the tests (JVM).
+3. Tests call **SDK functions** with those ids. The SDK knows how each
+   primitive is built in the DOM (hidden inputs, portals, MUI v9 sectioned
+   date fields, SunEditor...).
 
-```
+### Artifacts
 
-We can do something like this:
+| Artifact                     | Contains                                 | Use from        |
+|------------------------------|------------------------------------------|-----------------|
+| `edd-web-primitives`         | the primitives (cljs) + `el-id` helpers  | the app (cljs)  |
+| `edd-web-primitives-ui-sdk`  | `web.primitives.sdk.*` + `el-id` helpers | the tests (clj) |
 
-1) The component which know where data comes from (re-frame aware, used in application)
-```clojurescript
-(defn main-panel
-  [classes]
-  (main-panel-component classes
-                        {:user-is-logged-in
-                         @(rf/subscribe [::umsubs/user-is-logged-in])
-                         :subscribe-cp
-                         @(rf/subscribe [::subs/selected-consolidation-point])
-                         :dispatch-cp-selected #(rf/dispatch [::events/consolidation-point-selected (-> % .-target .-value)])}))
-```
+The SDK only depends on Clojure and `com.microsoft.playwright/playwright`.
+Any runner works (clojure.test, kaocha, clojure-playwright).
 
-2) Pure component which renders data and perfectly can be used in devcards:
-
-```clojurescript
-(defn main-panel-component
-  [classes {:keys [user-is-logged-in subscribe-cp dispatch-cp-selected]}]
-  (let [logged-in user-is-logged-in]
-    ...
-     [:> Select {:value subscribe-cp :on-change dispatch-cp-selected}])
-    ...
-  )
-```
-
-*Caution: currently is an idea example code could be broken!*
-
-
-
-### How to write devcards
-
-#### WHY:
-Devcards are sandbox environment for UI components where we can check all
-edge cases of our components. This is done to make sure you component can
-display provided data correctly. Devcards can also be used as a UI component
-catalog and for QA.
-
-#### HOW:
-
-1) You need to create a namespace for you component devcards:
-```clojurescript
-(ns primitives.devcards-example
-  (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
-   [devcards.core :refer-macros (defcard defcard-rg)]
-   ["@material-ui/core" :refer [Button Card CardContent Typography]]
-   ["@material-ui/icons/Menu" :default Menu]
-   ["@material-ui/core/styles/withStyles" :default withStyles]
-   [reagent.core :as r]))
-
-(defcard-rg simple-button-component
-  "## Material UI Button"
-  [:> Button {:variant
-              :contained} "button"])
-```
-
-2) You need to **require** your namespace in **start_ui.cljs***
-
-```clojurescript
-(ns primitives.start-ui
-  (:require
-   [cljsjs.react]
-   [cljsjs.react.dom]
-   [devcards.core :as dc]
-   [primitives.devcards-example]))
-```
-
-For more info: [devcards](https://github.com/bhauman/devcards)
-
-
-
-### How to write devcards test
-
-#### WHY:
-Someone made a change to css, we need to make sure all our components still
-rendered in desired way, nothing is overlapping.
-We should do visual confirmation by going through all devcards making sure nothing is broken .
-
-#### HOW
-Going after each change through all devcards is tedious task. That's why we have automated it.
-As a test dependency you can include artifact:
-**{org/glms-ui-testkit {:mvn/version "1.0.b9"}}**
-After calling **c/run-devcard-test** following is happening:
-
-1) Project npm dependencies are installed
-2) Project artifact is compiled
-3) Project artifact is started
-4) After project is running, all devcards groups screenshots are made
-5) Comparing all screenshots with catalog values
-
-*Caution: currently whole group of devcards is checked and not single devcards!*
+### 1. Give elements an id
 
 ```clojure
-(ns primitives.devcards-test
-  (:require [clojure.test :refer [deftest]]
-            [ui-testkit.core :as c]))
+;; src/cljc/my/app/order/elements.cljc
+(ns my.app.order.elements
+  (:require [web.primitives.testing.el-id :refer [el-id]]))
 
-(def default-opts
-  {:screenshot-dir "target/devcards"
-   :reference-dir "src/test/resources/devcards"
-   :build-id :devcards
-   :aliases [:dev]
-   :metric-threshold 0.001
-   :verbose true
-   :assert? true})
-
-(deftest when-devcards-ok
-  (c/run-devcard-tests default-opts))
-```
-*Caution: this is a clojure file and not a clojurescript!*
-
-For manual start you can run from console:
-```bash
-clojure -A:test:runner
+(defn customer   [] (el-id ::customer))
+(defn due-date   [] (el-id ::due-date))
+(defn urgent     [] (el-id ::urgent))
+(defn save       [] (el-id ::save))
+(defn saved-toast [] (el-id ::saved-toast))
+(defn line-row   [n] (el-id ::line-row n))   ; => ".../line-row--3"
 ```
 
-Options:
+```clojure
+;; view
+[RawAutocomplete {:el-id (els/customer) :options customers ...}]
+[EddDatePicker   {:el-id (els/due-date) ...}]
+[RawCheckbox     {:el-id (els/urgent) :label "Urgent" ...}]
+[RawButton       {:el-id (els/save) :variant "contained" ...} "Save"]
+[RawSnackbar     {:el-id (els/saved-toast) :open saved? :message "Order saved" ...}]
+```
 
-| Key               | Meaning                                                                  | Default                              |
-| -------------     | :-------------:                                                          | -----:                               |
-| :reference-dir    | catalog image directory, files names must correspond to devcard group-id | "#{proj_dir}test/resources/devcards" |
-| :screenshot-dir   | working directory, where screenshots and image diffs will be saved       | "${proj_dir}target/devcards"         |
-| :aliases          | deps aliases, f.e dev,test                                               | []                                   |
-| :assert?          | should results of image comparing be asserted                            | true                                 |
-| :metric-threshold | tolerated image difference                                               | 0.001                                |
-| :build-id         | devcards artifact                                                        | :devcards                            |
+### 2. Write the test with SDK functions
+
+```clojure
+(ns my.app.order.order-test
+  (:require [clojure.test :refer [deftest is]]
+            [my.app.order.elements :as els]
+            [web.primitives.sdk.core :as sdk]
+            [web.primitives.sdk.autocomplete :as autocomplete]
+            [web.primitives.sdk.date-picker :as date-picker]
+            [web.primitives.sdk.checkbox :as checkbox]
+            [web.primitives.sdk.button :as button]
+            [web.primitives.sdk.snackbar :as snackbar]))
+
+(deftest create-urgent-order
+  (sdk/with-page page                       ; any Playwright Page
+    (sdk/goto! "http://localhost:3000/#/orders/new")
+
+    (autocomplete/choose! (els/customer) "ACME")
+    (date-picker/set-date! (els/due-date) "15.05.2027")
+    (checkbox/check!       (els/urgent))
+    (button/click!         (els/save))
+
+    (is (= "Order saved" (snackbar/message (els/saved-toast))))))
+```
+
+With clojure-playwright (traces for every test):
+
+```clojure
+(deftest create-urgent-order
+  (with-ui [page]
+    (sdk/with-page page
+      ...)))
+```
+
+### Namespaces
+
+| Namespace                        | For                                       | Main functions |
+|----------------------------------|-------------------------------------------|----------------|
+| `sdk.core`                       | binding the page, generic helpers         | `with-page` `goto!` `el` `click!` `text` `visible?` `becomes-visible?` `becomes-hidden?` `press!` `eventually` |
+| `sdk.button`                     | RawButton, RawFab, RawIconButton          | `click!` `enabled?` `label` |
+| `sdk.checkbox`                   | RawCheckbox                               | `checked?` `check!` `uncheck!` `set-checked!` `toggle!` |
+| `sdk.switch`                     | RawSwitch (incl. two-value)               | `on?` `turn-on!` `turn-off!` `toggle!` |
+| `sdk.text-field`                 | RawTextField, RawNumberField, RawPercentField | `fill!` `type!` `clear!` `value` `blur!` `label` `helper-text` `read-only?` |
+| `sdk.select`                     | RawSelect, RawFormSelect                  | `choose!` `selected` `options` |
+| `sdk.autocomplete`               | RawAutocomplete                           | `search!` `choose!` `visible-options` `value` `chips` `clear!` |
+| `sdk.radio`                      | RawRadioGroup                             | `choose!` `selected` `values` |
+| `sdk.slider`                     | RawSlider                                 | `set-value!` `value` `min-value` `max-value` |
+| `sdk.date-picker`                | EddDatePicker                             | `set-date!` `type-date!` `value` `blank?` `clear!` `blur!` `error?` `helper-text` `open-calendar!` |
+| `sdk.text-editor`                | EddTextEditor                             | `editing?` `start-editing!` `type!` `text` `save!` `discard!` |
+| `sdk.dialog`                     | RawDialog                                 | `wait-open!` `wait-closed!` `open?` `title` `body-text` `close-with-escape!` |
+| `sdk.snackbar`                   | RawSnackbar                               | `message` `open?` `wait-closed!` |
+| `sdk.menu`                       | RawMenu, RawMenuItem                      | `items` `choose!` `wait-open!` `wait-closed!` |
+| `sdk.tabs`                       | RawTabs                                   | `choose!` (label or index) `selected` `selected-index` `labels` |
+| `sdk.drawer`                     | RawDrawer, RawSwipeableDrawer             | `content-text` `open?` `close-with-escape!` |
+| `sdk.accordion`                  | RawAccordion, EddAccordion                | `expand!` `collapse!` `expanded?` `details-text` |
+| `sdk.toggle-button`              | RawToggleButtonGroup                      | `choose!` `pressed?` `selected` |
+| `sdk.tooltip`                    | RawTooltip                                | `text` `show!` `hide!` |
+| `sdk.display`                    | typography, badge, chip, avatar, alert, list, table, tree, card, progress | `text` `tag` `badge-content` `alert-severity` `list-items` `table-headers` `table-rows` `tree-items` `expand-tree-item!` `card-title` |
+| `sdk.console`                    | smoke tests                               | `watch-errors!` `page-errors` `console-errors` |
+
+### Rules
+
+- **Wait on the state, not the clock.** MUI animates dialogs, drawers,
+  backdrops and transitions. After an action that shows or hides
+  something, use `becomes-visible?` / `becomes-hidden?` or a `wait-*`
+  function, never `visible?` straight after a click.
+- **Labels are what you passed**, not what CSS shows (`button/label`
+  returns `"Save"`, not the upper-cased `"SAVE"`).
+- **Missing an action?** Add it to the SDK namespace for that primitive,
+  not to your test. Every consumer of the primitive then gets it.
+
+### Running the gallery tests in this repo
+
+```
+make gallery   # serve the component browser on http://localhost:3002
+make it        # run the Playwright suite against it (traces in target/pw-traces)
+make jars      # build both artifacts into target/release-libs
+```

@@ -18,6 +18,7 @@
   [:> Dialog
    (->  props
         (dissoc :dividers :title :actions)
+        (utils/with-el-id-as-testid)
         (utils/handle-paper-props-migration)
         (utils/handle-transition-props-migration))
    [:> DialogTitle title]
@@ -37,15 +38,15 @@
                  :auto-hide-duration (or auto-hide-duration 5000)
                  :message            (or message "")
                  :key                key}
-                (dissoc props :alert-props))
+                (utils/with-el-id-as-testid (dissoc props :alert-props)))
    (when (and (nil? content) (some? alert-props))
      [:> Alert alert-props message])])
 
 (defn RawCircularProgress [props]
-  [:> CircularProgress props])
+  [:> CircularProgress (utils/with-el-id-as-testid props)])
 
 (defn RawBackdrop [props]
-  [:> Backdrop props
+  [:> Backdrop (utils/with-el-id-as-testid props)
    [RawCircularProgress {}]])
 
 (defn calculate-progress [time time-left]

@@ -10,8 +10,10 @@
    [dompurify :as dompurify]
    [web.primitives.icons.core :refer [EditIcon]]
    [web.primitives.layout.core :refer [RawGrid]]
+   [web.primitives.utils :as utils]
    [web.primitives.text-editor.utils :refer [copied-cell-payload deep-merge handle-on-drop handle-on-paste handle-on-save maybe-normalize-paste-artifacts! normalize-sun-editor-options resolve-selected-single-cell sun-editor-default-options sync-li-style-marker]]
-   [web.primitives.text-editor.model :as model]))
+   [web.primitives.text-editor.model :as model]
+   [web.primitives.text-editor.styles :as styles]))
 
 (defn sanitize-html [value]
   (dompurify/sanitize value #js {:USE_PROFILES #js {:html true}
@@ -36,7 +38,7 @@
              :class-name              "sun-editor-editable"}
     (reagent.core/create-element
      "div"
-     #js {:class "se-container se-wrapper"
+     #js {:className "se-container se-wrapper"
           :dangerouslySetInnerHTML
           #js {:__html (sanitize-html (sync-li-style-marker (:set-contents props)))}})]
 
@@ -368,23 +370,27 @@
                      (when (:id props) {:id (str "discard-button-" (:id props))})) "Discard"]])]]))
 
 (defn RawTextEditor
-  [{:keys [editor-mode set-read-only-mode set-edit-mode disable]
+  [{:keys [editor-mode set-read-only-mode set-edit-mode disable el-id id]
     :or   {editor-mode :edit-mode}
     :as   props}]
-  (if
-   (or (= :read-only-mode editor-mode)
-       disable)
-    (read-only-mode props set-edit-mode)
-    (edit-mode props set-read-only-mode)))
+  (styles/install!)
+  (let [props
+        (assoc props :id (or (utils/el-id->string el-id) id))]
+    (if
+     (or (= :read-only-mode editor-mode)
+         disable)
+      (read-only-mode props set-edit-mode)
+      (edit-mode props set-read-only-mode))))
 
 (declare editor-id)
 
 (defn EddTextEditor
-  [props]
+  [{:keys [el-id id] :as props}]
   (r/with-let [uuid (str (random-uuid))
                editor-id (keyword (str "rich-text-editor-mode-" uuid))]
-    (let [editor-mode @(rf/subscribe [::model/get-editor-mode editor-id])
-          editor-scope-id (or (:id props) uuid)
+    (let [resolved-id (or (utils/el-id->string el-id) id)
+          editor-mode @(rf/subscribe [::model/get-editor-mode editor-id])
+          editor-scope-id (or resolved-id uuid)
           set-read-only-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :read-only-mode]))
           set-edit-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :edit-mode]))]
       [RawTextEditor (merge
@@ -392,4 +398,4 @@
                        :editor-scope-id    editor-scope-id
                        :set-read-only-mode set-read-only-mode
                        :set-edit-mode      set-edit-mode}
-                      props)])))
+                      (assoc props :id resolved-id))])))

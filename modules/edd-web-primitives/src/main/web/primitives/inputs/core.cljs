@@ -27,6 +27,7 @@
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
             [web.primitives.inputs.model :as model]
+            [web.primitives.utils :as shared-utils]
             [web.primitives.formatting.core :as formatting]
             [clojure.string :as string]
 
@@ -63,7 +64,8 @@
                                                    [:> InputAdornment {:position "end"} suffix])}))]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard"}
-            (dissoc props :transform-func :read-only-with-underline :input-props :InputProps :FormHelperTextProps)
+            (shared-utils/with-el-id-as-id
+              (dissoc props :transform-func :read-only-with-underline :input-props :InputProps :FormHelperTextProps))
             {:slotProps (merge
                          {}
                          (when (some? merged-input-slot-props)
@@ -87,7 +89,7 @@
         {:control
          (r/as-element
           [:> Switch (merge
-                      (utils/clean-switch-props props)
+                      (utils/clean-switch-props (shared-utils/with-el-id-as-id props))
                       {:color      "secondary"
                        :class-name :Switch-With-Two-Values
                        :checked    (= right-value value)
@@ -119,7 +121,7 @@
     (switch-with-two-values props)
 
     [:> FormControlLabel
-     {:control         (r/as-element [:> Switch (merge {:color "primary"} (utils/clean-switch-props props))])
+     {:control         (r/as-element [:> Switch (merge {:color "primary"} (utils/clean-switch-props (shared-utils/with-el-id-as-id props)))])
       :label           label
       :sx              {:margin-right "-4px"}
       :disabled        disabled
@@ -139,14 +141,20 @@
        :defaultValue default
        :children     (for [option options]
                        (r/as-element [:> MenuItem {:key option :value option} option]))}
-      props
+      (shared-utils/with-el-id-as-id props)
       {:on-change    (fn [^js event]
                        (on-change (.. event -target -value)))})]))
 
-(defn RawFormSelect [{:keys [id input-label required required? helper-text
+(defn RawFormSelect [{:keys [id el-id input-label required required? helper-text
                              read-only-with-underline read-only]
                       :or   {read-only-with-underline false read-only false} :as props}]
-  (let [required? (or required required?)]
+  (let [required? (or required required?)
+
+        id
+        (or (shared-utils/el-id->string el-id) id)
+
+        props
+        (dissoc props :el-id)]
     [:> FormControl
      (merge
       {:id          (str id "-form-control")
@@ -195,11 +203,24 @@
                :text-transform "none"
                :box-shadow     "none"}
      :variant "contained"}
-    props)
+    (shared-utils/with-el-id-as-testid props))
    (:label props)])
 
+(defn parse-iso-date [value]
+  (.toDate (moment value "YYYY-MM-DD")))
+
+(defn valid-iso-date-string? [value]
+  (and (string? value)
+       (not (string/blank? value))
+       (.isValid (moment value "YYYY-MM-DD"))))
+
+(defn controlled-picker-value [value]
+  (if (valid-iso-date-string? value)
+    (parse-iso-date value)
+    nil))
+
 (defn RawDatePicker
-  [{:keys [id value label required error helper-text variant
+  [{:keys [id el-id value label required error helper-text variant
            set-touched set-focused
            invalid? invalid-date-message
            minDate maxDate min-date max-date slotProps]
@@ -211,10 +232,15 @@
     :as   props}]
   (let [component-min-date (or minDate min-date "1900-01-01")
         component-max-date (or maxDate max-date "2099-12-31")
+
+        id
+        (or (shared-utils/el-id->string el-id) id)
+
         picker-props (dissoc props
                              :allowSameDateSelection
                              :clear-text
                              :clearText
+                             :el-id
                              :error
                              :helper-text
                              :id
@@ -234,10 +260,7 @@
                              :variant)
 
         value
-        (if (and (not invalid?) (string/blank? value))
-          nil
-
-          (.toDate (moment value "YYYY-MM-DD")))]
+        (controlled-picker-value value)]
 
     [:> LocalizationProvider
      {:dateAdapter AdapterDateFns}
@@ -252,10 +275,10 @@
         :value value
 
         :minDate
-        (.toDate (moment component-min-date "YYYY-MM-DD"))
+        (parse-iso-date component-min-date)
 
         :maxDate
-        (.toDate (moment component-max-date "YYYY-MM-DD"))
+        (parse-iso-date component-max-date)
 
         :error error
 
@@ -334,14 +357,14 @@
         props)])))
 
 (defn EddDatePicker
-  [{:keys [id label value read-only? read-only read-only-with-underline]
+  [{:keys [id el-id label value read-only? read-only read-only-with-underline]
     :or   {read-only?               false
            read-only                false
            read-only-with-underline false}
     :as   props}]
 
   (if (or read-only? read-only read-only-with-underline)
-    [RawTextField {:id                       id
+    [RawTextField {:id                       (or (shared-utils/el-id->string el-id) id)
                    :read-only                (or read-only? read-only)
                    :read-only-with-underline read-only-with-underline
                    :label                    label
@@ -351,7 +374,7 @@
 (defn RawButton
   [{:keys [component href nativeButton] :as props} inner-text]
   [:> Button
-   (cond-> props
+   (cond-> (shared-utils/with-el-id-as-testid props)
      (and (nil? nativeButton)
           (or (some? component)
               (some? href)))
@@ -361,14 +384,14 @@
 (defn RawFab
   ([props icon]
    [:> Zoom {:in true :timeout 300}
-    [:> Fab (merge {:color "primary"} props) icon]])
+    [:> Fab (merge {:color "primary"} (shared-utils/with-el-id-as-testid props)) icon]])
 
   ([props icon inner-text]
    [:> Zoom {:in true :timeout 300}
     [:> Fab (merge
              {:color   "primary"
               :variant "extended"}
-             props) icon [RawGrid {:style {:margin-left 5}} inner-text]]]))
+             (shared-utils/with-el-id-as-testid props)) icon [RawGrid {:style {:margin-left 5}} inner-text]]]))
 
 (defn RawIconButton
   [{:keys [size] :or {size "medium"} :as props} icon]
@@ -377,7 +400,8 @@
         adj-size-icon (if (some? icon)
                         (conj icon icon-props)
                         [RawGrid icon-props])
-        button-props (if (some? icon) props (conj props {:disabled true}))]
+        with-testid (shared-utils/with-el-id-as-testid props)
+        button-props (if (some? icon) with-testid (conj with-testid {:disabled true}))]
     [:> IconButton button-props adj-size-icon]))
 
 (declare icon-button-state-id)
@@ -404,9 +428,10 @@
   [:> FormControlLabel
    {:control         (r/as-element
                       [:> Checkbox (merge {:color "secondary"}
-                                          (-> props
-                                              (dissoc :label-placement)
-                                              (dissoc :on-change)))])
+                                          (shared-utils/with-el-id-as-id
+                                            (-> props
+                                                (dissoc :label-placement)
+                                                (dissoc :on-change))))])
 
     :on-change       on-change
     :label           label
@@ -422,9 +447,10 @@
      [:> FormLabel {} label])
    (into
     [:> RadioGroup (merge {:row row}
-                          (-> props
-                              (dissoc :children)
-                              (dissoc :label)))]
+                          (shared-utils/with-el-id-as-testid
+                            (-> props
+                                (dissoc :children)
+                                (dissoc :label))))]
 
     (for [item children]
       [:> FormControlLabel
@@ -481,7 +507,8 @@
        :color      "primary"
        :variant    "standard"
        :autoFocus  auto-focus}
-      (dissoc props :formatting-func :read-only-with-underline :read-only-with-red-number-color)
+      (shared-utils/with-el-id-as-id
+        (dissoc props :formatting-func :read-only-with-underline :read-only-with-red-number-color))
       (when (some? merged-slot-props)
         {:slotProps merged-slot-props})
       {:default-value (cond
@@ -525,7 +552,8 @@
                                                  [:> InputAdornment {:position "end"} suffix])})]
     [utils/adapted-text-field
      (merge {:full-width true :color "primary" :variant "standard" :autoFocus auto-focus}
-            (dissoc props :transform-func :read-only-with-underline)
+            (shared-utils/with-el-id-as-id
+              (dissoc props :transform-func :read-only-with-underline))
             {:slotProps {:input merged-input-slot-props}}
 
             {:on-change (fn [event] (utils/handle-input-change-with-percent-formatting event
@@ -536,4 +564,4 @@
                               (formatting/format-percent-without-percentage-sign default-value))})]))
 
 (defn RawSlider [props]
-  [:> Slider props])
+  [:> Slider (shared-utils/with-el-id-as-id props)])

@@ -3,7 +3,12 @@ ARG DOCKER_ORG
 ARG BUILD_ID
 ARG PROJECT_NAME=edd-web-primitives
 
-FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:b2042
+# ===========================================================================
+# Stage 1: build — lint, unit tests, compile, release the static gallery,
+# build the published jars and the integration-test uberjar.
+# Runs on web-img (clojure + node + maven toolchain).
+# ===========================================================================
+FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest AS build
 
 ENV PROJECT_NAME edd-web-primitives
 
@@ -34,28 +39,81 @@ RUN set -e &&\
 
 COPY --chown=build:build resources resources
 COPY --chown=build:build src src
+COPY --chown=build:build build.clj build.clj
+COPY --chown=build:build tests-it.edn tests-it.edn
+COPY --chown=build:build .clj-kondo .clj-kondo
 
-RUN set -e && clojure -M:lint --lint src/main src/test
+RUN set -e && clojure -M:lint --lint src/main src/shared src/test src/gallery src/sdk src/it
 RUN set -e && clojure -M:test:runner
-RUN set -e && npx shadow-cljs -A:dev compile
+RUN set -e && npx shadow-cljs -A:dev:gallery compile gallery
+
+# The UI SDK must compile on its own (no gallery / cljs on the classpath).
+RUN set -e && clojure -M:sdk -e "(require 'web.primitives.sdk.core 'web.primitives.sdk.button 'web.primitives.sdk.checkbox 'web.primitives.sdk.switch 'web.primitives.sdk.text-field 'web.primitives.sdk.select 'web.primitives.sdk.autocomplete 'web.primitives.sdk.radio 'web.primitives.sdk.slider 'web.primitives.sdk.date-picker 'web.primitives.sdk.text-editor 'web.primitives.sdk.dialog 'web.primitives.sdk.snackbar 'web.primitives.sdk.menu 'web.primitives.sdk.tabs 'web.primitives.sdk.drawer 'web.primitives.sdk.accordion 'web.primitives.sdk.toggle-button 'web.primitives.sdk.tooltip 'web.primitives.sdk.display 'web.primitives.sdk.console)"
 
 RUN set -e &&\
     clojure -Sdeps '{:deps {cljfmt/cljfmt {:mvn/version "0.9.2"}}}' \
-            -M -m cljfmt.main check src/main/ src/test
+            -M -m cljfmt.main check src/main/ src/shared src/test src/gallery src/sdk src/it
 
 RUN ls -la /dist
-RUN set -e && npx shadow-cljs -A:dev release devcards
+RUN set -e && npx shadow-cljs -A:gallery release gallery
 
 RUN ls -la /dist
-RUN cp -r resources/public/* /dist/s3/
+RUN cp -r resources/gallery/* /dist/s3/
 RUN sed -i 's/version=1/version='${BUILD_ID}'/g' /dist/s3/index.html
 RUN ls -la /dist
 
-RUN set -e && clojure -A:test -Sdeps '{:deps {luchiniatwork/cambada {:mvn/version "1.0.5"}}}' \
-                      -m cambada.jar \
-                      --app-version "1.0.${BUILD_ID}" \
-                      --app-artifact-id "${PROJECT_NAME}" \
-                      --app-group-id "${ARTIFACT_ORG}" \
-                      --copy-source \
-                      -o /dist/release-libs/; \
-                    cp pom.xml "/dist/release-libs/${PROJECT_NAME}-1.0.${BUILD_ID}.jar.pom.xml"; \
+# Packaged, self-contained integration-test runner (SDK + clojure-playwright +
+# IT suite). Runs later on ui-runtime with plain `java -jar`.
+RUN set -e && clojure -T:build it-uberjar :out '"/dist/it"' &&\
+    ls -la /dist/it
+
+# Two published artifacts:
+#   ${PROJECT_NAME}          - the primitives (cljs source jar)
+#   ${PROJECT_NAME}-ui-sdk   - the Playwright UI test SDK (clj source jar)
+RUN set -e && clojure -T:build all \
+                      :group   "\"${ARTIFACT_ORG}\"" \
+                      :version "\"1.0.${BUILD_ID}\"" \
+                      :out     "\"/dist/release-libs\"" &&\
+    ls -la /dist/release-libs
+
+# ===========================================================================
+# Stage 2: uitest — run the Playwright suite on ui-runtime.
+# ui-runtime ships Chrome's system libraries + Java; the gallery is served as
+# a plain static site and the tests run from the uberjar.
+# ===========================================================================
+FROM ${DOCKER_URL}/${DOCKER_ORG}/ui-runtime-img:latest AS uitest
+
+USER root
+WORKDIR /opt/uitest
+
+COPY --from=build /dist/it/it-tests.jar it-tests.jar
+COPY --from=build /dist/s3 gallery
+COPY run-it.sh run-it.sh
+
+ENV IT_JAR=/opt/uitest/it-tests.jar
+ENV GALLERY_DIR=/opt/uitest/gallery
+ENV GALLERY_PORT=3002
+# ui-runtime ships Chrome-for-Testing here; Playwright drives it directly
+# (no browser download, which the build network blocks).
+ENV PLAYWRIGHT_CHROME=/opt/chrome-linux64/chrome
+
+RUN set -e && bash run-it.sh && date > /opt/uitest/it-passed
+
+# ===========================================================================
+# Stage 3: final — ship only the release libs (and gallery assets).
+# The COPY from uitest forces this stage to depend on a green UI test run.
+# ===========================================================================
+FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest AS final
+
+ARG BUILD_ID
+
+# Only exists when the UI tests passed; makes stage 3 depend on stage 2.
+COPY --from=uitest /opt/uitest/it-passed /tmp/.it-passed
+
+USER build
+
+RUN mkdir -p /dist/release-libs /dist/s3
+COPY --from=build --chown=build:build /dist/release-libs /dist/release-libs
+COPY --from=build --chown=build:build /dist/s3 /dist/s3
+
+RUN ls -la /dist/release-libs

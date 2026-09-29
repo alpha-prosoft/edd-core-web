@@ -19,6 +19,7 @@
 
    [web.primitives.icons.core :refer [ExpandMoreIcon ExpandLessIcon]]
 
+   [web.primitives.utils :as utils]
    [web.primitives.surfaces.model :as model]))
 
 (defn- control-position-right? [props]
@@ -39,12 +40,14 @@
                      :or   {control-position :left elevation 0 disabled false control-sx {}}
                      :as   props} content]
   [:> Accordion
-   {:expanded  (handle-on-expand-funk expanded? on-expand-func)
-    :elevation elevation
-    :sx        (merge
-                {:width "100%"}
-                (or sx style))
-    :onChange  on-change}
+   (merge
+    {:expanded  (handle-on-expand-funk expanded? on-expand-func)
+     :elevation elevation
+     :sx        (merge
+                 {:width "100%"}
+                 (or sx style))
+     :onChange  on-change}
+    (utils/with-el-id-as-testid (select-keys props [:el-id])))
 
    [:> AccordionSummary
     (merge {:sx           (merge
@@ -78,10 +81,10 @@
     {:sx (merge {:padding "0px"} (or details-sx details-style))}
     content]])
 
-(defn RawHeadlessAccordion [{:keys [id expanded? elevation sx styles details-sx details-styles]
+(defn RawHeadlessAccordion [{:keys [id el-id expanded? elevation sx styles details-sx details-styles]
                              :or   {expanded? true elevation 0 sx {}}}
                             content]
-  [:> Accordion {:id        id
+  [:> Accordion {:id        (or (utils/el-id->string el-id) id)
                  :expanded  expanded?
                  :elevation elevation
                  :sx        (merge {:width "100%"} (or sx styles))}
@@ -104,11 +107,11 @@
                             :on-click  on-click} props) content])))
 
 (defn RawAppBar [props content]
-  [:> AppBar props content])
+  [:> AppBar (utils/with-el-id-as-testid props) content])
 
 (defn RawToolbar [props & children]
   (into
-   [:> Toolbar props]
+   [:> Toolbar (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
@@ -132,6 +135,7 @@
                                        {:variant "h3"})})
 
         card-props (dissoc props :on-click :header :media :actions :content-props :action-props :titleTypographyProps)
+        card-props (utils/with-el-id-as-testid card-props)
         header (when (some? header) (dissoc header :titleTypographyProps))]
     [:> Card
      (merge card-props

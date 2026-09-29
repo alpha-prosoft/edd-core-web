@@ -30,7 +30,7 @@
                  :or   {color "primary"}
                  :as   props}]
   [:> Badge (merge
-             props
+             (utils/with-el-id-as-testid props)
              {:color color}
              (when (= 0 (:badge-content props))
                {:badge-content "0"}))
@@ -45,19 +45,21 @@
     {:arrow arrow}
     (-> props
         (dissoc :container-style
-                :no-grid)
+                :no-grid
+                :el-id)
         (utils/handle-paper-props-migration)))
    (if no-grid
      content
-     [:> Grid {:sx (merge {:width "fit-content"}
-                          container-style)}
+     [:> Grid (merge {:sx (merge {:width "fit-content"}
+                                 container-style)}
+                     (utils/with-el-id-as-testid (select-keys props [:el-id])))
       content])])
 
 (defn RawTypography [props content]
-  [:> Typography (utils/handle-root-styles-migration  props) content])
+  [:> Typography (utils/with-el-id-as-testid (utils/handle-root-styles-migration props)) content])
 
 (defn RawList [props & children]
-  (into [:> List (merge {:component "nav"} props)]
+  (into [:> List (merge {:component "nav"} (utils/with-el-id-as-testid props))]
         (for [child children]
           child)))
 
@@ -79,81 +81,82 @@
                                              :disable-padding
                                              :divider
                                              :secondary-action)
+                                     (utils/with-el-id-as-testid)
                                      (update :sx #(merge {:cursor "pointer"} %)))]
       [:> ListItem list-item-props
        (into [:> ListItemButton list-item-button-props]
              (for [child children]
                child))])
-    (into [:> ListItem (dissoc props :button :disableTouchRipple)]
+    (into [:> ListItem (utils/with-el-id-as-testid (dissoc props :button :disableTouchRipple))]
           (for [child children]
             child))))
 
 (defn RawListItemText [props content]
-  [:> ListItemText props content])
+  [:> ListItemText (utils/with-el-id-as-testid props) content])
 
 (defn RawListItemIcon [props content]
-  [:> ListItemIcon props content])
+  [:> ListItemIcon (utils/with-el-id-as-testid props) content])
 
 (defn RawListSubheader [props content]
-  [:> ListSubheader props content])
+  [:> ListSubheader (utils/with-el-id-as-testid props) content])
 
 (defn RawDivider [props]
-  [:> Divider props])
+  [:> Divider (utils/with-el-id-as-testid props)])
 
 (defn RawMenu [{:keys [open] :or {open false} :as props} & children]
-  (into [:> Menu (merge props {:open (boolean open)})]
+  (into [:> Menu (merge (utils/with-el-id-as-testid props) {:open (boolean open)})]
         (for [child children]
           child)))
 
 (defn RawMenuList [props & children]
-  (into [:> MenuList props]
+  (into [:> MenuList (utils/with-el-id-as-testid props)]
         (for [child children]
           child)))
 
 (defn RawMenuItem [props content]
-  [:> MenuItem props content])
+  [:> MenuItem (utils/with-el-id-as-testid props) content])
 
 (defn RawTableContainer [props & children]
   (into
-   [:> TableContainer props]
+   [:> TableContainer (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawTable [props & children]
   (into
-   [:> Table props]
+   [:> Table (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawTableBody [props & children]
   (into
-   [:> TableBody props]
+   [:> TableBody (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawTableHead [props & children]
   (into
-   [:> TableHead props]
+   [:> TableHead (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawTableRow [props & children]
   (into
-   [:> TableRow props]
+   [:> TableRow (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawTableCell [props & children]
   (into
-   [:> TableCell props]
+   [:> TableCell (utils/with-el-id-as-testid props)]
    (for [child children]
      child)))
 
 (defn RawAvatar
   ([props content]
-   [:> Avatar props content])
+   [:> Avatar (utils/with-el-id-as-testid props) content])
   ([props]
-   [:> Avatar props]))
+   [:> Avatar (utils/with-el-id-as-testid props)]))
 
 (defn RawChip [props]
-  [:> Chip props])
+  [:> Chip (utils/with-el-id-as-testid props)])
