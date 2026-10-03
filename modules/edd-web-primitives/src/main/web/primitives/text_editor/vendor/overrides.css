@@ -1,7 +1,7 @@
 /*
- * Fixes on top of the stock SunEditor stylesheet (vendor/suneditor.min.css).
+ * Fixes on top of the stock SunEditor stylesheet (suneditor.min.css).
  *
- * The vendor files are copied unmodified from node_modules by `make suneditor-css`
+ * The vendor files are copied unmodified from node_modules by `make suneditor-vendor`
  * and must never be edited. Put every change here instead, with a short reason
  * and the ticket, so it survives SunEditor upgrades. Loaded after the vendor CSS.
  */

@@ -1,7 +1,6 @@
 (ns web.primitives.text-editor.core
   (:require
    ["react" :refer [useEffect useRef]]
-   ["suneditor" :default suneditor :refer [plugins]]
    ["@mui/material/Button" :default Button]
    ["@mui/material/IconButton" :default IconButton]
    [clojure.string :as str]
@@ -13,7 +12,8 @@
    [web.primitives.utils :as utils]
    [web.primitives.text-editor.utils :refer [copied-cell-payload deep-merge handle-on-drop handle-on-paste handle-on-save maybe-normalize-paste-artifacts! normalize-sun-editor-options resolve-selected-single-cell sun-editor-default-options sync-li-style-marker]]
    [web.primitives.text-editor.model :as model]
-   [web.primitives.text-editor.styles :as styles]))
+   [web.primitives.text-editor.styles :as styles]
+   [web.primitives.text-editor.vendor :as vendor]))
 
 (defn sanitize-html [value]
   (dompurify/sanitize value #js {:USE_PROFILES #js {:html true}
@@ -88,7 +88,7 @@
          (set! (.-onerror img) (fn [] (resolve nil)))
          (set! (.-src img) url))))))
 
-(defn- resolve-original-image-width [info]
+(defn- resolve-original-image-width [^js info]
   (let [files (.-files info)
         url (or (.-url info) (.-src info))]
     (cond
@@ -101,8 +101,8 @@
       :else
       (js/Promise.resolve nil))))
 
-(defn- ensure-original-image-width-in-px [params]
-  (let [info (.-info params)
+(defn- ensure-original-image-width-in-px [^js params]
+  (let [^js info (.-info params)
         is-update (true? (.-isUpdate info))]
     (if (or (nil? info) is-update)
       (js/Promise.resolve info)
@@ -260,24 +260,28 @@
 
     (useEffect
      (fn []
-       (let [filtered-plugins (let [excluded #{"exportPDF" "fileUpload" "layout" "template" "math"}
+       (let [^js suneditor-api (vendor/api)
+             _ (when-not (and suneditor-api (.-create suneditor-api))
+                 (throw (js/Error. "SunEditor API.create unavailable")))
+             filtered-plugins (let [excluded #{"exportPDF" "fileUpload" "layout" "template" "math"}
+                                    plugins (.-plugins suneditor-api)
                                     filtered (js-obj)]
                                 (doseq [key (js->clj (js/Reflect.ownKeys plugins))]
                                   (when-not (excluded key)
                                     (aset filtered key (aget plugins key))))
                                 filtered)
-             callback-events {:onChange (fn [params]
+             callback-events {:onChange (fn [^js params]
                                           (let [normalized-data (-> (.-data params)
                                                                     (sync-li-style-marker))]
                                             (when on-change
                                               (on-change normalized-data))
                                             (js/setTimeout #(sync-font-size-label! scope-id) 0)))
 
-                              :onPaste  (fn [params]
+                              :onPaste  (fn [^js params]
                                           (when on-paste
                                             (on-paste (.-event params) (.-data params)))
                                           (js/setTimeout #(sync-font-size-label! scope-id) 0))
-                              :onDrop   (fn [params]
+                              :onDrop   (fn [^js params]
                                           (when on-drop
                                             (on-drop (.-event params)))
                                           (js/setTimeout #(sync-font-size-label! scope-id) 0))
@@ -288,13 +292,7 @@
              merged-options (update merged-options :events (fn [events]
                                                              (merge (or events {}) callback-events)))
              opts (clj->js (normalize-sun-editor-options merged-options))
-             suneditor-api (or (when (.-create suneditor) suneditor)
-                               (when (and (.-default suneditor)
-                                          (.-create (.-default suneditor)))
-                                 (.-default suneditor)))
-             _ (when-not suneditor-api
-                 (throw (js/Error. "SunEditor API.create unavailable")))
-             instance (.create suneditor-api (.-current el-ref) opts)
+             ^js instance (.create suneditor-api (.-current el-ref) opts)
              schedule-sync (fn [] (js/setTimeout #(sync-font-size-label! scope-id) 0))
              container (when scope-id (.getElementById js/document (str "editor-" scope-id)))
              editable (when container (.querySelector container ".sun-editor-editable"))
@@ -328,7 +326,7 @@
            (when container
              (.removeEventListener container "click" click-listener true)
              (.removeEventListener container "paste" paste-listener true))
-           (when-let [editor (.-current instance-ref)]
+           (when-let [^js editor (.-current instance-ref)]
              (.destroy editor)
              (set! (.-current instance-ref) nil)))))
      #js [set-contents disable scope-id])

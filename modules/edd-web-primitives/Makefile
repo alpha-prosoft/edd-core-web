@@ -1,15 +1,20 @@
 SRC := src/main src/shared src/test src/gallery src/sdk src/it
 VERSION ?= 1.0.0-SNAPSHOT
-SUNEDITOR_CSS := src/main/web/primitives/text_editor/css/vendor
+SUNEDITOR_VENDOR := src/main/web/primitives/text_editor/vendor
 
 all: lint format
 
-# Refresh the stock SunEditor CSS after bumping suneditor in src/main/deps.cljs.
-# Fixes go in text_editor/css/overrides.css, never into the vendor files.
-suneditor-css:
-	mkdir -p $(SUNEDITOR_CSS)
-	cp node_modules/suneditor/dist/suneditor.min.css $(SUNEDITOR_CSS)/
-	cp node_modules/suneditor/dist/suneditor-contents.min.css $(SUNEDITOR_CSS)/
+# Refresh the stock SunEditor bundle and CSS after bumping suneditor in
+# src/main/deps.cljs. Fixes go in text_editor/vendor/overrides.css, never into
+# the copied vendor files.
+suneditor-vendor:
+	mkdir -p $(SUNEDITOR_VENDOR)
+	cp node_modules/suneditor/dist/suneditor.min.js $(SUNEDITOR_VENDOR)/
+	cp node_modules/suneditor/dist/suneditor.min.css $(SUNEDITOR_VENDOR)/
+	cp node_modules/suneditor/dist/suneditor-contents.min.css $(SUNEDITOR_VENDOR)/
+
+suneditor-vendor-check: npm-deps
+	bash check-suneditor-vendor.sh
 
 lint:
 	clojure -M:lint --lint $(SRC)
@@ -26,10 +31,14 @@ clean:
 
 run: gallery
 
-gallery:
+# shadow-cljs 3.5+ no longer installs npm deps implicitly; do it explicitly.
+npm-deps:
+	clojure -M:gallery -m shadow.cljs.devtools.cli run shadow.cljs.npm-deps
+
+gallery: npm-deps
 	clojure -M:gallery -m shadow.cljs.devtools.cli watch gallery
 
-gallery-release:
+gallery-release: npm-deps
 	clojure -M:gallery -m shadow.cljs.devtools.cli release gallery
 
 it:
@@ -60,4 +69,4 @@ jars:
 push:
 	git push origin HEAD:refs/for/master%topic=env/${ENV}
 
-.PHONY: all lint format suneditor-css antiq clean run gallery gallery-release it it-report it-traces it-uberjar it-ci push jar sdk jars
+.PHONY: all lint format suneditor-vendor suneditor-vendor-check npm-deps antiq clean run gallery gallery-release it it-report it-traces it-uberjar it-ci push jar sdk jars

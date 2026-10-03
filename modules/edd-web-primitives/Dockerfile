@@ -42,9 +42,15 @@ COPY --chown=build:build src src
 COPY --chown=build:build build.clj build.clj
 COPY --chown=build:build tests-it.edn tests-it.edn
 COPY --chown=build:build .clj-kondo .clj-kondo
+COPY --chown=build:build check-suneditor-vendor.sh check-suneditor-vendor.sh
 
 RUN set -e && clojure -M:lint --lint src/main src/shared src/test src/gallery src/sdk src/it
 RUN set -e && clojure -M:test:runner
+
+# shadow-cljs 3.5+ no longer installs npm deps implicitly on every command;
+# install the versions pinned in src/main/deps.cljs before compiling.
+RUN set -e && npx shadow-cljs run shadow.cljs.npm-deps
+RUN set -e && bash check-suneditor-vendor.sh
 RUN set -e && npx shadow-cljs -A:dev:gallery compile gallery
 
 # The UI SDK must compile on its own (no gallery / cljs on the classpath).

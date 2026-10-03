@@ -12,8 +12,6 @@
    :asset-path "/js"
    :modules    {:main {:entries  [web.gallery.main]
                        :init-fn web.gallery.main/init}}
-   :js-options
-   {:npm-module {:transpile ["suneditor"]}}
    :compiler-options
    {:infer-externs    :auto
     :closure-warnings {:global-this :off}}
