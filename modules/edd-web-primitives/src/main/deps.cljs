@@ -1,6 +1,6 @@
 {:npm-deps {:create-react-class   "15.7.0"
-            "@mui/x-tree-view"    "9.14.0"
-            "@mui/x-date-pickers" "9.14.0"
+            "@mui/x-tree-view"    "9.15.0"
+            "@mui/x-date-pickers" "9.15.0"
             "@mui/material"       "9.4.0"
             "@mui/icons-material" "9.4.0"
             "@mui/lab"            "9.0.0-beta.9"
