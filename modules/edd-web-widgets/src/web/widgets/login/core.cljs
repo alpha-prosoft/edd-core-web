@@ -114,6 +114,10 @@
     :type    "ExpiredCodeException"
     :key     :code-expired
     :search  "Invalid code provided, please request a code again."}
+   {:message "Cannot reset password for the user as there is no registered/verified email or phone_number"
+    :type    "InvalidParameterException"
+    :search  "Cannot reset password for the user as there is no registered/verified email"
+    :key     :account-not-confirmed}
    {:message "Attempt limit exceeded, please try after some time."
     :type    "LimitExceededException"
     :search  "Attempt limit exceeded, please try after some time."

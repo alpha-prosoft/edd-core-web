@@ -30,7 +30,7 @@
          multiple false
          grid-styles {}}}]
   (let [dropzone-params {:disabled (not enabled)
-                         :maxSize (* max-size-mb * 1024 * 1024)
+                         :maxSize (* max-size-mb 1024 1024)
                          :multiple multiple
                          :onDrop (fn [e]
                                    (js/console.log "File Added" e))
@@ -101,9 +101,13 @@
 (defn ImageWidget
   [{:keys [read-only?
            default-value
+           label
            on-change]
     :or {default-value
          "/images/missing-image.svg"
+
+         label
+         "Upload image"
 
          on-change
          (fn [_f])}
@@ -123,7 +127,7 @@
                     :color "white"}}
       (when (not read-only?)
         [UploadArea
-         {:label            "Upload event image!"
+         {:label            label
           :grid-styles   {:opacity "0.9"
                           :width "100%"}
           :on-file-accepted (fn [images]

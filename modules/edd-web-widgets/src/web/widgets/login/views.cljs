@@ -211,12 +211,13 @@
                    :fullWidth     true
                    :onKeyUp       #(rf/dispatch [::events/login-on-key-enter %])}]))
 
-(defn password-requirement [label checked?]
+(defn password-requirement [label state]
   [:> Grid {:container true :spacing 1 :sx {:align-items "center" :width "100%"}}
    [:> Grid {}
-    (if checked?
-      [:> TaskAlt {:color "success"}]
-      [:> ErrorOutline {:color "warning"}])]
+    (case state
+      :met     [:> TaskAlt {:color "success"}]
+      :unmet   [:> ErrorOutline {:color "warning"}]
+      :pending [:> TaskAlt {:color "disabled"}])]
    [:> Grid {:size "grow"}
     [:> Typography {:variant "subtitle2"}
      label]]])
@@ -225,16 +226,26 @@
   (let [{:keys [missing-upper-case?
                 missing-lower-case?
                 missing-number?
-                missing-length-8?]} @(rf/subscribe [::subs/password-invalid-explanation])]
+                missing-length-8?]} @(rf/subscribe [::subs/password-invalid-explanation])
+
+        typed?
+        (seq (str @(rf/subscribe [::subs/password])))
+
+        state
+        (fn [missing?]
+          (cond
+            (not typed?) :pending
+            missing?     :unmet
+            :else        :met))]
     [:> Grid {:container true :spacing 2 :sx {:width "100%"}}
      [:> Grid {:size 12}
-      (password-requirement (tr :password-requirements :upper-case) (not missing-upper-case?))]
+      (password-requirement (tr :password-requirements :upper-case) (state missing-upper-case?))]
      [:> Grid {:size 12}
-      (password-requirement (tr :password-requirements :lower-case) (not missing-lower-case?))]
+      (password-requirement (tr :password-requirements :lower-case) (state missing-lower-case?))]
      [:> Grid {:size 12}
-      (password-requirement (tr :password-requirements :number) (not missing-number?))]
+      (password-requirement (tr :password-requirements :number) (state missing-number?))]
      [:> Grid {:size 12}
-      (password-requirement (tr :password-requirements :length) (not missing-length-8?))]]))
+      (password-requirement (tr :password-requirements :length) (state missing-length-8?))]]))
 
 (defn login-dialog []
   (let [form-type @(rf/subscribe [::subs/form-type])
@@ -272,6 +283,12 @@
            (if (string? error-message)
              error-message
              (str (tr (or error-message :unknown-error))))]])
+
+       (when (and show-error? (= :account-not-confirmed error-message))
+         [:> Grid {:sx {:text-align "center"}}
+          [:> Link {:sx       {:cursor "pointer"}
+                    :on-click #(rf/dispatch [::events/confirm-account])}
+           (tr :confirm-account)]])
 
        (when (= form-type :login)
          [:> Grid {:sx {:text-align "center"}}

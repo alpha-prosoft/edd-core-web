@@ -1,10 +1,10 @@
 {:npm-deps {"shadow-cljs"         "3.5.3"
-            "@mui/material"       "9.3.1"
-            "@mui/icons-material" "9.3.1"
+            "@mui/material"       "9.4.0"
+            "@mui/icons-material" "9.4.0"
             "@emotion/react"      "11.14.0"
             "@emotion/styled"     "11.14.1"
-            "react"               "18.3.1"
-            "react-dom"           "18.3.1"
-            "marked"              "16.3.0"
-            "highlight.js"        "11.11.1"
-            "react-dropzone"      "14.2.3"}}
+            "react"               "19.3.0"
+            "react-dom"           "19.3.0"
+            "marked"              "18.0.14"
+            "highlight.js"        "11.12.0"
+            "react-dropzone"      "20.1.2"}}

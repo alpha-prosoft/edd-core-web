@@ -14,12 +14,12 @@
 (rf/reg-sub
  ::username
  (fn [db]
-   (:db/username db)))
+   (::db/username db)))
 
 (rf/reg-sub
  ::password
  (fn [db]
-   (:db/password db)))
+   (::db/password db)))
 
 (rf/reg-sub
  ::dialog-visible

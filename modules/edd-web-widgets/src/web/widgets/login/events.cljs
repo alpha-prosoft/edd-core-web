@@ -86,6 +86,15 @@
                                       :on-success [::resend-code-succeeded]
                                       :on-failure [::register-failed]}])
 
+(rf/reg-event-fx
+ ::confirm-account
+ (fn [{:keys [db]} _]
+   {:db (assoc db
+               ::db/form-type :confirm-login
+               ::db/error-message ""
+               ::db/error-message-visible false)
+    :fx [(request-code db)]}))
+
 (rf/reg-event-db
  ::resend-code-succeeded
  (fn [db _]

@@ -23,6 +23,8 @@
         :invalid-code           "Неверный код"
         :missing-username       "Отсутствует имя пользователя"
         :missing-password       "Отсутствует пароль"
+        :account-not-confirmed  "Этот аккаунт ещё не подтверждён, поэтому пароль нельзя сбросить."
+        :confirm-account        "Подтвердите аккаунт кодом из письма"
         :no-account?            "Нет аккаунта?"
         :create-account         "Зарегистрироваться"
         :have-account?          "Уже есть аккаунт?"
