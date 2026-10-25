@@ -18,7 +18,9 @@ ARG BUILD_ID
 # Custom build from here on
 
 USER root
-RUN npm install -g shadow-cljs karma karma-cljs-test karma-chrome-launcher karma-junit-reporter
+RUN node -v && npm -v && npm config get registry && \
+    npm install -g --loglevel verbose --fetch-timeout=60000 --fetch-retries=2 \
+      shadow-cljs karma karma-cljs-test karma-chrome-launcher karma-junit-reporter
 USER build
 
 COPY --chown=build:build shadow-cljs.edn shadow-cljs.edn
