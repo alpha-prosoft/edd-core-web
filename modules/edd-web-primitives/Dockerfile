@@ -86,8 +86,9 @@ RUN set -e && clojure -T:build all \
 
 # ===========================================================================
 # Stage 2: uitest — run the Playwright suite on ui-runtime.
-# ui-runtime ships Chrome's system libraries + Java; the gallery is served as
-# a plain static site and the tests run from the uberjar.
+# ui-runtime is the official Playwright image (browsers in /ms-playwright)
+# plus Java; the gallery is served as a plain static site and the tests run
+# from the uberjar. Its Playwright version must match the one in deps.edn.
 # ===========================================================================
 FROM ${DOCKER_URL}/${DOCKER_ORG}/ui-runtime-img:latest AS uitest
 
@@ -101,9 +102,6 @@ COPY run-it.sh run-it.sh
 ENV IT_JAR=/opt/uitest/it-tests.jar
 ENV GALLERY_DIR=/opt/uitest/gallery
 ENV GALLERY_PORT=3002
-# ui-runtime ships Chrome-for-Testing here; Playwright drives it directly
-# (no browser download, which the build network blocks).
-ENV PLAYWRIGHT_CHROME=/opt/chrome-linux64/chrome
 
 RUN set -e && bash run-it.sh && date > /opt/uitest/it-passed
 

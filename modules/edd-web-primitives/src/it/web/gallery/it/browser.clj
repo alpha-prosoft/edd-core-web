@@ -1,11 +1,9 @@
 (ns web.gallery.it.browser
-  "Points clojure-playwright at an already-installed Chromium instead of
-   downloading Playwright's bundled browser.
+  "Optionally points clojure-playwright at an already-installed Chromium
+   instead of Playwright's bundled browser.
 
-   The ui-runtime image ships Chrome-for-Testing (and its system libraries)
-   but has no outbound access to Playwright's browser CDN, so
-   `playwright install` is not an option. Playwright can drive any compatible
-   Chromium via BrowserType.LaunchOptions.setExecutablePath, so we replace
+   Playwright can drive any compatible Chromium via
+   BrowserType.LaunchOptions.setExecutablePath, so we replace
    testing.pw/start-browser with a variant that sets that path when configured.
 
    Configure the path with either:

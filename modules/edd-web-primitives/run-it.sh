@@ -1,23 +1,21 @@
 #!/bin/bash
 # Run the packaged Playwright integration suite against the static gallery.
 #
-# Designed for the ui-runtime image (Ubuntu + Chrome-for-Testing + Java, no
-# clojure CLI). ui-runtime has no outbound access to Playwright's browser CDN,
-# so instead of `playwright install` we point Playwright at the Chrome binary
-# already present in the image (see web.gallery.it.browser).
+# Designed for the ui-runtime image (Playwright image + Java). Browsers
+# are preinstalled there, so nothing is downloaded. Set PLAYWRIGHT_CHROME to
+# drive a different Chrome binary instead (see web.gallery.it.browser).
 #
 # Inputs:
 #   IT_JAR            integration-test uberjar  (default target/it/it-tests.jar)
 #   GALLERY_DIR       static gallery to serve   (default resources/gallery)
 #   GALLERY_PORT      port to serve on          (default 3002)
-#   PLAYWRIGHT_CHROME path to the Chrome binary (default /opt/chrome-linux64/chrome)
+#   PLAYWRIGHT_CHROME optional path to a Chrome binary (default: Playwright's bundled browser)
 set -e
 
 IT_JAR="${IT_JAR:-target/it/it-tests.jar}"
 GALLERY_DIR="${GALLERY_DIR:-resources/gallery}"
 GALLERY_PORT="${GALLERY_PORT:-3002}"
 GALLERY_URL="http://localhost:${GALLERY_PORT}"
-export PLAYWRIGHT_CHROME="${PLAYWRIGHT_CHROME:-/opt/chrome-linux64/chrome}"
 
 # Never try to download or validate Playwright's own browser bundle.
 export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
@@ -50,7 +48,7 @@ stop_gallery() {
 
 trap stop_gallery EXIT
 
-echo "Using Chrome binary: ${PLAYWRIGHT_CHROME}"
+echo "Using Chrome binary: ${PLAYWRIGHT_CHROME:-playwright bundled}"
 
 serve_gallery
 wait_for_gallery
