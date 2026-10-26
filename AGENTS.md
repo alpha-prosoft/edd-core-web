@@ -2,6 +2,12 @@
 
 Dont over-document 
 
+# Changes
+
+After committing run `./changes.py` and amend the commit with the updated
+`CHANGES.md`. Its first entry must match the commit message
+(`./changes.py --shallow --check`).
+
 
 
 # Clojure Coding Conventions

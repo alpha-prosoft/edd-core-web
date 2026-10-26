@@ -1,0 +1,16 @@
+edd-core-web
+Copyright 2020-2026 Raiffeisen Bank International AG
+
+Licensed under the Apache License, Version 2.0, see LICENSE.
+
+All contributions by alpha-prosoft to this project, including
+edd-web-widgets, are donated to Raiffeisen Bank International AG,
+which holds the copyright.
+
+edd-core-web and edd-web-widgets were published under the MIT License
+before this relicensing; earlier releases remain available under MIT.
+
+modules/edd-web-primitives was imported with its full git history from
+https://github.com/raiffeisenbankinternational/edd-web-primitives
+(upstream commit 89c6ae4) and has been modified since. The changes are
+listed in CHANGES.md and in the git history.

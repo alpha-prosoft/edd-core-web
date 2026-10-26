@@ -67,3 +67,10 @@ disagreement between contributors and maintainers.
 
 ## Contribution Limitations
 Please note that contributions are purely voluntary and self-initiated. The owner should not initiate requests for amendments, alterations, modifications, or designs of the code.
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE). By submitting a
+contribution you agree that it is licensed under the same terms (section 5 of the
+license) and certify the [DCO](https://developercertificate.org/) with
+`git commit --sign-off`.

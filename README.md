@@ -220,3 +220,8 @@ humanized error.
   `::client/call`.
 - Cycles in `:depends-on` and references to unknown keys are detected up-front
   and throw.
+
+## License
+
+[Apache 2.0](LICENSE), see [NOTICE](NOTICE). Contributions follow
+[CONTRIBUTING](CONTRIBUTING.md).
