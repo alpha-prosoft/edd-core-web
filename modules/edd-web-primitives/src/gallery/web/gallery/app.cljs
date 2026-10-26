@@ -1,14 +1,14 @@
 (ns web.gallery.app
   (:require
    [reagent.dom.client :as rdomc]
-   [web.primitives.gallery.core :refer [EddComponentGallery]]))
+   [web.primitives.gallery.primitives :refer [PrimitivesGallery]]))
 
 (defonce root* (atom nil))
 
 (defn mount! []
   (let [container   (.getElementById js/document "app")
         react-root  (or @root* (reset! root* (rdomc/create-root container)))]
-    (rdomc/render react-root [EddComponentGallery {}])))
+    (rdomc/render react-root [PrimitivesGallery {}])))
 
 (defn ^:export init []
   (mount!))

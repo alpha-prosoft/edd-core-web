@@ -1,15 +1,14 @@
 (ns web.widgets.content-switcher.views
   (:require
-    ["@mui/material/Grid" :default Grid]
-    ["@mui/material/Zoom" :default Zoom]))
+   [web.primitives.components :refer [RawGrid RawZoom]]))
 
 (defn ContentSwitcher [{:keys [checked?]} content checked-content]
-  [:> Grid {:container true :sx {:width "100%"}}
-   [:> Zoom {:in checked?
-              :style (cond-> {:transitionDelay (if checked? "500ms" "0ms")}
-                             (false? checked?) (assoc :display "none"))}
-     checked-content]
-   [:> Zoom {:in (not checked?)
+  [RawGrid {:container true :sx {:width "100%"}}
+   [RawZoom {:in    checked?
+             :style (cond-> {:transitionDelay (if checked? "500ms" "0ms")}
+                      (false? checked?) (assoc :display "none"))}
+    checked-content]
+   [RawZoom {:in    (not checked?)
              :style (cond-> {:transitionDelay (if (not checked?) "500ms" "0ms")}
-                            checked? (assoc :display "none"))}
+                      checked? (assoc :display "none"))}
     content]])

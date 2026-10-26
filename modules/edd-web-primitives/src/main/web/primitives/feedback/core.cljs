@@ -13,16 +13,17 @@
    ["@mui/material/Snackbar" :default Snackbar]
    ["@mui/material/Backdrop" :default Backdrop]))
 
-(defn RawDialog [{:keys [title actions dividers]
-                  :or   {dividers false} :as props} content]
+(defn RawDialog [{:keys [title title-props actions dividers]
+                  :or   {dividers false title-props {}} :as props} content]
   [:> Dialog
    (->  props
-        (dissoc :dividers :title :actions)
+        (dissoc :dividers :title :title-props :actions)
         (utils/with-el-id-as-testid)
         (utils/handle-paper-props-migration)
         (utils/handle-transition-props-migration))
-   [:> DialogTitle title]
-   [:> DialogContent {:dividers dividers} content]
+   [:> DialogTitle title-props title]
+   (when (some? content)
+     [:> DialogContent {:dividers dividers} content])
    (when (some? actions)
      [:> DialogActions actions])])
 

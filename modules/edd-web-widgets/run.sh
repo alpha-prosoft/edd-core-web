@@ -3,11 +3,8 @@
 aliases=${1-:""}
 echo "Extra aliases $aliases"
 
-echo "Updating browser list"
-#npm install caniuse-lite
-#npx browserslist@latest --update-db &> /dev/null || echo "Browser list not updated."
+echo "Installing npm deps from edd-web-primitives"
+clj -M:shadow-cljs run shadow.cljs.npm-deps
 
-echo "Starging shadow"
-
-clj -M:shadow-cljs:dev:test:cider-cljs$aliases watch devcards
-
+echo "Starting widgets gallery on http://localhost:3009"
+clj -M:shadow-cljs:dev:gallery:cider-cljs$aliases watch gallery

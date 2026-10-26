@@ -3,39 +3,25 @@
             [edd.i18n :as lang]
             [projectname.home.subs :as subs]
             [projectname.home.events :as events]
-
-            ["@mui/material/Grid" :default Grid]
-            ["@mui/material/Button" :default Button]))
+            [web.primitives.components :refer [RawButton RawGrid]]))
 
 (defn main-panel
   [classes]
-  [:> Grid {:container true
-            :item      true}
-   [:> Grid {:item true
-             :xs   12}
-    @(rf/subscribe [::subs/name])]]
-  [:> Grid {:item true
-            :xs   12}
-   [:> Button
-    {:class-name (:page classes)
-     :on-click   #(rf/dispatch [::events/click])}
-    "Increment"]
-   [:> Grid {:item true
-             :xs   12}
+  [RawGrid {:container true}
+   [RawGrid {:size 12}
+    @(rf/subscribe [::subs/name])]
+   [RawGrid {:size 12}
+    [RawButton
+     {:class-name (:page classes)
+      :on-click   #(rf/dispatch [::events/click])}
+     "Increment"]]
+   [RawGrid {:size 12}
     (lang/tr :increments-count) @(rf/subscribe [::subs/clicks])]
-   (into [:> Grid {:item      true
-                   :container true
-                   :xs        12}]
+   (into [RawGrid {:container true
+                   :size      12}]
          (mapv
           (fn [i]
-            [:> Grid {:item true}
-             [:> Button {:on-click #(rf/dispatch [::events/open (:id i)])}
+            [RawGrid {}
+             [RawButton {:on-click #(rf/dispatch [::events/open (:id i)])}
               (:first-name i)]])
           @(rf/subscribe [::subs/items])))])
-
-
-
-
-
-
-

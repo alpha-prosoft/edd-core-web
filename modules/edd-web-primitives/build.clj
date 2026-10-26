@@ -80,11 +80,14 @@
 ;; via `java -jar`. The gallery is served separately as a static site.
 ;;
 ;;   clojure -T:build it-uberjar :out '"/dist/it"'
+;;
+;; :extra-src-dirs adds more IT namespaces (e.g. another gallery's tests);
+;; pass their names to the jar to run them instead of the primitives suite.
 ;; ---------------------------------------------------------------------------
 
 (defn it-uberjar [params]
-  (let [{:keys [out]}
-        (merge {:out "target/it"} (select-keys params [:out]))
+  (let [{:keys [out extra-src-dirs]}
+        (merge {:out "target/it"} (select-keys params [:out :extra-src-dirs]))
 
         class-dir
         "target/classes-it"
@@ -96,7 +99,7 @@
         (b/create-basis {:project "deps.edn" :aliases [:it]})]
 
     (b/delete {:path class-dir})
-    (b/copy-dir {:src-dirs   ["src/it" "src/sdk" "src/shared"]
+    (b/copy-dir {:src-dirs   (into ["src/it" "src/sdk" "src/shared"] extra-src-dirs)
                  :target-dir class-dir})
     (b/compile-clj {:basis      basis
                     :ns-compile '[web.gallery.it.runner]

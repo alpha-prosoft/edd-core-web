@@ -1,6 +1,6 @@
 (ns web.primitives.gallery.registry
   "Registry of gallery pages. A page is registered once (usually at namespace
-   load time) and rendered later by EddComponentGallery."
+   load time) and rendered later by web.primitives.gallery.core/Gallery."
   (:require
    [reagent.core :as r]))
 

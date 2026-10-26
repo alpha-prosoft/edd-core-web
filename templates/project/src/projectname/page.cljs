@@ -6,30 +6,23 @@
             [edd.util :as util]
             [edd.i18n :refer [tr]]
             [clojure.walk :refer [keywordize-keys]]
-            ["@mui/material/styles" :refer [createTheme, ThemeProvider]]
-            ["@mui/material/AppBar" :default AppBar]
-            ["@mui/material/Toolbar" :default Toolbar]
-            ["@mui/material/Button" :default Button]
-            ["@mui/material/IconButton" :default IconButton]
-            ["@mui/material/Drawer" :default Drawer]
-            ["@mui/material/Grid" :default Grid]
-            ["@mui/icons-material/KeyboardArrowRight" :default KeyboardArrowRightIcon]
-            ["@mui/icons-material/Menu" :default MenuIcon]))
+            [web.primitives.components :refer [RawAppBar RawButton RawDrawer RawGrid
+                                               RawIconButton RawThemeProvider RawToolbar]]
+            [web.primitives.icons.core :refer [KeyboardArrowRightIcon MenuIcon]]))
 
 (defn menu-item
   [{:keys [classes]} item]
   (let [_lang @(rf/subscribe [::subs/selected-language])]
-    [:> Grid {:item true
-              :xs   12}
-     [:> Button {:on-click   #(rf/dispatch [::events/navigate item])
+    [RawGrid {:size 12}
+     [RawButton {:on-click   #(rf/dispatch [::events/navigate item])
                  :key        (:key item)
                  :class-name (:nested classes)
-                 :start-icon (r/as-element [:> KeyboardArrowRightIcon])}
+                 :start-icon (r/as-element [KeyboardArrowRightIcon {}])}
       (tr item)]]))
 
 (defn drawer
   [{:keys [classes menu drawer] :as ctx}]
-  [:> Drawer {:open     @(rf/subscribe [::subs/drawer])
+  [RawDrawer {:open     @(rf/subscribe [::subs/drawer])
               :on-close #(rf/dispatch [::events/toggle-drawer])}
 
    [:div {:class-name (:drawer-list classes)
@@ -37,16 +30,12 @@
 
     (if drawer
       (drawer ctx)
-      [:> Grid {:container true}
-       [:> Grid {:item true
-                 :xs   12}]
-       [:> Grid {:item true
-                 :xs   1}]
-       [:> Grid {:item true
-                 :xs   10}
+      [RawGrid {:container true}
+       [RawGrid {:size 12}]
+       [RawGrid {:size 1}]
+       [RawGrid {:size 10}
         (into
-         [:> Grid {:container true
-                   :item      true
+         [RawGrid {:container true
                    :spacing   1}]
          (map
           (fn [item]
@@ -58,34 +47,32 @@
 
   (if @(rf/subscribe [::subs/ready])
     [:div {:class-name (:root classes)}
-     @(rf/subscribe [::subs/ready])
      (drawer ctx)
-     [:> Grid {:container  true
+     [RawGrid {:container  true
                :class-name (:root classes)}
-      [:> Grid {:item       true
-                :xs         12
+      [RawGrid {:size       12
                 :class-name (:header classes)}
-       [:> AppBar {:class-name (:app-bar classes)
+       [RawAppBar {:class-name (:app-bar classes)
                    :position   "static"}
 
-        [:> Toolbar
-         [:> IconButton {:edge     "start"
+        [RawToolbar {}
+         [RawIconButton {:edge     "start"
                          :bel      "Menu"
                          :on-click #(rf/dispatch [::events/toggle-drawer])}
-          [:> MenuIcon]]
+          [MenuIcon]]
 
          (cond
            app-bar (app-bar)
            :else ":app-bar placeholder")]]]
 
-      [:> Grid {:container true :class-name (:page-wrapper classes)}
+      [RawGrid {:container true :class-name (:page-wrapper classes)}
        (util/placeholder ctx)]]]
-    [:> Grid {:container true :item true} "Loading"]))
+    [RawGrid {:container true} "Loading"]))
 
 (defn body
   "Initialize body with custom style"
   [{:keys [theme] :as ctx}]
-  [:> ThemeProvider {:theme (createTheme (clj->js theme))}
+  [RawThemeProvider {:theme theme}
    [:> (r/reactify-component
         (fn [props]
           (page

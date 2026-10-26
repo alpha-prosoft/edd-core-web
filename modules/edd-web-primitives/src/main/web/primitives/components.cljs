@@ -9,6 +9,7 @@
    [web.primitives.surfaces.core :as surfaces-core]
    [web.primitives.utils.core :as utils-core]
    [web.primitives.gallery.core :as gallery-core]
+   [web.primitives.gallery.primitives :as gallery-primitives]
    [web.primitives.gallery.registry :as gallery-registry]
    [web.primitives.text-editor.core :as text-editor-core]))
 
@@ -59,6 +60,7 @@
 (def RawNumberField inputs-core/RawNumberField)
 (def RawPercentField inputs-core/RawPercentField)
 (def RawSlider inputs-core/RawSlider)
+(def RawDropzone inputs-core/RawDropzone)
 
 (def RawAutocomplete lab-core/RawAutocomplete)
 (def RawAlert lab-core/RawAlert)
@@ -82,6 +84,7 @@
 
 (def RawSlide utils-core/RawSlide)
 (def RawZoom utils-core/RawZoom)
+(def RawThemeProvider utils-core/RawThemeProvider)
 
 (def RawTextEditor text-editor-core/RawTextEditor)
 (def EddTextEditor text-editor-core/EddTextEditor)
@@ -89,5 +92,7 @@
 (def RawTreeView lab-core/RawSimpleTreeView)
 (def RawTreeItem lab-core/RawTreeItem)
 
-(def EddComponentGallery gallery-core/EddComponentGallery)
+(def Gallery gallery-core/Gallery)
+(def PrimitivesGallery gallery-primitives/PrimitivesGallery)
+(def EddComponentGallery gallery-primitives/PrimitivesGallery)
 (def register-gallery-page! gallery-registry/register-page!)

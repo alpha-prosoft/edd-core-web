@@ -23,6 +23,8 @@
             ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
             ["@mui/x-date-pickers" :refer [LocalizationProvider DesktopDatePicker]]
             ["moment" :as moment]
+            ["react-dropzone" :default Dropzone]
+            [goog.object :as gobj]
 
             [web.primitives.layout.core :refer [RawGrid]]
             [web.primitives.inputs.utils :as utils]
@@ -565,3 +567,20 @@
 
 (defn RawSlider [props]
   [:> Slider (shared-utils/with-el-id-as-id props)])
+
+(defn- js->props [^js o]
+  (into {}
+        (for [k (js-keys o)]
+          [(keyword k) (gobj/get o k)])))
+
+(defn RawDropzone
+  [{:keys [root-props input-props] :as props} & children]
+  [:> Dropzone (dissoc props :el-id :root-props :input-props)
+   (fn [^js state]
+     (r/as-element
+      (into
+       [:div (merge (js->props (.getRootProps state))
+                    (shared-utils/with-el-id-as-testid
+                      (merge root-props (select-keys props [:el-id]))))
+        [:input (merge (js->props (.getInputProps state)) input-props)]]
+       children)))])

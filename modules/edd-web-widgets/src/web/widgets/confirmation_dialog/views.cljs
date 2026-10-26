@@ -1,37 +1,36 @@
 (ns web.widgets.confirmation-dialog.views
   (:require
-    [re-frame.core :as rf]
-    [web.widgets.confirmation-dialog.subs :as subs]
-    [web.widgets.confirmation-dialog.events :as events]
-    ["@mui/material/Button" :default Button]
-    ["@mui/material/Grid" :default Grid]
-    ["@mui/material/Zoom" :default Zoom]
+   [re-frame.core :as rf]
+   [web.widgets.confirmation-dialog.subs :as subs]
+   [web.widgets.confirmation-dialog.events :as events]
+   [web.primitives.components :refer [RawButton RawDialog RawGrid]]))
 
-    ["@mui/material/index" :refer [Dialog DialogTitle DialogActions]]))
-
-(defn ConfirmationDialog [{:keys [button-props proceed-button-props cancel-button-props]}]
+(defn ConfirmationDialog [{:keys [el-id button-props proceed-button-props cancel-button-props]
+                           :or   {el-id :confirmation-dialog}}]
   (let [show? @(rf/subscribe [::subs/show-dialog?])
         message @(rf/subscribe [::subs/dialog-message])
         proceed-text @(rf/subscribe [::subs/dialog-proceed-text])
         cancel-text @(rf/subscribe [::subs/dialog-cancel-text])]
-    [:> Dialog {:disableEnforceFocus true
-                :open                show?}
-     [:> DialogTitle message]
-
-     [:> DialogActions
-      [:> Grid {:container true :spacing 2 :sx {:width "100%"}}
-       [:> Grid {:size "grow"}
-        [:> Button
-         (merge
-           button-props
-           proceed-button-props
-           {:on-click #(rf/dispatch [::events/on-proceed])})
-         proceed-text]]
-       [:> Grid {:size "grow"}
-        [:> Button
-         (merge
-           button-props
-           cancel-button-props
-           {:on-click #(rf/dispatch [::events/on-cancel])})
-         cancel-text]]]]]))
-
+    [RawDialog {:el-id               el-id
+                :disableEnforceFocus true
+                :open                show?
+                :title               message
+                :actions
+                [RawGrid {:container true :spacing 2 :sx {:width "100%"}}
+                 [RawGrid {:size "grow"}
+                  [RawButton
+                   (merge
+                    button-props
+                    proceed-button-props
+                    {:el-id    [el-id :proceed]
+                     :on-click #(rf/dispatch [::events/on-proceed])})
+                   proceed-text]]
+                 [RawGrid {:size "grow"}
+                  [RawButton
+                   (merge
+                    button-props
+                    cancel-button-props
+                    {:el-id    [el-id :cancel]
+                     :on-click #(rf/dispatch [::events/on-cancel])})
+                   cancel-text]]]}
+     nil]))

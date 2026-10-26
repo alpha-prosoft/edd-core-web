@@ -2,7 +2,8 @@
   (:require
    [web.primitives.utils :as utils]
    ["@mui/material/Zoom" :default Zoom]
-   ["@mui/material/Slide" :default Slide]))
+   ["@mui/material/Slide" :default Slide]
+   ["@mui/material/styles" :refer [ThemeProvider createTheme]]))
 
 (defn RawSlide [{:keys [in direction timeout el-id]
                  :or   {in false direction "left" timeout 500}}
@@ -21,3 +22,8 @@
             {:in in}
             (utils/with-el-id-as-testid props))
    [:div content]])
+
+(defn RawThemeProvider [{:keys [theme]} & children]
+  (into
+   [:> ThemeProvider {:theme (createTheme (clj->js theme))}]
+   children))

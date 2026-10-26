@@ -1,10 +1,8 @@
 (ns web.widgets.upload.views
   (:require [reagent.core :as r]
             [clojure.string :as string]
-
-            ["@mui/material/Grid" :default Grid]
-            ["@mui/material/Typography" :default Typography]
-            ["react-dropzone" :default Dropzone]))
+            [web.primitives.components :refer [RawDropzone RawGrid RawTypography]]
+            [web.primitives.icons.core :refer [AddIcon]]))
 
 (def default-formats
   {"image/*" [".png", ".gif", ".jpeg", ".jpg"]})
@@ -29,72 +27,38 @@
          max-size-mb 5
          multiple false
          grid-styles {}}}]
-  (let [dropzone-params {:disabled (not enabled)
-                         :maxSize (* max-size-mb 1024 1024)
-                         :multiple multiple
-                         :onDrop (fn [e]
-                                   (js/console.log "File Added" e))
-                         :onDropAccepted on-file-accepted
-                         :onDropRejected on-file-rejected
-                         :accept formats}
-        formats-label (string/join "," (map
+  (let [formats-label (string/join "," (map
                                         (fn [%]
                                           (string/join ", " %))
                                         (vals formats)))]
-    [:> Dropzone dropzone-params
-     (fn [props]
-       (let [clj-props (js->clj props :keywordize-keys true)
-             get-input-props (:getInputProps clj-props)
-             get-root-props (:getRootProps clj-props)
-             root-props {:id (str key "-container")
-                         :ref (.. (get-root-props) -ref)
-                         :tabIndex 0
-                         :on-key-down (.. (get-root-props) -onKeyDown)
-                         :on-focus (.. (get-root-props) -onFocus)
-                         :on-blur (.. (get-root-props) -onBlur)
-                         :on-click (.. (get-root-props) -onClick)
-                         :on-drag-enter (.. (get-root-props) -onDragEnter)
-                         :on-drag-over (.. (get-root-props) -onDragOver)
-                         :on-drag-leave (.. (get-root-props) -onDragLeave)
-                         :on-drop (.. (get-root-props) -onDrop)}
-             input-props {:id (str key "-field")
-                          :ref (.. (get-input-props) -ref)
-                          :accept (.. (get-input-props) -accept)
-                          :multiple (.. (get-input-props) -multiple)
-                          :style (.. (get-input-props) -style)
-                          :on-change (.. (get-input-props) -onChange)
-                          :on-click (.. (get-input-props) -onClick)
-                          :type (.. (get-input-props) -type)
-                          :auto-complete "off"
-                          :tab-index -1}]
-         (r/as-element
-          [:div root-props
-           [:> Grid {:container true
-                     :sx (merge {:border "2px dashed #ccc"
-                                 :border-radius "5px"
-                                 :padding "10px"
-                                 :background-color "#eee"
-                                 :align-items "center"
-                                 :width "100%"}
-                                grid-styles)}
-
-            [:> Grid {:size 1}
-             [:svg
-              {:focusable "false",
-               :aria-hidden "true",
-               :viewBox "0 0 24 24",
-               :data-testid "AddIcon"}
-              [:path {:d "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"}]]]
-            [:> Grid {:container true
-                      :size 11
-                      :sx {:align-items "center"}}
-             [:> Grid {:size 12}
-              [:> Typography {:variant "body1" :color "textPrimary"} label]]
-             [:> Grid {:size 12}
-
-              [:> Typography {:variant "caption" :color "textSecondary"}
-               formats-label]
-              [:input input-props]]]]])))]))
+    [RawDropzone {:disabled       (not enabled)
+                  :maxSize        (* max-size-mb 1024 1024)
+                  :multiple       multiple
+                  :onDrop         (fn [e]
+                                    (js/console.log "File Added" e))
+                  :onDropAccepted on-file-accepted
+                  :onDropRejected on-file-rejected
+                  :accept         formats
+                  :root-props     {:id (str key "-container")}
+                  :input-props    {:id (str key "-field")}}
+     [RawGrid {:container true
+               :sx (merge {:border "2px dashed #ccc"
+                           :border-radius "5px"
+                           :padding "10px"
+                           :background-color "#eee"
+                           :align-items "center"
+                           :width "100%"}
+                          grid-styles)}
+      [RawGrid {:size 1}
+       [AddIcon {}]]
+      [RawGrid {:container true
+                :size 11
+                :sx {:align-items "center"}}
+       [RawGrid {:size 12}
+        [RawTypography {:variant "body1" :color "text.primary"} label]]
+       [RawGrid {:size 12}
+        [RawTypography {:variant "caption" :color "text.secondary"}
+         formats-label]]]]]))
 
 (declare uploaded-image)
 

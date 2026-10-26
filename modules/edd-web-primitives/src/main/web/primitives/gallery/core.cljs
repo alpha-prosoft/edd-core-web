@@ -1,16 +1,16 @@
 (ns web.primitives.gallery.core
-  "EddComponentGallery: an embeddable catalogue of the web primitives.
+  "Gallery: an embeddable catalogue of registered component pages.
 
    Every registered page is rendered as a section of ONE page, so loading the
    gallery mounts every component at once and any render error surfaces
    immediately. The sidebar only scrolls to a section; it never swaps content.
 
-   Built-in primitives pages are registered on mount; extra pages can be added
-   with web.primitives.gallery.registry/register-page!."
+   Pages are added with web.primitives.gallery.page/register!, usually from
+   the :register! fn passed to Gallery. PrimitivesGallery is the catalogue of
+   the web primitives built on top of it."
   (:require
    [clojure.string :as str]
    [reagent.core :as r]
-   [web.primitives.gallery.catalog :as catalog]
    [web.primitives.gallery.registry :as registry]
    [web.primitives.gallery.snapshot :as snapshot]
    [web.primitives.gallery.ui :as ui]
@@ -184,33 +184,38 @@
       ^{:key (str (:id v))}
       [example-card v id])]])
 
-(defn- all-sections [group-order]
+(defn- all-sections [{:keys [heading intro group-order]}]
   [:main {:data-testid "gallery-content"
           :style       {:flex 1 :padding "0 40px" :max-width "900px"}}
-   [:h1 {:style {:font-size "32px" :margin "32px 0 8px"}} "Component browser"]
-   [:p {:style {:color "#4b5563" :font-size "16px"}}
-    "Every primitive on one page. Use the sidebar to jump to a component; each example's El-ids button shows the values the SDK scan reads."]
+   [:h1 {:style {:font-size "32px" :margin "32px 0 8px"}} heading]
+   (when intro
+     [:p {:style {:color "#4b5563" :font-size "16px"}}
+      intro])
    [snapshot/page-panel {:scope "[data-testid='gallery-content']"}]
    (for [p (ordered-pages group-order)]
      ^{:key (str (:id p))}
      [component-section p])])
 
 ;; ---------------------------------------------------------------------------
-;; EddComponentGallery
+;; Gallery
 ;; ---------------------------------------------------------------------------
 
-(defn EddComponentGallery
+(defn Gallery
   "Single-page catalogue of every registered gallery page.
 
    Optional props:
-     :title       sidebar heading (default \"Primitives\")
+     :register!   fn called once on mount to register the pages to show
+     :title       sidebar heading (default \"Components\")
+     :heading     content heading (default \"Component browser\")
+     :intro       text under the heading
      :group-order vector of group names controlling section order
 
    A #/page-id hash on load scrolls to that section; clicking the sidebar
    scrolls and updates the hash without re-rendering."
-  [props]
-  (r/with-let [_built-in-pages
-               (catalog/register-all!)
+  [{:keys [register!] :as props}]
+  (r/with-let [_pages
+               (when register!
+                 (register!))
 
                active-id
                (r/atom (hash->page-id (.. js/window -location -hash)))
@@ -223,8 +228,10 @@
 
                _initial-scroll
                (js/requestAnimationFrame scroll-to-url-section!)]
-    (let [{:keys [title group-order]
-           :or   {title "Primitives" group-order default-group-order}}
+    (let [{:keys [title heading intro group-order]
+           :or   {title       "Components"
+                  heading     "Component browser"
+                  group-order default-group-order}}
           props]
       [:div {:data-testid "gallery-root"
              :style       {:display "flex" :min-height "100vh"
@@ -233,4 +240,6 @@
                  :title       title
                  :group-order group-order
                  :on-select   select!}]
-       [all-sections group-order]])))
+       [all-sections {:heading     heading
+                      :intro       intro
+                      :group-order group-order}]])))

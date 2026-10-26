@@ -99,6 +99,10 @@
    ["@mui/icons-material/GppGood" :default GppGood]
    ["@mui/icons-material/OpenInNew" :default OpenInNew]
    ["@mui/icons-material/RocketLaunchOutlined" :default RocketLaunchOutlined]
+   ["@mui/icons-material/KeyboardArrowRight" :default KeyboardArrowRight]
+   ["@mui/icons-material/TaskAlt" :default TaskAlt]
+   ["@mui/icons-material/Visibility" :default Visibility]
+   ["@mui/icons-material/VisibilityOff" :default VisibilityOff]
 
    [web.primitives.icons.utils :refer [handle-props]]))
 
@@ -330,6 +334,9 @@
 (defn InsightsIcon [props]
   [:> Insights props])
 
+(defn KeyboardArrowRightIcon [props]
+  [:> KeyboardArrowRight props])
+
 (defn KeyboardTabIcon [props]
   [:> KeyboardTab props])
 
@@ -479,6 +486,9 @@
 (defn TableChartIcon [props]
   [:> TableChart props])
 
+(defn TaskAltIcon [props]
+  [:> TaskAlt props])
+
 (defn TimerIcon [props]
   [:> Timer props])
 
@@ -503,3 +513,8 @@
 (defn UploadIcon [props]
   [:> Upload props])
 
+(defn VisibilityIcon [props]
+  [:> Visibility props])
+
+(defn VisibilityOffIcon [props]
+  [:> VisibilityOff props])

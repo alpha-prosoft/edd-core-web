@@ -5,6 +5,7 @@
    [web.primitives.gallery.pages.checkbox :as checkbox]
    [web.primitives.gallery.pages.data-display :as data-display]
    [web.primitives.gallery.pages.date-picker :as date-picker]
+   [web.primitives.gallery.pages.dropzone :as dropzone]
    [web.primitives.gallery.pages.fab :as fab]
    [web.primitives.gallery.pages.facilities :as facilities]
    [web.primitives.gallery.pages.feedback :as feedback]
@@ -22,6 +23,7 @@
    [web.primitives.gallery.pages.switch :as switch]
    [web.primitives.gallery.pages.text-editor :as text-editor]
    [web.primitives.gallery.pages.text-field :as text-field]
+   [web.primitives.gallery.pages.theme-provider :as theme-provider]
    [web.primitives.gallery.pages.transitions :as transitions]
    [web.primitives.gallery.pages.typography :as typography]))
 
@@ -33,6 +35,7 @@
   (checkbox/register!)
   (data-display/register!)
   (date-picker/register!)
+  (dropzone/register!)
   (fab/register!)
   (feedback/register!)
   (icon-button/register!)
@@ -49,6 +52,7 @@
   (switch/register!)
   (text-editor/register!)
   (text-field/register!)
+  (theme-provider/register!)
   (transitions/register!)
   (typography/register!)
   (facilities/register!))

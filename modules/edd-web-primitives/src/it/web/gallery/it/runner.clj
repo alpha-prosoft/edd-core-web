@@ -25,9 +25,19 @@
    'web.gallery.it.smoke-test
    'web.gallery.it.values-test])
 
-(defn -main [& _args]
-  (let [summary
-        (apply test/run-tests test-namespaces)
+(defn -main
+  "Runs the primitives suite, or the namespaces named in `args`."
+  [& args]
+  (let [namespaces
+        (if (seq args)
+          (map symbol args)
+          test-namespaces)
+
+        _
+        (apply require namespaces)
+
+        summary
+        (apply test/run-tests namespaces)
 
         failures
         (+ (:fail summary 0) (:error summary 0))]

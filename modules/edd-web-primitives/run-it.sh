@@ -10,6 +10,8 @@
 #   GALLERY_DIR       static gallery to serve   (default resources/gallery)
 #   GALLERY_PORT      port to serve on          (default 3002)
 #   PLAYWRIGHT_CHROME optional path to a Chrome binary (default: Playwright's bundled browser)
+#
+# Arguments are test namespaces to run instead of the primitives suite.
 set -e
 
 IT_JAR="${IT_JAR:-target/it/it-tests.jar}"
@@ -54,6 +56,6 @@ serve_gallery
 wait_for_gallery
 
 echo "Running integration tests against ${GALLERY_URL}"
-java -Dgallery.base.url="${GALLERY_URL}" -jar "${IT_JAR}"
+java -Dgallery.base.url="${GALLERY_URL}" -jar "${IT_JAR}" "$@"
 
 echo "Integration tests passed"
