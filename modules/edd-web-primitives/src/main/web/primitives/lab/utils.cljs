@@ -5,7 +5,7 @@
    ["@mui/material/CircularProgress" :default CircularProgress]
    ["@mui/material/TextField" :default TextField]))
 
-(defn autocomplete-text-field [input-params
+(defn autocomplete-text-field [^js input-params
                                {:keys [helper-text FormHelperTextProps label disabled required loading error variant]
                                 :or   {label "" variant "standard"}}]
   ;; MUI v9 Autocomplete wires the field via slotProps in the renderInput params:

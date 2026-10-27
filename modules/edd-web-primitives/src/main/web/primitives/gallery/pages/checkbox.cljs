@@ -3,7 +3,7 @@
    [reagent.core :as r]
    [web.primitives.gallery.example :refer-macros [defdemo example]]
    [web.primitives.gallery.page :as page]
-   [web.primitives.inputs.core :refer [RawCheckbox]]))
+   [web.primitives.inputs.core :refer [RawCheckbox RawCheckboxControl]]))
 
 (defdemo toggling [variant props]
   (let [state (r/atom {:checked (boolean (:checked props))})]
@@ -15,6 +15,16 @@
                 :on-change #(swap! state update :checked not)}
                (dissoc props :checked))]
        [:div {:data-testid (page/testid :checkbox variant :readout)}
+        (str "checked:" (:checked @state))]])))
+
+(defdemo control []
+  (let [state (r/atom {:checked false})]
+    (fn []
+      [:div
+       [RawCheckboxControl {:el-id     (page/el :checkbox :control)
+                            :checked   (:checked @state)
+                            :on-change #(swap! state update :checked not)}]
+       [:div {:data-testid (page/testid :checkbox :control :readout)}
         (str "checked:" (:checked @state))]])))
 
 (def ^:private props-doc
@@ -31,7 +41,7 @@
    {:id    :checkbox
     :group "Inputs"
     :title "Checkbox"
-    :doc   "Checkboxes select one or more items from a set, or toggle a single option on/off."
+    :doc   "Checkboxes select one or more items from a set, or toggle a single option on/off. `RawCheckboxControl` is the bare box without the label wrapper."
     :props props-doc
     :variants
     [(example {:id :basic :title "Basic"}
@@ -45,6 +55,9 @@
 
      (example {:id :checked :title "Initially checked"}
               [toggling :checked {:checked true :label "On"}])
+
+     (example {:id :control :title "Bare control"}
+              [control])
 
      (example {:id :disabled :title "Disabled"}
               [RawCheckbox {:el-id    (page/el :checkbox :disabled)

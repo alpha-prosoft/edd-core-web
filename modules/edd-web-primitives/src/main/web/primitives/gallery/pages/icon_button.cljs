@@ -18,9 +18,16 @@
        [:div {:data-testid (page/testid :icon-button variant :readout)}
         (str "clicks:" @state)]])))
 
+(defdemo link []
+  [RawIconButton {:el-id  (page/el :icon-button :link)
+                  :href   "#icon-button"
+                  :sx     {:color "text.secondary"}}
+   [EditIcon {:font-size "small"}]])
+
 (def ^:private props-doc
   [{:name :size     :type "\"small\" | \"medium\"" :default "\"medium\"" :doc "Icon size (20px / 24px)."}
    {:name :on-click :type "fn"      :default "—"     :doc "Click handler."}
+   {:name :href     :type "string"  :default "nil"   :doc "Renders a link."}
    {:name :disabled :type "boolean" :default "false" :doc "Disabled automatically when no icon is given."}
    {:name :el-id    :type "keyword | string" :default "—" :doc "Lands as data-testid."}])
 
@@ -29,11 +36,14 @@
    {:id    :icon-button
     :group "Inputs"
     :title "Icon button"
-    :doc   "A button with just an icon. `EddIconButton` can also swap to a hover icon."
+    :doc   "A button with just an icon. The icon is sized by `:size` unless it brings its own props. `EddIconButton` can also swap to a hover icon."
     :props props-doc
     :variants
     [(example {:id :medium :title "Medium"}
               [clickable :medium {}])
 
      (example {:id :small :title "Small"}
-              [clickable :small {:size "small"}])]}))
+              [clickable :small {:size "small"}])
+
+     (example {:id :link :title "Link with own icon props"}
+              [link])]}))

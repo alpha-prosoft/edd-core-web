@@ -626,10 +626,15 @@
 
 (defn- validate-depends-on! [deps]
   (let [all-keys
-        (set (keys deps))]
-    (doseq [[k {:keys [depends-on]}] deps
-            :let [missing (vec (remove all-keys depends-on))]
-            :when (seq missing)]
+        (set (keys deps))
+
+        [k missing]
+        (first
+         (for [[k {:keys [depends-on]}] deps
+               :let [missing (vec (remove all-keys depends-on))]
+               :when (seq missing)]
+           [k missing]))]
+    (when k
       (throw (js/Error.
               (str ":depends-on for " k " references unknown deps: " missing))))))
 

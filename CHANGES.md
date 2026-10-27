@@ -2,6 +2,22 @@
 
 ## Changes
 
+**[AP-1025]** Update dependencies, fix console and build warnings
+- MUI 9.5.0 (lab 9.0.0-beta.10, x-date-pickers and x-tree-view 9.16.0),
+  React 19.3.1, marked, react-dropzone, dompurify, shadow-cljs 3.5.8
+- SunEditor 3.4.0 with refreshed vendor files
+- Maven deps updated in every module and the project template;
+  Playwright stays at 1.64 to match ui-runtime-img
+- New primitives: RawTimePicker, RawPopover, RawLinearProgress,
+  RawCollapse, RawGlobalStyles, RawCheckboxControl and RawRadio;
+  RawSelect takes {:value :label} options; RawIconButton keeps icons
+  that bring their own props and supports links
+- Text editor no longer throws after save or discard: SunEditor's
+  autocomplete plugin ran a debounced input handler after destroy
+- Text editor switches modes synchronously, so saving no longer
+  recreates the editor right before it unmounts (E_INIT_FAIL)
+- No compile warnings left in either gallery release build
+
 **[AP-1024]** Relicense to Apache 2.0 under RBI copyright
 - The whole repository is Apache 2.0, the same as edd-web-primitives
   and edd-core; edd-core-web and edd-web-widgets were MIT before

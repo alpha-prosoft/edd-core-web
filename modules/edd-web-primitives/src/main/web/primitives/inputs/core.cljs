@@ -21,7 +21,7 @@
             ["@mui/material/Slider" :default Slider]
 
             ["@mui/x-date-pickers/AdapterDateFns" :refer [AdapterDateFns]]
-            ["@mui/x-date-pickers" :refer [LocalizationProvider DesktopDatePicker]]
+            ["@mui/x-date-pickers" :refer [LocalizationProvider DesktopDatePicker MobileTimePicker]]
             ["moment" :as moment]
             ["react-dropzone" :default Dropzone]
             [goog.object :as gobj]
@@ -129,21 +129,30 @@
       :disabled        disabled
       :label-placement label-placement}]))
 
+(defn- select-option [option]
+  (if (map? option)
+    option
+    {:value option :label option}))
+
 (defn RawSelect
   [{:keys [id options value on-change variant]
     :or   {id        ::simple-select
            variant   "standard"}
     :as   props}]
-  (let [default (first options)]
+  (let [options
+        (map select-option options)
+
+        default
+        (:value (first options))]
     [:> Select
      (merge
       {:id           id
        :variant      variant
        :value        (or value default)
        :defaultValue default
-       :children     (for [option options]
-                       (r/as-element [:> MenuItem {:key option :value option} option]))}
-      (shared-utils/with-el-id-as-id props)
+       :children     (for [{option-value :value label :label} options]
+                       (r/as-element [:> MenuItem {:key (str option-value) :value option-value} label]))}
+      (shared-utils/with-el-id-as-id (dissoc props :options))
       {:on-change    (fn [^js event]
                        (on-change (.. event -target -value)))})]))
 
@@ -373,6 +382,26 @@
                    :value                    (utils/date-string->ui-view value)}]
     (date-picker-with-state props)))
 
+(defn RawTimePicker
+  [{:keys [id el-id slotProps] :as props}]
+  (let [id
+        (or (shared-utils/el-id->string el-id) id)
+
+        text-field-props
+        (merge {:id        id
+                :variant   "standard"
+                :fullWidth true}
+               (:textField slotProps))]
+    [:> LocalizationProvider
+     {:dateAdapter AdapterDateFns}
+     [:> MobileTimePicker
+      (merge
+       {:ampm   false
+        :format "HH:mm"
+        :views  ["hours" "minutes"]}
+       (dissoc props :id :el-id :slotProps)
+       {:slotProps (assoc slotProps :textField text-field-props)})]]))
+
 (defn RawButton
   [{:keys [component href nativeButton] :as props} inner-text]
   [:> Button
@@ -395,16 +424,29 @@
               :variant "extended"}
              (shared-utils/with-el-id-as-testid props)) icon [RawGrid {:style {:margin-left 5}} inner-text]]]))
 
+(defn- icon-has-props? [icon]
+  (let [props-index
+        (if (= :> (first icon)) 2 1)]
+    (map? (get icon props-index))))
+
+(defn- sized-icon [icon size]
+  (let [icon-props
+        {:style {:width size :height size}}]
+    (cond
+      (nil? icon)                                  [RawGrid icon-props]
+      (or (not (vector? icon)) (icon-has-props? icon)) icon
+      :else                                        (conj icon icon-props))))
+
 (defn RawIconButton
-  [{:keys [size] :or {size "medium"} :as props} icon]
+  [{:keys [size component href nativeButton] :or {size "medium"} :as props} icon]
   (let [size (if (= size "small") 20 24)
-        icon-props {:style {:width size :height size}}
-        adj-size-icon (if (some? icon)
-                        (conj icon icon-props)
-                        [RawGrid icon-props])
-        with-testid (shared-utils/with-el-id-as-testid props)
+        with-testid (cond-> (shared-utils/with-el-id-as-testid props)
+                      (and (nil? nativeButton)
+                           (or (some? component)
+                               (some? href)))
+                      (assoc :nativeButton false))
         button-props (if (some? icon) with-testid (conj with-testid {:disabled true}))]
-    [:> IconButton button-props adj-size-icon]))
+    [:> IconButton button-props (sized-icon icon size)]))
 
 (declare icon-button-state-id)
 
@@ -439,6 +481,12 @@
     :label           label
     :disabled        disabled
     :label-placement label-placement}])
+
+(defn RawCheckboxControl [props]
+  [:> Checkbox (merge {:color "secondary"} (shared-utils/with-el-id-as-id props))])
+
+(defn RawRadio [props]
+  [:> Radio (merge {:color "secondary"} (shared-utils/with-el-id-as-id props))])
 
 (defn RawRadioGroup
   [{:keys [label children row]

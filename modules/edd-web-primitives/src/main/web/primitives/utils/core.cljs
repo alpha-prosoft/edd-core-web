@@ -3,6 +3,8 @@
    [web.primitives.utils :as utils]
    ["@mui/material/Zoom" :default Zoom]
    ["@mui/material/Slide" :default Slide]
+   ["@mui/material/Collapse" :default Collapse]
+   ["@mui/material/GlobalStyles" :default GlobalStyles]
    ["@mui/material/styles" :refer [ThemeProvider createTheme]]))
 
 (defn RawSlide [{:keys [in direction timeout el-id]
@@ -22,6 +24,14 @@
             {:in in}
             (utils/with-el-id-as-testid props))
    [:div content]])
+
+(defn RawCollapse [{:keys [in] :or {in false} :as props} & children]
+  (into
+   [:> Collapse (merge (utils/with-el-id-as-testid props) {:in (boolean in)})]
+   children))
+
+(defn RawGlobalStyles [props]
+  [:> GlobalStyles props])
 
 (defn RawThemeProvider [{:keys [theme]} & children]
   (into

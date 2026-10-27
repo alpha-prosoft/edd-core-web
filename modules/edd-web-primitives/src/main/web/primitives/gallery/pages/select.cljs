@@ -17,6 +17,20 @@
        [:div {:data-testid (page/testid :select :simple :readout)}
         (str "value:" (:value @state))]])))
 
+(defdemo labelled []
+  (let [state (r/atom {:value ""})]
+    (fn []
+      [:div
+       [RawSelect {:el-id        (page/el :select :labelled)
+                   :displayEmpty true
+                   :options      [{:value "" :label [:i "Auto"]}
+                                  {:value "1" :label "1st"}
+                                  {:value "2" :label "2nd"}]
+                   :value        (:value @state)
+                   :on-change    #(swap! state assoc :value %)}]
+       [:div {:data-testid (page/testid :select :labelled :readout)}
+        (str "value:" (:value @state))]])))
+
 (defdemo form []
   (let [state (r/atom {:value "A"})]
     (fn []
@@ -34,7 +48,7 @@
         (str "value:" (:value @state))]])))
 
 (def ^:private props-doc
-  [{:name :options                  :type "vector"  :default "[]"    :doc "RawSelect: plain option values."}
+  [{:name :options                  :type "vector"  :default "[]"    :doc "RawSelect: plain values, or {:value :label} maps when the label differs."}
    {:name :children                 :type "elements" :default "—"    :doc "RawFormSelect: MenuItem elements (use r/as-element)."}
    {:name :value                    :type "any"     :default "first option" :doc "Selected value."}
    {:name :on-change                :type "fn"      :default "—"     :doc "RawSelect: called with the value. RawFormSelect: called with the event."}
@@ -55,6 +69,9 @@
     :variants
     [(example {:id :simple :title "Simple select"}
               [simple])
+
+     (example {:id :labelled :title "Labelled options"}
+              [labelled])
 
      (example {:id :form :title "Form select"}
               [form])]}))

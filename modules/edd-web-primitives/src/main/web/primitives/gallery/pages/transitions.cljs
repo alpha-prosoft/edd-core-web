@@ -4,7 +4,7 @@
    [web.primitives.gallery.example :refer-macros [defdemo example]]
    [web.primitives.gallery.page :as page]
    [web.primitives.inputs.core :refer [RawCheckbox]]
-   [web.primitives.utils.core :refer [RawZoom RawSlide]]))
+   [web.primitives.utils.core :refer [RawZoom RawSlide RawCollapse]]))
 
 (defdemo zoom []
   (let [state (r/atom {:in true})]
@@ -28,6 +28,17 @@
        [RawSlide {:el-id (page/el :transitions :slide) :in (:in @state) :direction "right"}
         [:div {:style {:padding "16px" :background "#efe"}} "Sliding box"]]])))
 
+(defdemo collapse []
+  (let [state (r/atom {:in true})]
+    (fn []
+      [:div
+       [RawCheckbox {:el-id     (page/el :transitions :collapse-toggle)
+                     :checked   (:in @state)
+                     :label     "Show"
+                     :on-change #(swap! state update :in not)}]
+       [RawCollapse {:el-id (page/el :transitions :collapse) :in (:in @state)}
+        [:div {:style {:padding "16px" :background "#fee"}} "Collapsing box"]]])))
+
 (def ^:private props-doc
   [{:name :in        :type "boolean" :default "false"  :doc "Show (true) or hide (false) the child."}
    {:name :direction :type "left | right | up | down" :default "\"left\"" :doc "RawSlide: slide direction."}
@@ -38,7 +49,7 @@
   (page/register!
    {:id    :transitions
     :group "Utils"
-    :title "Transitions (zoom / slide)"
+    :title "Transitions (zoom / slide / collapse)"
     :doc   "Animate content in and out. The child is wrapped in a div so any hiccup works."
     :props props-doc
     :variants
@@ -46,4 +57,7 @@
               [zoom])
 
      (example {:id :slide :title "Slide"}
-              [slide])]}))
+              [slide])
+
+     (example {:id :collapse :title "Collapse"}
+              [collapse])]}))

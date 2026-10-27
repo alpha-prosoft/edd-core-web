@@ -43,6 +43,8 @@
 (def RawCircularProgress feedback-core/RawCircularProgress)
 (def EddLinearProgress feedback-core/EddLinearProgress)
 (def RawBackdrop feedback-core/RawBackdrop)
+(def RawLinearProgress feedback-core/RawLinearProgress)
+(def RawPopover feedback-core/RawPopover)
 
 (def RawTextField inputs-core/RawTextField)
 (def RawSwitch inputs-core/RawSwitch)
@@ -51,11 +53,14 @@
 (def RawChoiceButton inputs-core/RawChoiceButton)
 (def RawDatePicker inputs-core/RawDatePicker)
 (def EddDatePicker inputs-core/EddDatePicker)
+(def RawTimePicker inputs-core/RawTimePicker)
 (def RawButton inputs-core/RawButton)
 (def RawFab inputs-core/RawFab)
 (def RawIconButton inputs-core/RawIconButton)
 (def EddIconButton inputs-core/EddIconButton)
 (def RawCheckbox inputs-core/RawCheckbox)
+(def RawCheckboxControl inputs-core/RawCheckboxControl)
+(def RawRadio inputs-core/RawRadio)
 (def RawRadioGroup inputs-core/RawRadioGroup)
 (def RawNumberField inputs-core/RawNumberField)
 (def RawPercentField inputs-core/RawPercentField)
@@ -84,6 +89,8 @@
 
 (def RawSlide utils-core/RawSlide)
 (def RawZoom utils-core/RawZoom)
+(def RawCollapse utils-core/RawCollapse)
+(def RawGlobalStyles utils-core/RawGlobalStyles)
 (def RawThemeProvider utils-core/RawThemeProvider)
 
 (def RawTextEditor text-editor-core/RawTextEditor)

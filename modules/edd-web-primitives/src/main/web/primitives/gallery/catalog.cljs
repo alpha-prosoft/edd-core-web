@@ -23,6 +23,7 @@
    [web.primitives.gallery.pages.switch :as switch]
    [web.primitives.gallery.pages.text-editor :as text-editor]
    [web.primitives.gallery.pages.text-field :as text-field]
+   [web.primitives.gallery.pages.time-picker :as time-picker]
    [web.primitives.gallery.pages.theme-provider :as theme-provider]
    [web.primitives.gallery.pages.transitions :as transitions]
    [web.primitives.gallery.pages.typography :as typography]))
@@ -52,6 +53,7 @@
   (switch/register!)
   (text-editor/register!)
   (text-field/register!)
+  (time-picker/register!)
   (theme-provider/register!)
   (transitions/register!)
   (typography/register!)

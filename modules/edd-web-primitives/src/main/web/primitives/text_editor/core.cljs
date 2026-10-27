@@ -263,7 +263,7 @@
        (let [^js suneditor-api (vendor/api)
              _ (when-not (and suneditor-api (.-create suneditor-api))
                  (throw (js/Error. "SunEditor API.create unavailable")))
-             filtered-plugins (let [excluded #{"exportPDF" "fileUpload" "layout" "template" "math"}
+             filtered-plugins (let [excluded #{"autocomplete" "exportPDF" "fileUpload" "layout" "template" "math"}
                                     plugins (.-plugins suneditor-api)
                                     filtered (js-obj)]
                                 (doseq [key (js->clj (js/Reflect.ownKeys plugins))]
@@ -389,8 +389,8 @@
     (let [resolved-id (or (utils/el-id->string el-id) id)
           editor-mode @(rf/subscribe [::model/get-editor-mode editor-id])
           editor-scope-id (or resolved-id uuid)
-          set-read-only-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :read-only-mode]))
-          set-edit-mode (fn [] (rf/dispatch [::model/set-editor-mode editor-id :edit-mode]))]
+          set-read-only-mode (fn [] (rf/dispatch-sync [::model/set-editor-mode editor-id :read-only-mode]))
+          set-edit-mode (fn [] (rf/dispatch-sync [::model/set-editor-mode editor-id :edit-mode]))]
       [RawTextEditor (merge
                       {:editor-mode        editor-mode
                        :editor-scope-id    editor-scope-id

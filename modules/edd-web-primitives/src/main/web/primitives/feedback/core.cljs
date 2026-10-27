@@ -10,6 +10,7 @@
    ["@mui/material/DialogActions" :default DialogActions]
    ["@mui/material/LinearProgress" :default LinearProgress]
    ["@mui/material/CircularProgress" :default CircularProgress]
+   ["@mui/material/Popover" :default Popover]
    ["@mui/material/Snackbar" :default Snackbar]
    ["@mui/material/Backdrop" :default Backdrop]))
 
@@ -45,6 +46,14 @@
 
 (defn RawCircularProgress [props]
   [:> CircularProgress (utils/with-el-id-as-testid props)])
+
+(defn RawLinearProgress [props]
+  [:> LinearProgress (utils/with-el-id-as-testid props)])
+
+(defn RawPopover [{:keys [open] :or {open false} :as props} & children]
+  (into
+   [:> Popover (merge (utils/with-el-id-as-testid props) {:open (boolean open)})]
+   children))
 
 (defn RawBackdrop [props]
   [:> Backdrop (utils/with-el-id-as-testid props)
