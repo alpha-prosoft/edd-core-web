@@ -8,7 +8,7 @@ calls to edd services.
 Needs a JVM, the Clojure CLI and Node.js.
 
 ```sh
-clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.260.0"}}}' \
+clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.261.0"}}}' \
   -M -m edd.bootstrap create-project my-app my-app
 cd my-app
 clojure -M:shadow-cljs:dev:test:run
@@ -139,6 +139,10 @@ Translate with `edd.i18n/tr`:
 (tr {:message :welcome :params ["Bob" "Berlin"]})
 (tr {:message :greeting :params {:name "Bob"}})
 ```
+
+## Upgrading
+
+See [MIGRATION.md](MIGRATION.md) for breaking changes.
 
 ## License
 

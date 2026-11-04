@@ -2,6 +2,8 @@
 
 ## Changes
 
+**[AP-1031]** Remove :classes, fix frame deps and template menu
+
 **[AP-1030]** Clenaup script ans certificates
 
 **[AP-1029]** Improve scafolding docu

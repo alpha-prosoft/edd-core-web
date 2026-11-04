@@ -6,14 +6,13 @@
             [web.primitives.components :refer [RawButton RawGrid]]))
 
 (defn main-panel
-  [classes]
+  []
   [RawGrid {:container true}
    [RawGrid {:size 12}
     @(rf/subscribe [::subs/name])]
    [RawGrid {:size 12}
     [RawButton
-     {:class-name (:page classes)
-      :on-click   #(rf/dispatch [::events/click])}
+     {:on-click #(rf/dispatch [::events/click])}
      "Increment"]]
    [RawGrid {:size 12}
     (lang/tr :increments-count) @(rf/subscribe [::subs/clicks])]

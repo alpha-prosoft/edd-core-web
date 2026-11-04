@@ -5,7 +5,7 @@
    [edd.error-pages :as error-pages]))
 
 (defn placeholder
-  [{:keys [pages classes] :as _ctx}]
+  [{:keys [pages] :as _ctx}]
   (let [active-panel
         @(rf/subscribe [::subs/active-panel])
 
@@ -26,7 +26,7 @@
         [error-pages/bad-request-page])
 
       (contains? pages active-panel)
-      [(get-in pages [active-panel :panel]) classes]
+      [(get-in pages [active-panel :panel])]
 
       :else
       [error-pages/not-found-page])))

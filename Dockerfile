@@ -248,7 +248,7 @@ RUN set -e &&\
        -Dversion="${VERSION}" \
        -Dpackaging=jar &&\
     echo "Building modules:" &&\
-    for i in $(ls modules | grep -vx edd-web-primitives); do  \
+    for i in edd-web-widgets $(ls modules | grep -vxE 'edd-web-primitives|edd-web-widgets'); do  \
       echo "Moving to modules/$i" &&\
       cd modules/$i &&\
       cp $root/build.clj . &&\
@@ -258,7 +258,14 @@ RUN set -e &&\
              :version "\"${VERSION}\"" &&\
       cp target/classes/META-INF/maven/${ARTIFACT_ORG}/${i}/pom.xml \
              /dist/release-libs/${i}-${VERSION}.jar.pom.xml &&\
-      cp target/${i}-${VERSION}.jar /dist/release-libs/${i}-${VERSION}.jar; \
+      cp target/${i}-${VERSION}.jar /dist/release-libs/${i}-${VERSION}.jar &&\
+      mvn install:install-file \
+         -Dfile=target/${i}-${VERSION}.jar \
+         -DgroupId=${ARTIFACT_ORG} \
+         -DartifactId=${i} \
+         -DpomFile=target/classes/META-INF/maven/${ARTIFACT_ORG}/${i}/pom.xml \
+         -Dversion="${VERSION}" \
+         -Dpackaging=jar &&\
       cd $root || exit 1; \
     done
 

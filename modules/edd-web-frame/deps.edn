@@ -1,6 +1,7 @@
 {:paths ["src"]
  :deps  {edd/edd-core-web                     {:local/root "../../"}
          edd/edd-web-primitives               {:local/root "../edd-web-primitives"}
+         edd/edd-web-widgets                  {:local/root "../edd-web-widgets"}
          com.andrewmcveigh/cljs-time          {:mvn/version "0.5.2"}}
  :aliases
  {:lint

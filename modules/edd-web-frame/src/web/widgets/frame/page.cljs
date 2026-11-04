@@ -7,7 +7,6 @@
             [edd.util :as util]
             [edd.i18n :refer [tr]]
             [clojure.string :as str]
-            [clojure.walk :refer [keywordize-keys]]
             [web.primitives.components :refer [RawAppBar RawButton RawDrawer RawGrid
                                                RawIconButton RawThemeProvider RawToolbar]]
             [web.primitives.icons.core :refer [KeyboardArrowRightIcon MenuIcon]]
@@ -40,23 +39,21 @@
     nil))
 
 (defn menu-item
-  [{:keys [classes]} item]
+  [item]
   (let [_lang @(rf/subscribe [::subs/selected-language])]
     [RawGrid {:on-click   #(rf/dispatch [::events/navigate item])
               :size 12}
      [RawButton {:on-click   #(rf/dispatch [::events/navigate item])
                  :key        (:key item)
-                 :class-name (:nested classes)
                  :start-icon (r/as-element [KeyboardArrowRightIcon {}])}
       (tr item)]]))
 
 (defn drawer
-  [{:keys [classes menu drawer] :as ctx}]
+  [{:keys [menu drawer] :as ctx}]
   [RawDrawer {:open     @(rf/subscribe [::subs/drawer])
               :on-close #(rf/dispatch [::events/toggle-drawer])}
 
-   [:div {:class-name (:drawer-list classes)
-          :role       "presentation"}
+   [:div {:role "presentation"}
 
     (if drawer
       (drawer ctx)
@@ -68,10 +65,7 @@
          [RawGrid {:container true
                    :spacing   1
                    :sx {:width "100%"}}]
-         (map
-          (fn [item]
-            (menu-item ctx item))
-          menu))]])]])
+         (map menu-item menu))]])]])
 
 (defn page
   [{:keys [app-bar
@@ -95,9 +89,9 @@
          [RawToolbar {}
           (when-not (hide-menu)
             (let [env @(rf/subscribe [::env-prefix])]
-              [RawIconButton (cond-> {:edge     "start"
-                                      :bel      "Menu"
-                                      :on-click #(rf/dispatch [::events/toggle-drawer])}
+              [RawIconButton (cond-> {:edge       "start"
+                                      :aria-label "Menu"
+                                      :on-click   #(rf/dispatch [::events/toggle-drawer])}
                                (some? (menu-button-sx env))
                                (assoc :sx (menu-button-sx env)))
                [MenuIcon]]))
@@ -117,13 +111,6 @@
       "Loading..."]]))
 
 (defn body
-  "Initialize body with custom style"
   [{:keys [theme] :as ctx}]
   [RawThemeProvider {:theme theme}
-   [:> (r/reactify-component
-        (fn [props]
-          (page
-           (assoc
-            ctx
-            :classes (keywordize-keys
-                      (:classes (js->clj props)))))))]])
+   [page ctx]])

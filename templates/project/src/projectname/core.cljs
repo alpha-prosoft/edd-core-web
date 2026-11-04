@@ -1,7 +1,6 @@
 (ns projectname.core
   (:require [edd.core :as core]
             [projectname.i18n :as i18n]
-            [projectname.styles :refer [theme styles]]
             [projectname.home.core :as home]
             [projectname.about.core :as about]
             [projectname.page :as page]))
@@ -18,9 +17,8 @@
      ;; Optional: override error pages
      ;; :error-pages {:not-found   my-custom-404
      ;;               :bad-request my-custom-400}
-    :menu         [:home :about]
-    :theme        (theme)
-    :styles       styles
+    :menu         [:home]
+    :theme        {}
     :name         "projectname"
     :body         page/body}))
 

@@ -5,7 +5,7 @@
             [web.primitives.components :refer [RawButton RawGrid]]))
 
 (defn main-panel
-  [_classes]
+  []
   (let [params
         @(rf/subscribe [::subs/params])
 
