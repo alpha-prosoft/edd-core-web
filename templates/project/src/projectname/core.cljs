@@ -13,8 +13,8 @@
                   :about about/main}
     :languages    [:en :de]
     :translations i18n/translations
-    :routes       ["/" {""             :home
-                        ["about/" :id] :about}]
+    :routes       [["/" :home]
+                   ["/about/:id" :about]]
      ;; Optional: override error pages
      ;; :error-pages {:not-found   my-custom-404
      ;;               :bad-request my-custom-400}

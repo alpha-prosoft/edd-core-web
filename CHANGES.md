@@ -2,6 +2,8 @@
 
 ## Changes
 
+**[AP-1029]** Improve scafolding docu
+
 **[AP-1025]** Update dependencies, fix console and build warnings
 - MUI 9.5.0 (lab 9.0.0-beta.10, x-date-pickers and x-tree-view 9.16.0),
   React 19.3.1, marked, react-dropzone, dompurify, shadow-cljs 3.5.8

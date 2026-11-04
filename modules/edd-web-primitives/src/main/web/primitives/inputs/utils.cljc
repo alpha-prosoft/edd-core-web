@@ -97,9 +97,10 @@
 
 #?(:cljs
    (defn date-out-of-range? [{:keys [component-min-date component-max-date disablePast disable-past]} date]
-     (or (t/before? date (time-fmt/parse-local-date component-min-date))
-         (t/after? date (time-fmt/parse-local-date component-max-date))
-         (and (or disablePast disable-past) (t/before? date (t/today))))))
+     (boolean
+      (or (t/before? date (time-fmt/parse-local-date component-min-date))
+          (t/after? date (time-fmt/parse-local-date component-max-date))
+          (and (or disablePast disable-past) (t/before? date (t/today)))))))
 
 #?(:cljs
    (defn validate-date-min-max-date [{:keys [set-date-input-invalid on-change]

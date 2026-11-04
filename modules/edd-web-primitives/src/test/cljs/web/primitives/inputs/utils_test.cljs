@@ -41,9 +41,16 @@
      (= [false]
         (:invalid result)))))
 
+(defn- typed-date
+  "A JS Date the way the picker hands it over; t/date-time would map years
+   below 100 to 19xx."
+  [year month day]
+  (doto (js/Date. 2000 (dec month) day)
+    (.setFullYear year)))
+
 (deftest validate-out-of-range-date-still-propagates-typed-value
   (let [result
-        (capture-validate {} (t/to-default-time-zone (t/date-time 2 5 15)))]
+        (capture-validate {} (t/to-default-time-zone (typed-date 2 5 15)))]
 
     (is
      (= ["0002-05-15"]

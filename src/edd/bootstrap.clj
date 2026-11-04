@@ -3,7 +3,9 @@
   (:require [clojure.tools.logging :as log]
             [clojure.java.io :as io]
             [clojure.string :as string])
-  (:import [java.io StringWriter FileOutputStream]
+  (:import [java.io ByteArrayOutputStream FileOutputStream]
+           [java.nio ByteBuffer]
+           [java.nio.charset CharacterCodingException StandardCharsets]
            [java.util.zip ZipOutputStream ZipEntry ZipInputStream]
            [java.util HashSet]
            [java.nio.file Files]
@@ -35,11 +37,19 @@
               (.putNextEntry zip (ZipEntry. entry))
               (io/copy in zip))))))))
 
-(defn read-stream
+(defn read-bytes
   [stream]
-  (let [sw (StringWriter.)]
-    (io/copy stream sw)
-    (.toString sw)))
+  (let [out (ByteArrayOutputStream.)]
+    (io/copy stream out)
+    (.toByteArray out)))
+
+(defn decode-utf8
+  [bytes]
+  (try
+    (str (.decode (.newDecoder StandardCharsets/UTF_8)
+                  (ByteBuffer/wrap bytes)))
+    (catch CharacterCodingException _
+      nil)))
 
 (defn unzip
   [& [{:keys [target
@@ -54,14 +64,16 @@
     (loop [entry (.getNextEntry zip)]
       (let [name (-> (str target "/" (.getName entry))
                      name-filter)
-            content (->> (read-stream zip)
-                         (content-filter name))
+            bytes (read-bytes zip)
+            text (decode-utf8 bytes)
             file (io/file name)]
         (log/info "Extracting: " name)
         (when-let [dir (.getParentFile file)]
           (log/info "Creating dir: " (.getPath dir))
           (.mkdirs dir))
-        (spit name content)
+        (if text
+          (spit name (content-filter name text))
+          (io/copy bytes file))
         (when (string/ends-with? name ".sh")
           (log/info "Making executable")
           (let [perms (HashSet.)]

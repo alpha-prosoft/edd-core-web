@@ -4,3 +4,5 @@
 **/.cpcache
 **/.shadow-cljs
 **/.clj-kondo/.cache
+**/package.json
+**/package-lock.json

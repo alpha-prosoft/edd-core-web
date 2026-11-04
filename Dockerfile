@@ -10,8 +10,9 @@ FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest AS primitives
 
 ARG ARTIFACT_ORG
 ARG BUILD_ID
-# 2.{commits}.{tags} from version.sh once the pipeline passes it; old scheme until then.
-ARG VERSION=1.${BUILD_ID}
+# APP_VERSION comes from the pipeline, see version.sh.
+ARG APP_VERSION=0.0.${BUILD_ID}
+ARG VERSION=${APP_VERSION}
 
 USER root
 RUN node -v && npm -v && npm config get registry && \
@@ -24,7 +25,7 @@ COPY --chown=build:build modules/edd-web-primitives/deps.edn deps-temp.edn
 COPY --chown=build:build modules/edd-web-primitives/tests.edn tests.edn
 
 ARG DEPLOY_TARGET
-ENV DEPLOY_TARGET ${DEPLOY_TARGET}
+ENV DEPLOY_TARGET=${DEPLOY_TARGET}
 
 RUN mkdir -p /dist/s3
 RUN set -e &&\
@@ -46,6 +47,10 @@ RUN set -e && clojure -M:test:runner
 # install the versions pinned in src/main/deps.cljs before compiling.
 RUN set -e && npx shadow-cljs run shadow.cljs.npm-deps
 RUN set -e && bash check-suneditor-vendor.sh
+# ClojureScript unit tests; the bundle runs in a browser in the uitest stage.
+RUN set -e && npx shadow-cljs -A:test compile test &&\
+    mkdir -p /dist/karma/primitives/target &&\
+    cp target/ci.js /dist/karma/primitives/target/ci.js
 RUN set -e && npx shadow-cljs -A:dev:gallery compile gallery
 
 # The UI SDK must compile on its own (no gallery / cljs on the classpath).
@@ -80,7 +85,9 @@ RUN set -e && clojure -T:build all \
 FROM ${DOCKER_URL}/${DOCKER_ORG}/web-img:latest AS widgets
 
 COPY --chown=build:build deps.edn edd/deps.edn
+COPY --chown=build:build shadow-cljs.edn edd/shadow-cljs.edn
 COPY --chown=build:build src edd/src
+COPY --chown=build:build test edd/test
 COPY --chown=build:build modules/edd-web-primitives edd/modules/edd-web-primitives
 COPY --chown=build:build modules/edd-web-widgets edd/modules/edd-web-widgets
 
@@ -90,6 +97,14 @@ RUN set -e &&\
     clojure -M:shadow-cljs:gallery release gallery &&\
     mkdir -p /dist/widgets-gallery &&\
     cp -r resources/gallery/* /dist/widgets-gallery/
+
+# edd-core-web ClojureScript unit tests, run in a browser in the uitest stage.
+RUN set -e &&\
+    cd edd &&\
+    clojure -M:shadow-cljs:test run shadow.cljs.npm-deps &&\
+    clojure -M:shadow-cljs:test compile test &&\
+    mkdir -p /dist/karma/core/target &&\
+    cp target/ci.js /dist/karma/core/target/ci.js
 
 # ===========================================================================
 # Stage 3: uitest — run the Playwright suite on ui-runtime.
@@ -107,10 +122,24 @@ COPY --from=primitives /dist/it/it-tests.jar it-tests.jar
 COPY --from=primitives /dist/s3 gallery
 COPY --from=widgets /dist/widgets-gallery widgets-gallery
 COPY modules/edd-web-primitives/run-it.sh run-it.sh
+COPY --from=primitives /dist/karma karma
+COPY --from=widgets /dist/karma karma
+COPY karma.conf.js karma/primitives/karma.conf.js
+COPY karma.conf.js karma/core/karma.conf.js
 
 ENV IT_JAR=/opt/uitest/it-tests.jar
 ENV GALLERY_DIR=/opt/uitest/gallery
 ENV GALLERY_PORT=3002
+
+# ClojureScript unit tests of primitives and core in Playwright's Chromium.
+RUN set -e &&\
+    cd karma &&\
+    npm install --no-save --no-audit --no-fund karma karma-cljs-test karma-chrome-launcher karma-junit-reporter &&\
+    export CHROME_BIN=$(ls -d /ms-playwright/chromium-*/chrome-linux*/chrome | head -1) &&\
+    for suite in primitives core; do \
+      echo "ClojureScript unit tests: $suite" &&\
+      npx karma start $suite/karma.conf.js --single-run || exit 1; \
+    done
 
 RUN set -e &&\
     bash run-it.sh &&\
@@ -125,7 +154,7 @@ RUN set -e &&\
 FROM ${DOCKER_URL}/${DOCKER_ORG}/common-img:b681
 
 ARG ARTIFACT_ORG
-ENV PROJECT_NAME edd-core-web
+ENV PROJECT_NAME=edd-core-web
 
 # Custom build here
 COPY src src
@@ -136,7 +165,8 @@ COPY modules/edd-web-primitives modules/edd-web-primitives
 RUN set -e && clojure -A:test:unit
 
 ARG BUILD_ID
-ARG VERSION=1.${BUILD_ID}
+ARG APP_VERSION=0.0.${BUILD_ID}
+ARG VERSION=${APP_VERSION}
 
 COPY --from=uitest /opt/uitest/it-passed /tmp/.it-passed
 COPY --from=primitives --chown=build:build /dist/release-libs /dist/release-libs

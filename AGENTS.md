@@ -4,9 +4,14 @@ Dont over-document
 
 # Changes
 
-After committing run `./changes.py` and amend the commit with the updated
-`CHANGES.md`. Its first entry must match the commit message
-(`./changes.py --shallow --check`).
+After every commit, and again after a rebase:
+
+1. Run `./changes.py`; the first entry of `CHANGES.md` must match the commit
+   message.
+2. Set the version in the README scaffold command to `./version.sh`; every
+   commit changes it.
+3. Amend the commit with both files.
+4. Run `./pre-build.sh`; CI runs the same checks.
 
 
 

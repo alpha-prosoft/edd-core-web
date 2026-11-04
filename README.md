@@ -1,192 +1,92 @@
-# Core library for doing re-frame applications
+# edd-core-web
 
+Core library for building re-frame applications: routing, pages, i18n and
+calls to edd services.
 
+## Creating a project
 
-# Project template (originally re-gen)
+Needs a JVM, the Clojure CLI and Node.js.
 
-Generator for initalizing re-frame web application using react, material-ui and router.
-
-```
-npm install -g shadow-cljs # Node.js and JVM are required to be installed
-```
-Options
-```
-npx @rpofuk/re-gen --help
-Usage: re-gen [options] [command]
-
-Contact management system
-
-Options:
-  -V, --version           output the version number
-  -h, --help              output usage information
-
-Commands:
-  create|c <projectName>  Bootstrap project
-  add|a <pageName>        Add a page
+```sh
+clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.259.0"}}}' \
+  -M -m edd.bootstrap create-project my-app my-app
+cd my-app
+./run.sh
 ```
 
-```
-# Create projecet
-npx @rpofuk/re-gen@1.2.1 create myproject
-cd myproject 
+The arguments are the target directory and the project name; namespaces use
+the name with `-` replaced by `_` (`my_app`). `./run.sh` installs the npm deps
+and serves the app on http://localhost:3000.
 
-# Create new view
-npx @rpofuk/re-gen@1.2.1 add demo
+The generated project uses edd-web-primitives and edd-web-widgets for UI
+components, pinned to the same version as edd-core-web.
 
-# Running
-shadow-cljs -A:dev watch :app
-```
+## Defining the app
 
+`edd.core/init` wires pages, routes, menu, translations and theme:
 
-Generated project has this structure:
-```
-
-.
-├── deps.edn
-├── Dockerfile
-├── package.json
-├── package-lock.json
-├── project.iml
-├── resources
-│   └── public
-│       ├── devcards.html
-│       └── index.html
-├── shadow-cljs.edn
-└── src
-    └── main
-        ├── edd
-        │   ├── core.cljs
-        │   ├── db.cljs
-        │   ├── events.cljs
-        │   ├── i18n.cljs
-        │   ├── routing.cljs
-        │   ├── subs.cljs
-        │   ├── util.cljs
-        │   └── views.cljs
-        └── myproject
-            ├── about
-            │   ├── db.cljs
-            │   ├── events.cljs
-            │   ├── subs.cljs
-            │   └── views.cljs
-            ├── core.cljs
-            ├── home
-            │   ├── db.cljs
-            │   ├── events.cljs
-            │   ├── subs.cljs
-            │   └── views.cljs
-            ├── i18n.cljs
-            └── styles.cljs
-
-```
-
-Adding new view
-```
-npx @rpofuk/re-gen add news
-
-; src/main/myproject/core.cljs (dont forget required :))
-; Add translations to i18n file for UX
+```clojure
+(ns my-app.core
+  (:require [edd.core :as core]
+            [my-app.home.core :as home]
+            [my-app.about.core :as about]))
 
 (defn ^:export init
-  [config]
+  [& [_config]]
   (core/init
-    {...
-     :panels       {...
-                    :news news/main-panel}
-     ...}))
-
-
-
-```
-Development
-
-```
-node bin/index.js
-sudo npm install -g ./
+   {:pages        {:home  home/main
+                   :about about/main}
+    :routes       [["/" :home]
+                   ["/about/:id" :about]]
+    :menu         [:home :about]
+    :languages    [:en :de]
+    :translations translations
+    :name         "my-app"}))
 ```
 
-During development you can use local installation:
-```
-npx re-gen --help
-```
+A page is a function returning the event to dispatch on entry and the view:
 
-## Internationalization (i18n)
-
-### Translation Function (tr)
-
-The `tr` function in `src/edd/i18n.cljs` provides flexible translation capabilities with parameter substitution.
-
-#### Usage Examples:
-
-**Basic translation:**
 ```clojure
-(tr :first-name)  ; Translates the :first-name key
+(defn main
+  [_ctx]
+  {:init  ::events/init
+   :panel views/main-panel})
 ```
 
-**Nested key translation:**
+Navigate between pages with:
+
 ```clojure
-(tr [:user :first-name])  ; Translates {:user {:first-name "..."}}
+(rf/dispatch [::edd.events/navigate :about {:id id}])
 ```
 
-**Map-based syntax:**
+Override the built-in error pages with
+`:error-pages {:not-found my-404 :bad-request my-400}`.
+
+## Calling services
+
+`::edd.client/call` sends a query or commands to a service and dispatches
+`:on-success` or `:on-failure` with the response appended:
+
 ```clojure
-(tr {:message :first-name})  ; Translates the :first-name key
-(tr {:message [:user :first-name]})  ; Translates nested key
+(rf/reg-event-fx
+ ::load-user
+ (fn [_ [_ id]]
+   {::client/call {:service    :user-svc
+                   :query      {:query-id :get-user
+                                :id       id}
+                   :on-success [::user-loaded]
+                   :on-failure [::user-load-failed]}}))
 ```
 
-**With positional parameters:**
-```clojure
-(tr {:message :greeting
-     :params ["Bob", "Alice"]})
-; If translation is "Hello {0}, welcome {1}!"
-; Returns: "Hello Bob, welcome Alice!"
-```
+Use `:command` for a single command or `:commands` for several, and
+`:retry {:attempts 3}` to retry. `::client/call-n` takes `{:items [...]}` and
+runs several calls in parallel.
 
-**With named parameters:**
-```clojure
-(tr {:message :greeting
-     :params {:name "Bob" :place "Berlin"}})
-; If translation is "Hello {name}, welcome to {place}!"
-; Returns: "Hello Bob, welcome to Berlin!"
-```
+### Dependent queries (`::client/deps`)
 
-#### Translation format:
-
-In your translation files, use placeholders for parameters:
-- Positional: `{0}`, `{1}`, `{2}`, etc.
-- Named: `{name}`, `{place}`, `{count}`, etc.
-
-Example translation structure:
-```clojure
-{:en {:greeting "Hello {name}!"
-      :welcome "Welcome {0} to {1}"
-      :user {:first-name "First Name"
-             :last-name "Last Name"}}}
-```
-
-## Declarative query dependencies (`::client/deps`)
-
-The `::edd.client/deps` re-frame effect resolves a graph of remote queries and
-then dispatches a single `:on-success` (or `:on-failure`) event with the
-combined result map. Independent deps in the same wave are fetched in parallel;
-deps with `:depends-on` wait for their inputs and can use them to build their
-query.
-
-### Spec
-
-`:deps` is a map of `{dep-key dep-spec}`. Each spec:
-
-| Key            | Required | Description                                                                 |
-| -------------- | -------- | --------------------------------------------------------------------------- |
-| `:service`     | yes      | Keyword identifying the target service (same as for `::client/call`).       |
-| `:query`       | yes      | A literal query map, **or** a fn `resolved-deps -> query map`.              |
-| `:depends-on`  | no       | Vector of dep keys that must resolve first; their results pass to `:query`. |
-| `:retry`       | no       | Retry config, same shape as for `::client/call`.                            |
-
-Validated with malli (`edd.client/DepsEffectSchema`); invalid specs throw with a
-humanized error.
-
-### Usage
+`::client/deps` resolves a graph of queries and dispatches `:on-success` once
+with all results. Independent deps run in parallel; a dep with `:depends-on`
+waits for its inputs and receives them in its `:query` function.
 
 ```clojure
 (rf/reg-event-fx
@@ -210,16 +110,34 @@ humanized error.
    (assoc db :user user :profile profile)))
 ```
 
-### Semantics
+| Key           | Required | Description                                                   |
+| ------------- | -------- | ------------------------------------------------------------- |
+| `:service`    | yes      | Target service, as for `::client/call`.                       |
+| `:query`      | yes      | A query map, or a fn `resolved-deps -> query map`.            |
+| `:depends-on` | no       | Dep keys that must resolve first.                             |
+| `:retry`      | no       | Retry config, as for `::client/call`.                         |
 
-- The `:on-success` event is dispatched once with the resolved-deps map
-  appended, e.g. `[::profile-loaded {:user {...} :profile {...}}]`.
-- The `:on-failure` event is dispatched on the first dep that fails, with the
-  failure value appended.
-- Each dep's result is the `:result` field of the response, just like a single
-  `::client/call`.
-- Cycles in `:depends-on` and references to unknown keys are detected up-front
-  and throw.
+Each dep's value is the `:result` of its response. The first failing dep
+dispatches `:on-failure`. Cycles and unknown keys throw up-front.
+
+## Translations
+
+Translations are a map per language, passed to `core/init`:
+
+```clojure
+{:en {:greeting "Hello {name}!"
+      :welcome  "Welcome {0} to {1}"
+      :user     {:first-name "First Name"}}}
+```
+
+Translate with `edd.i18n/tr`:
+
+```clojure
+(tr :greeting)
+(tr [:user :first-name])
+(tr {:message :welcome :params ["Bob" "Berlin"]})
+(tr {:message :greeting :params {:name "Bob"}})
+```
 
 ## License
 
