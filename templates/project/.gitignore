@@ -21,7 +21,7 @@
 /resources/public/config.json.dev04
 /resources/public/config.json.test01
 classes
-ext/myCA/**
+ext/
 node_modules
 npm-debug*
 package-lock.json

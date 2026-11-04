@@ -8,15 +8,16 @@ calls to edd services.
 Needs a JVM, the Clojure CLI and Node.js.
 
 ```sh
-clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.259.0"}}}' \
+clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.260.0"}}}' \
   -M -m edd.bootstrap create-project my-app my-app
 cd my-app
-./run.sh
+clojure -M:shadow-cljs:dev:test:run
 ```
 
-The arguments are the target directory and the project name; namespaces use
-the name with `-` replaced by `_` (`my_app`). `./run.sh` installs the npm deps
-and serves the app on http://localhost:3000.
+The arguments are the target directory and the project name. The app runs on
+https://my-app.local.localdevhub.com:3000; its TLS certificate is downloaded
+to `ext/` on first start. `clojure -M:format fix` formats the code and
+`clojure -X:clean` removes build output.
 
 The generated project uses edd-web-primitives and edd-web-widgets for UI
 components, pinned to the same version as edd-core-web.

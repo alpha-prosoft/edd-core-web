@@ -2,6 +2,8 @@
 
 ## Changes
 
+**[AP-1030]** Clenaup script ans certificates
+
 **[AP-1029]** Improve scafolding docu
 
 **[AP-1025]** Update dependencies, fix console and build warnings

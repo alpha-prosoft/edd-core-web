@@ -17,6 +17,10 @@
            :cider-cljs 
            {:extra-deps {cider/cider-nrepl {:mvn/version "0.63.1"}
                                      cider/piggieback {:mvn/version "0.8.0"}}}
+           :run {:main-opts ["-m" "edd.dev"]}
+           :clean {:exec-fn edd.dev/clean}
+           :format {:extra-deps {dev.weavejester/cljfmt {:mvn/version "0.16.6"}}
+                    :main-opts ["-m" "cljfmt.main"]}
            :shadow-cljs
            {:main-opts ["-m" "shadow.cljs.devtools.cli"]
             :extra-deps {thheller/shadow-cljs {:mvn/version "3.5.8"}}}}}

@@ -1,34 +1,22 @@
-# projectname 
+# projectname
 
-## Development 
+re-frame application built on edd-core-web.
+
+## Development
 
 ```shell
-shadow-cljs -A:dev watch :app
+clojure -M:shadow-cljs:dev:test:run     # https://projectname.local.localdevhub.com:3000
+clojure -M:format fix                   # or: check
+clojure -X:clean                        # remove build output and node_modules
 ```
-
-This is template project for using ClojureScript, MaterialUI with re-frame. 
-Powered by shadow-cljs. 
-
-Project is using edd-core-web in order to provide common functionality 
-like navigation and bootstraping. It is not required to use this library
-but it is usefull for starting the project. 
-
-
 
 ## Translations
 
-To put new translation you can update i18n.cljs file with new keys. 
-You can use translations on view by using i18n/tr function. 
+Add keys to `i18n.cljs` and use them in views with `tr`:
 
 ```clojure
-
 (ns projectname.home.views
   (:require [edd.i18n :as lang]))
 
-...
-
 (lang/tr :increments-count)
-
 ```
-
-## config.xml
