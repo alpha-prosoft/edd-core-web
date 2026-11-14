@@ -76,7 +76,7 @@
 ;; Integration-test uberjar
 ;;
 ;; A self-contained runnable jar with the IT suite, the SDK and
-;; clojure-playwright. Runs on the ui-runtime image (Playwright + Java)
+;; edd-core-web-playwright. Runs on the ui-runtime image (Playwright + Java)
 ;; via `java -jar`. The gallery is served separately as a static site.
 ;;
 ;;   clojure -T:build it-uberjar :out '"/dist/it"'

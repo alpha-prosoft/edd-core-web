@@ -11,7 +11,7 @@
 (browser/install!)
 
 (defmacro with-gallery
-  "Start a traced browser (clojure-playwright) and bind it for the SDK."
+  "Start a traced browser (edd-core-web-playwright) and bind it for the SDK."
   [& body]
   `(pw/with-ui [page#]
      (sdk/with-page page#

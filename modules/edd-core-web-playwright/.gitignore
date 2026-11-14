@@ -1,0 +1,10 @@
+.classes
+.cpcache
+.clj-kondo
+*~
+#*
+classes
+target
+.lsp
+target
+pom.xml

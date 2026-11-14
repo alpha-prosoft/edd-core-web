@@ -1,8 +1,9 @@
 (ns projectname.about.views
   (:require [re-frame.core :as rf]
+            [projectname.about.elements :as el]
             [projectname.about.subs :as subs]
             [edd.events :as edd-events]
-            [web.primitives.components :refer [RawButton RawGrid]]))
+            [web.primitives.components :refer [RawButton RawGrid RawTypography]]))
 
 (defn main-panel
   []
@@ -13,16 +14,19 @@
         (or (:tab params) "overview")]
     [RawGrid {:container true}
      [RawGrid {:size 12}
-      (str "About item: " (:id params))]
+      [RawTypography {:el-id el/title}
+       (str "About item: " (:id params))]]
 
      [RawGrid {:size 12}
-      [RawButton {:on-click #(rf/dispatch [::edd-events/navigate
+      [RawButton {:el-id    el/overview
+                  :on-click #(rf/dispatch [::edd-events/navigate
                                            {:page  :about
                                             :path  {:id (:id params)}
                                             :query {:tab "overview"}}])
                   :variant  (if (= tab "overview") "contained" "outlined")}
        "Overview"]
-      [RawButton {:on-click #(rf/dispatch [::edd-events/navigate
+      [RawButton {:el-id    el/details
+                  :on-click #(rf/dispatch [::edd-events/navigate
                                            {:page  :about
                                             :path  {:id (:id params)}
                                             :query {:tab "details"}}])

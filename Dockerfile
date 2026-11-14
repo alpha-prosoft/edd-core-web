@@ -23,6 +23,8 @@ USER build
 COPY --chown=build:build modules/edd-web-primitives/shadow-cljs.edn shadow-cljs.edn
 COPY --chown=build:build modules/edd-web-primitives/deps.edn deps-temp.edn
 COPY --chown=build:build modules/edd-web-primitives/tests.edn tests.edn
+COPY --chown=build:build modules/edd-core-web-playwright /opt/edd-core-web-playwright
+RUN sed -i 's#"../edd-core-web-playwright"#"/opt/edd-core-web-playwright"#g' deps-temp.edn
 
 ARG DEPLOY_TARGET
 ENV DEPLOY_TARGET=${DEPLOY_TARGET}
@@ -64,7 +66,7 @@ RUN set -e && npx shadow-cljs -A:gallery release gallery
 RUN cp -r resources/gallery/* /dist/s3/
 RUN sed -i 's/version=1/version='${VERSION}'/g' /dist/s3/index.html
 
-# Packaged, self-contained integration-test runner (SDK + clojure-playwright +
+# Packaged, self-contained integration-test runner (SDK + edd-core-web-playwright +
 # IT suites of primitives and widgets). Runs later on ui-runtime with plain `java -jar`.
 RUN set -e && clojure -T:build it-uberjar :out '"/dist/it"' :extra-src-dirs '["widgets-it"]' &&\
     ls -la /dist/it
@@ -195,7 +197,7 @@ RUN set -e &&\
     module_names="$(ls modules)" &&\
     modules=$(find modules/  -name "deps.edn" -exec dirname {} \;) &&\
     modules="$modules templates/project ." &&\
-    libs="$(ls -xm modules), ${PROJECT_NAME}" &&\
+    libs="$(ls -xm modules), edd-web-primitives-ui-sdk, ${PROJECT_NAME}" &&\
     for i in $modules; do \
       echo "Moving to $i" &&\
       cd $i &&\

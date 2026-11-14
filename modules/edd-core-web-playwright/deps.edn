@@ -1,0 +1,35 @@
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.12.6"}
+
+        ;; Same version as modules/edd-web-primitives (and the CI ui-runtime image)
+        com.microsoft.playwright/playwright {:mvn/version "1.64.0"}
+
+        ;; testing.login: Cognito AdminInitiateAuth; S3/SSM for downstream suites
+        software.amazon.awssdk/cognitoidentityprovider {:mvn/version "2.59.1"}
+        software.amazon.awssdk/auth {:mvn/version "2.59.1"}
+        software.amazon.awssdk/regions {:mvn/version "2.59.1"}
+        software.amazon.awssdk/s3 {:mvn/version "2.59.1"}
+        software.amazon.awssdk/ssm {:mvn/version "2.59.1"}
+
+        org.clojure/data.json {:mvn/version "2.5.2"}
+        cheshire/cheshire {:mvn/version "6.2.1"}
+
+        lambdaisland/kaocha {:mvn/version "1.91.1392"}
+
+        ;; testing.repl: nREPL with a browser attached, for exploring an app
+        nrepl/nrepl {:mvn/version "1.8.0"}
+        cider/cider-nrepl {:mvn/version "0.64.1"}}
+
+ :aliases
+ {:test
+  {:extra-paths ["test"]
+   :main-opts ["-m" "kaocha.runner"]}
+
+  :aggregate
+  {:main-opts ["-m" "testing.pw-aggregate"]}
+
+  :traces
+  {:main-opts ["-m" "testing.pw-http-server"]}
+
+  :nrepl
+  {:main-opts ["-m" "testing.repl"]}}}

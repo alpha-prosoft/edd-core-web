@@ -8,7 +8,7 @@ calls to edd services.
 Needs a JVM, the Clojure CLI and Node.js.
 
 ```sh
-clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.261.0"}}}' \
+clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.262.0"}}}' \
   -M -m edd.bootstrap create-project my-app my-app
 cd my-app
 clojure -M:shadow-cljs:dev:test:run
@@ -20,7 +20,12 @@ to `ext/` on first start. `clojure -M:format fix` formats the code and
 `clojure -X:clean` removes build output.
 
 The generated project uses edd-web-primitives and edd-web-widgets for UI
-components, pinned to the same version as edd-core-web.
+components, pinned to the same version as edd-core-web. Its `AGENTS.md`
+describes how to use the libraries; `clojure -M:it` runs the Playwright tests,
+`clojure -M:guide` regenerates the screenshot user guide in `docs/guide` and
+`clojure -M:explore` opens an nREPL with a browser for exploring the app, all
+against the running app. They are built on
+[edd-core-web-playwright](modules/edd-core-web-playwright).
 
 ## Defining the app
 

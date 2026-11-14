@@ -24,7 +24,7 @@
                    "../edd-web-primitives/src/shared"]
    :replace-deps  {org.clojure/clojure                  {:mvn/version "1.12.6"}
                    com.microsoft.playwright/playwright  {:mvn/version "1.64.0"}
-                   com.alpha-prosoft/clojure-playwright {:mvn/version "1.3"}
+                   edd/edd-core-web-playwright          {:local/root "../edd-core-web-playwright"}
                    lambdaisland/kaocha                  {:mvn/version "1.91.1392"}}
    :main-opts     ["-m" "kaocha.runner" "--config-file" "tests-it.edn"]}
 

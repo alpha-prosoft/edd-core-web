@@ -1,0 +1,4 @@
+#kaocha/v1
+{:tests [{:id          :it
+          :test-paths  ["test/it"]
+          :ns-patterns ["-it$"]}]}

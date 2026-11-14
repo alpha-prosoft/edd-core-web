@@ -129,9 +129,10 @@ selectors, MUI class names or XPath. Instead:
 |------------------------------|------------------------------------------|-----------------|
 | `edd-web-primitives`         | the primitives (cljs) + `el-id` helpers  | the app (cljs)  |
 | `edd-web-primitives-ui-sdk`  | `web.primitives.sdk.*` + `el-id` helpers | the tests (clj) |
+| `edd-core-web-playwright`    | `testing.pw` (traces), `testing.repl`    | the tests (clj) |
 
 The SDK only depends on Clojure and `com.microsoft.playwright/playwright`.
-Any runner works (clojure.test, kaocha, clojure-playwright).
+Any runner works (clojure.test, kaocha, edd-core-web-playwright).
 
 ### 1. Give elements an id
 
@@ -182,7 +183,7 @@ Any runner works (clojure.test, kaocha, clojure-playwright).
     (is (= "Order saved" (snackbar/message (els/saved-toast))))))
 ```
 
-With clojure-playwright (traces for every test):
+With edd-core-web-playwright (traces for every test):
 
 ```clojure
 (deftest create-urgent-order

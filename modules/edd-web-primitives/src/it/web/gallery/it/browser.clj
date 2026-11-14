@@ -1,5 +1,5 @@
 (ns web.gallery.it.browser
-  "Optionally points clojure-playwright at an already-installed Chromium
+  "Optionally points edd-core-web-playwright at an already-installed Chromium
    instead of Playwright's bundled browser.
 
    Playwright can drive any compatible Chromium via

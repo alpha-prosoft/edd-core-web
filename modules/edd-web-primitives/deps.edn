@@ -26,23 +26,23 @@
           :replace-deps  {org.clojure/clojure                 {:mvn/version "1.12.6"}
                           com.microsoft.playwright/playwright {:mvn/version "1.64.0"}}}
 
-         ;; Integration tests against the gallery: SDK + clojure-playwright runner.
+         ;; Integration tests against the gallery: SDK + edd-core-web-playwright runner.
          :it
          {:replace-paths ["src/it" "src/sdk" "src/shared"]
           :replace-deps  {org.clojure/clojure                  {:mvn/version "1.12.6"}
                           com.microsoft.playwright/playwright  {:mvn/version "1.64.0"}
-                          com.alpha-prosoft/clojure-playwright {:mvn/version "1.3"}
+                          edd/edd-core-web-playwright          {:local/root "../edd-core-web-playwright"}
                           lambdaisland/kaocha                  {:mvn/version "1.91.1392"}}
           :main-opts     ["-m" "kaocha.runner" "--config-file" "tests-it.edn"]}
 
          ;; Local only: HTML report of the last IT run (target/pw-traces/index.html)
          ;; and an HTTP server so its trace-viewer links work.
          :it-report
-         {:replace-deps {com.alpha-prosoft/clojure-playwright {:mvn/version "1.3"}}
+         {:replace-deps {edd/edd-core-web-playwright {:local/root "../edd-core-web-playwright"}}
           :main-opts    ["-m" "testing.pw-aggregate"]}
 
          :it-traces
-         {:replace-deps {com.alpha-prosoft/clojure-playwright {:mvn/version "1.3"}}
+         {:replace-deps {edd/edd-core-web-playwright {:local/root "../edd-core-web-playwright"}}
           :main-opts    ["-m" "testing.pw-http-server"]}
 
          :build

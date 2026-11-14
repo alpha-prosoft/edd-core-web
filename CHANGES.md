@@ -2,6 +2,15 @@
 
 ## Changes
 
+**[AP-1071]** Add edd-core-web-playwright module, scaffold AGENTS.md, UI tests, guide and explorer
+- modules/edd-core-web-playwright: clojure-playwright moved in (testing.*),
+  Playwright 1.64.0, REPL headless option and preloaded namespaces
+- primitives and widgets integration tests use the module
+- scaffold: AGENTS.md on using the libraries, el-ids, tests, guide
+  generation and exploring the app over nREPL
+- scaffold: el-ids on home/about, :it tests, :guide (docs/guide),
+  :explore (nREPL with a browser)
+
 **[AP-1031]** Remove :classes, fix frame deps and template menu
 
 **[AP-1030]** Clenaup script ans certificates

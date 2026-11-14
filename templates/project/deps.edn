@@ -17,6 +17,20 @@
            :cider-cljs 
            {:extra-deps {cider/cider-nrepl {:mvn/version "0.63.1"}
                                      cider/piggieback {:mvn/version "0.8.0"}}}
+           :it {:extra-paths ["test/it"]
+                :extra-deps {edd/edd-web-primitives-ui-sdk {:local/root "../../modules/edd-web-primitives"}
+                             edd/edd-core-web-playwright {:local/root "../../modules/edd-core-web-playwright"}
+                             lambdaisland/kaocha {:mvn/version "1.91.1392"}}
+                :main-opts ["-m" "kaocha.runner" "--config-file" "tests-it.edn"]}
+           :guide {:extra-paths ["test/it" "test/guide"]
+                   :extra-deps {edd/edd-web-primitives-ui-sdk {:local/root "../../modules/edd-web-primitives"}
+                                edd/edd-core-web-playwright {:local/root "../../modules/edd-core-web-playwright"}}
+                   :main-opts ["-m" "projectname.guide"]}
+           :explore {:extra-paths ["test/it" "test/explore"]
+                     :extra-deps {edd/edd-web-primitives-ui-sdk {:local/root "../../modules/edd-web-primitives"}
+                                  edd/edd-core-web-playwright {:local/root "../../modules/edd-core-web-playwright"}}
+                     :main-opts ["-m" "testing.repl" "7888" "projectname.explore"]}
+           :headed {:jvm-opts ["-Dplaywright.browser.headless=false"]}
            :run {:main-opts ["-m" "edd.dev"]}
            :clean {:exec-fn edd.dev/clean}
            :format {:extra-deps {dev.weavejester/cljfmt {:mvn/version "0.16.6"}}
