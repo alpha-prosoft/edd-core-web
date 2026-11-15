@@ -1,5 +1,8 @@
 (ns web.widgets.login.db)
 
+(def remembered-email-key
+  "web.widgets.login/last-email")
+
 (def default-db
   {::user                    nil
    ::username                ""
@@ -13,7 +16,10 @@
    ::on-logout-hook          nil
    ::forgot-password-visible false
    ::dialog-visible          false
-   ::interrupted-event nil
+   ::interrupted-event       nil
    ::show-password?          false
-  ::loading?                false
-  ::confirmed?              false})
+   ::loading?                false
+   ::resending?              false
+   ::notice                  nil
+   ::submits                 0
+   ::confirmed?              false})

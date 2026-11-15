@@ -2,6 +2,19 @@
 
 ## Changes
 
+**[AP-1087]** Login widget: real form, no lost keystrokes, neutral reset, plain errors
+- Fields keep every keystroke; the email is trimmed and lower-cased only when sent
+- A <form>: Enter sends what the fields hold; buttons disabled only while busy
+- name/autocomplete, named dialog and password toggle, focus to the field
+  of an error, Escape back to the opener (:focus-fallback)
+- Remembers the last email that logged in (:remember-email, default on)
+- Reset answers every address the same, waits for Cognito, says when
+  offline; its Resend code calls ForgotPassword
+- Cognito refusals in plain words (en, de, ru, ua); "Log in", "Create an
+  account", "Email address" (:translations keeps old texts)
+- Full screen below 600 px; confirmation names the address; :register-note
+- Widgets unit tests and login browser tests run in CI
+
 **[AP-1078]** Use edd-core-web-playwright start-browser in all tests
 - start-browser takes :executable-path (PLAYWRIGHT_CHROME), :timeout-ms,
   :viewport, :device-scale-factor and :color-scheme

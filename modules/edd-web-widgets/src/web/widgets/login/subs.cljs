@@ -32,12 +32,12 @@
    (::db/form-type db)))
 
 (rf/reg-sub
-  ::user-name
-  (fn [db]
-    (let [user (get-in db [::edd-db/user])]
-      (when
-        (some? user)
-        (utils/decode-user-name (:id-token user))))))
+ ::user-name
+ (fn [db]
+   (let [user (get-in db [::edd-db/user])]
+     (when
+      (some? user)
+       (utils/decode-user-name (:id-token user))))))
 
 (rf/reg-sub
  ::user-id
@@ -110,6 +110,32 @@
  (fn [db]
    (get-in db [::db/loading?] false)))
 
+(rf/reg-sub
+ ::resending?
+ (fn [db]
+   (boolean (::db/resending? db))))
 
+(rf/reg-sub
+ ::notice
+ (fn [db]
+   (::db/notice db)))
 
+(rf/reg-sub
+ ::register-note
+ (fn [db]
+   (::db/register-note db)))
 
+(rf/reg-sub
+ ::focus-fallback
+ (fn [db]
+   (::db/focus-fallback db)))
+
+(rf/reg-sub
+ ::confirmation-code
+ (fn [db]
+   (::db/confirmation-code db)))
+
+(rf/reg-sub
+ ::submits
+ (fn [db]
+   (get db ::db/submits 0)))

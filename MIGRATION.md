@@ -1,5 +1,40 @@
 # Migration
 
+## Login widget
+
+Events, subs, views and effects keep their names. What changes for an app:
+
+- English texts: "Log in" (was "Login"), "Create an account" ("Register"),
+  "Email address" ("Username (e-mail)"), "Log out" ("Logout"). Tests that find
+  the dialog by text need the new words, or keep the old ones:
+
+  ```clojure
+  (rf/dispatch [::login-events/init
+                {:translations {:en {:login    "Login"
+                                     :register "Register"
+                                     :username "Username (e-mail)"
+                                     :logout   "Logout"
+                                     :titles   {:login    "Login"
+                                                :register "Register"}}}}])
+  ```
+
+- The dialog is a `<form>`: Enter sends it and the submit button is disabled
+  only while a request runs. An incomplete form says what is missing.
+- `::db/username` holds the email as typed; effects trim and lower-case it
+  (`utils/sent-email`) when they call Cognito.
+- Errors are always translation keys, never Cognito's sentence
+  (`utils/cognito-error-key`).
+- The password reset moves to the code step only after Cognito answered, with
+  the same notice for an address with and without an account. Its "Resend
+  code" calls `ForgotPassword`.
+- The email that logged in last is kept in local storage
+  (`web.widgets.login/last-email`) and filled in when the dialog opens.
+  Switch it off with `{:remember-email false}`.
+- The password toggle switches the field to `type="text"` (was `"input"`).
+
+New `::init` options: `:remember-email` (true), `:register-note` (none),
+`:translations` (none), `:focus-fallback` (none).
+
 ## `:classes` removed
 
 `:classes` was left over from MUI v4 `withStyles`. Nothing filled it, so every

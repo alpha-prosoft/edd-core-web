@@ -20,20 +20,48 @@
  (fn [db [_ init?]]
    (assoc-in db [::db/init?] init?)))
 
+(defn init
+  "Options of the widget: `:remember-email` (default true) offers the email address that logged in last;
+   `:register-note` is shown under the sign-up form (a reagent component, or `{:text \"…\" :links [{:label :href}]}`);
+   `:translations` overrides texts per language (`{:en {:login \"Login\"}}`); `:focus-fallback` (a CSS selector or a
+   fn returning an element) gets the focus when the dialog closes and what opened it is gone."
+  [{:keys [db]} [_ {:keys [language-switcher on-logout-hook remember-email register-note translations focus-fallback]
+                    :or   {language-switcher false
+                           remember-email    true}}]]
+  {:db (assoc db
+              ::db/show-language-switcher? language-switcher
+              ::db/on-logout-hook on-logout-hook
+              ::db/remember-email? (boolean remember-email)
+              ::db/register-note register-note
+              ::db/translations translations
+              ::db/focus-fallback focus-fallback)})
+
 (rf/reg-event-fx
  ::init
- (fn [{:keys [db]} [_ {:keys [language-switcher on-logout-hook]
-                       :or   {language-switcher false}}]]
-   {:db (-> db
-            (assoc-in [::db/show-language-switcher?] language-switcher)
-            (assoc-in [::db/on-logout-hook] on-logout-hook))}))
+ init)
+
+(defn remember-email?
+  [db]
+  (get db ::db/remember-email? true))
+
+(rf/reg-cofx
+ ::remembered-email
+ (fn [cofx _]
+   (assoc cofx :remembered-email (try
+                                   (.getItem js/localStorage db/remembered-email-key)
+                                   (catch :default _ nil)))))
+
+(rf/reg-fx
+ ::remember-email
+ (fn [email]
+   (try
+     (.setItem js/localStorage db/remembered-email-key email)
+     (catch :default _ nil))))
 
 (rf/reg-event-db
  ::username-change
  (fn [db [_ value]]
-   (assoc db ::db/username (-> value
-                               (str/lower-case)
-                               (str/trim)))))
+   (assoc db ::db/username value)))
 
 (rf/reg-event-db
  ::password-change
@@ -56,7 +84,9 @@
              ::db/confirmation-visible false
              ::db/confirmation-code ""
              ::db/confirmed? false
-             ::db/loading? false)))
+             ::db/loading? false
+             ::db/resending? false
+             ::db/notice nil)))
 
 (rf/reg-event-db
  ::close-dialog
@@ -68,17 +98,32 @@
   (-> (assoc-in db [::edd-db/user] auth)
       close-dialog))
 
+(defn login-succeeded
+  [{:keys [db]} [_ auth]]
+  (let [do-after-load
+        (get-in db [::db/interrupted-event])
+
+        config
+        (::edd-db/config db)
+
+        email
+        (utils/sent-email (::db/username db))
+
+        remember?
+        (and (remember-email? db)
+             (some? (utils/validate-email email)))]
+    {:db (login-suceeded db auth)
+     :fx [(when remember?
+            [::remember-email email])
+          (cond
+            (or (get config :ApplicationId)
+                (get config :ApplicationName))
+            [:dispatch [::edd-events/load-application do-after-load]]
+            do-after-load [:dispatch do-after-load])]}))
+
 (rf/reg-event-fx
  ::login-succeeded
- (fn [{:keys [db]} [_ auth]]
-   (let [do-after-load (get-in db [::db/interrupted-event])
-         config (::edd-db/config db)]
-     {:db (login-suceeded db auth)
-      :fx [(cond
-             (or (get config :ApplicationId)
-                 (get config :ApplicationName))
-             [:dispatch [::edd-events/load-application do-after-load]]
-             do-after-load [:dispatch do-after-load])]})))
+ login-succeeded)
 
 (defn request-code
   [db]
@@ -162,12 +207,30 @@
    {:db       (assoc-in db [::db/do-after-login] on-success)
     :dispatch [::open-dialog :login]}))
 
-(rf/reg-event-db
+(defn open-dialog
+  "Opens the dialog at `form-type`. The email address that logged in last is filled in when none is typed; it is read
+   now, as the dialog opens, so it never overwrites what is typed."
+  [{:keys [db remembered-email]} [_ form-type]]
+  (let [opened
+        (assoc db
+               ::db/form-type form-type
+               ::db/dialog-visible true
+               ::db/error-message-visible false
+               ::db/error-message ""
+               ::db/notice nil)
+
+        prefill?
+        (and (remember-email? db)
+             (str/blank? (::db/username db))
+             (not (str/blank? remembered-email)))]
+    {:db (if prefill?
+           (assoc opened ::db/username remembered-email)
+           opened)}))
+
+(rf/reg-event-fx
  ::open-dialog
- (fn [db [_ form-type]]
-   (-> db
-       (assoc ::db/form-type form-type)
-       (assoc ::db/dialog-visible true))))
+ [(rf/inject-cofx ::remembered-email)]
+ open-dialog)
 
 (rf/reg-event-db
  ::register-success
@@ -214,32 +277,104 @@
    (assoc db
           ::db/error-message-visible false
           ::db/error-message ""
+          ::db/notice nil
           ::db/form-type :forgot-password)))
+
+(defn reset-asked
+  "Asks for a reset code. The dialog stays at the address, busy, until Cognito answered."
+  [{:keys [db]} _]
+  {:db (assoc db
+              ::db/error-message ""
+              ::db/error-message-visible false
+              ::db/notice nil
+              ::db/loading? true)
+   :fx [[:amplify-forgot-password {:username   (::db/username db)
+                                   :on-success [::reset-code-sent]
+                                   :on-failure [::reset-code-refused]}]]})
 
 (rf/reg-event-fx
  ::reset-password
- (fn [{:keys [db]}]
-   {:db (assoc db ::db/form-type :confirm-password-reset
-               ::db/error-message ""
-               ::db/password ""
-               ::db/error-message-visible false
-               ::db/loading? true)
-    :fx [[:amplify-forgot-password {:username   (::db/username db)
-                                    :on-success [::reset-password-succeeded]
-                                    :on-failure [::register-failed]}]]}))
+ reset-asked)
+
+(defn reset-code-sent
+  "The code step, with the same notice whether or not the address has an account."
+  [db _]
+  (assoc db
+         ::db/form-type :confirm-password-reset
+         ::db/password ""
+         ::db/confirmation-code ""
+         ::db/loading? false
+         ::db/error-message ""
+         ::db/error-message-visible false
+         ::db/notice :reset-code-sent))
+
+(rf/reg-event-db
+ ::reset-code-sent
+ reset-code-sent)
+
+(defn reset-code-refused
+  "An address without an account is answered exactly like one with an account, so nobody learns which addresses have
+   one. Other refusals keep the dialog at the address and say why."
+  [db [_ {:keys [type message]}]]
+  (if (= "UserNotFoundException" type)
+    (reset-code-sent db nil)
+    (assoc db
+           ::db/error-message-visible true
+           ::db/error-message message
+           ::db/loading? false)))
+
+(rf/reg-event-db
+ ::reset-code-refused
+ reset-code-refused)
 
 (rf/reg-event-db
  ::reset-password-succeeded
  (fn [db [_ _]]
    (assoc db ::db/loading? false)))
 
+(defn resend-code
+  "A new reset code (`ForgotPassword`) while a password is reset, else the code that confirms a new account
+   (`ResendConfirmationCode`, which answers an existing account with \"User is already confirmed.\")."
+  [{:keys [db]} _]
+  (let [request
+        {:username   (::db/username db)
+         :on-success [::code-resent]
+         :on-failure [::code-resend-failed]}]
+    {:db (assoc db
+                ::db/error-message ""
+                ::db/error-message-visible false
+                ::db/notice nil
+                ::db/resending? true)
+     :fx [(if (= :confirm-password-reset (::db/form-type db))
+            [:amplify-forgot-password request]
+            [:amplify-resend-confirmation-code request])]}))
+
 (rf/reg-event-fx
  ::resend-code
- (fn [{:keys [db]}]
-   {:db (assoc db
-               ::db/error-message ""
-               ::db/error-message-visible false)
-    :fx [(request-code db)]}))
+ resend-code)
+
+(defn code-resent
+  [db _]
+  (assoc db
+         ::db/resending? false
+         ::db/notice :code-resent))
+
+(rf/reg-event-db
+ ::code-resent
+ code-resent)
+
+(defn code-resend-failed
+  [db [_ {:keys [type message] :as refusal}]]
+  (if (= "UserNotFoundException" type)
+    (code-resent db refusal)
+    (assoc db
+           ::db/resending? false
+           ::db/error-message-visible true
+           ::db/error-message message)))
+
+(rf/reg-event-db
+ ::code-resend-failed
+ code-resend-failed)
 
 (rf/reg-event-fx
  ::confirm-reset-password
@@ -286,3 +421,41 @@
             (not username-invalid?))
        {:dispatch [::reset-password]}
        :else {}))))
+
+(def submit-events
+  {:login                  [::do-login]
+   :register               [::do-register]
+   :forgot-password        [::reset-password]
+   :confirm-password-reset [::confirm-reset-password]
+   :confirm-login          [::submit-verification]})
+
+(defn submit-form
+  "The dialog's form is sent with what its fields hold right now, typed or filled by the browser a moment ago: the
+   values are taken, checked, and the step goes out. Nothing goes out while a request is under way."
+  [{:keys [db]} [_ form-type {:keys [username password code]}]]
+  (let [taken
+        (cond-> (update db ::db/submits (fnil inc 0))
+          (some? username) (assoc ::db/username username)
+          (some? password) (assoc ::db/password password)
+          (some? code)     (assoc ::db/confirmation-code (str/trim code)))
+
+        problem
+        (utils/submit-problem form-type {:username (::db/username taken)
+                                         :password (::db/password taken)
+                                         :code     (::db/confirmation-code taken)})]
+    (cond
+      (::db/loading? db)
+      {}
+
+      problem
+      {:db (assoc taken
+                  ::db/error-message problem
+                  ::db/error-message-visible true)}
+
+      :else
+      {:db (assoc taken ::db/loading? true)
+       :fx [[:dispatch (submit-events form-type)]]})))
+
+(rf/reg-event-fx
+ ::submit-form
+ submit-form)

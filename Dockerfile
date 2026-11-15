@@ -100,6 +100,13 @@ RUN set -e &&\
     mkdir -p /dist/widgets-gallery &&\
     cp -r resources/gallery/* /dist/widgets-gallery/
 
+# edd-web-widgets ClojureScript unit tests, run in a browser in the uitest stage.
+RUN set -e &&\
+    cd edd/modules/edd-web-widgets &&\
+    clojure -M:shadow-cljs:test compile test &&\
+    mkdir -p /dist/karma/widgets/target &&\
+    cp target/ci.js /dist/karma/widgets/target/ci.js
+
 # edd-core-web ClojureScript unit tests, run in a browser in the uitest stage.
 RUN set -e &&\
     cd edd &&\
@@ -128,17 +135,18 @@ COPY --from=primitives /dist/karma karma
 COPY --from=widgets /dist/karma karma
 COPY karma.conf.js karma/primitives/karma.conf.js
 COPY karma.conf.js karma/core/karma.conf.js
+COPY karma.conf.js karma/widgets/karma.conf.js
 
 ENV IT_JAR=/opt/uitest/it-tests.jar
 ENV GALLERY_DIR=/opt/uitest/gallery
 ENV GALLERY_PORT=3002
 
-# ClojureScript unit tests of primitives and core in Playwright's Chromium.
+# ClojureScript unit tests of primitives, core and widgets in Playwright's Chromium.
 RUN set -e &&\
     cd karma &&\
     npm install --no-save --no-audit --no-fund karma karma-cljs-test karma-chrome-launcher karma-junit-reporter &&\
     export CHROME_BIN=$(ls -d /ms-playwright/chromium-*/chrome-linux*/chrome | head -1) &&\
-    for suite in primitives core; do \
+    for suite in primitives core widgets; do \
       echo "ClojureScript unit tests: $suite" &&\
       npx karma start $suite/karma.conf.js --single-run || exit 1; \
     done
@@ -146,7 +154,7 @@ RUN set -e &&\
 RUN set -e &&\
     bash run-it.sh &&\
     GALLERY_DIR=/opt/uitest/widgets-gallery GALLERY_PORT=3009 \
-      bash run-it.sh web.gallery.it.smoke-test web.widgets.gallery.it.widgets-test &&\
+      bash run-it.sh web.gallery.it.smoke-test web.widgets.gallery.it.widgets-test web.widgets.gallery.it.login-test &&\
     date > /opt/uitest/it-passed
 
 # ===========================================================================

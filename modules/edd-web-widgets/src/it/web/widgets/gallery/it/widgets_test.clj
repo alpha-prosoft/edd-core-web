@@ -7,8 +7,7 @@
    [web.primitives.sdk.core :as sdk]
    [web.primitives.sdk.dialog :as dialog]
    [web.primitives.sdk.select :as select]
-   [web.primitives.sdk.snackbar :as snackbar]
-   [web.primitives.sdk.text-field :as text-field])
+   [web.primitives.sdk.snackbar :as snackbar])
   (:import
    [java.nio.file Files Path]
    [java.nio.file.attribute FileAttribute]
@@ -139,26 +138,24 @@
             (is
              (sdk/becomes-visible? [:login-bar :register]))))
 
-    (step "login opens the dialog with the submit button disabled"
+    (step "login opens the dialog; submit is enabled, an empty form says what is missing"
           (fn []
             (button/click! [:login-bar :login])
             (dialog/wait-open! [:login-bar :dialog])
 
             (is
-             (= "Login"
+             (= "Log in"
                 (dialog/title [:login-bar :dialog])))
 
             (is
-             (false?
-              (button/enabled? [:login-bar :submit-login])))))
+             (button/enabled? [:login-bar :submit-login]))
 
-    (step "valid credentials enable submit"
-          (fn []
-            (text-field/fill! [:login-bar :username] "user@example.com")
-            (text-field/fill! [:login-bar :password] "Passw0rdX")
+            (button/click! [:login-bar :submit-login])
 
             (is
-             (sdk/eventually #(button/enabled? [:login-bar :submit-login])))))
+             (sdk/eventually= "Enter an email address like name@example.com."
+                              #(when (sdk/present? [:login-bar :error-message])
+                                 (sdk/text [:login-bar :error-message]))))))
 
     (step "visibility toggle shows the password"
           (fn []
@@ -169,7 +166,7 @@
             (button/click! [:login-bar :password-visibility])
 
             (is
-             (sdk/eventually= "input"
+             (sdk/eventually= "text"
                               #(sdk/attr [:login-bar :password] "type")))))
 
     (step "close button closes the dialog"

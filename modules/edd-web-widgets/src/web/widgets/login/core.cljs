@@ -137,121 +137,110 @@
 
 (defn match-error-message
   [body]
-  (let [message (.-message body)
-        message-type (aget body "__type")
-        matched-key (get (first
-                          (filter
-                           (fn [{:keys [search type]}]
-                             (and
-                              (= type message-type)
-                              (str/includes? message search)))
-                           known-messages))
-                         :key)]
-    {:message (or matched-key message)
+  (let [message
+        (.-message body)
+
+        message-type
+        (aget body "__type")]
+    {:message (utils/cognito-error-key message-type message)
      :type    message-type}))
+
+(def network-error
+  {:message :network-error
+   :type    "NetworkError"})
+
+(def ^:private cognito-url
+  (str "https://cognito-idp." "eu-west-1" ".amazonaws.com"))
+
+(defn- refused!
+  [on-failure response]
+  (let [parsed
+        (.then (.json response)
+               (fn [body]
+                 (rf/dispatch (conj on-failure (match-error-message body)))))]
+    (.catch parsed
+            (fn [_]
+              (rf/dispatch (conj on-failure {:message :unknown-error
+                                             :type    (str (.-status response))}))))))
+
+(defn- cognito-call!
+  "Sends `target` with `body` to Cognito. An answer goes to `on-answer`, a refusal to `on-failure` as a
+   translation key, and a request that never reached Cognito to `on-failure` as `network-error`."
+  [target body on-failure on-answer]
+  (let [request
+        (clj->js {:method  "POST"
+                  :body    (.stringify js/JSON (clj->js body))
+                  :headers {"X-Amz-Target" (str "AWSCognitoIdentityProviderService." target)
+                            "Content-Type" "application/x-amz-json-1.1"}})]
+    (.then (.fetch js/window cognito-url request)
+           (fn [response]
+             (if (.-ok response)
+               (.then (.json response) on-answer)
+               (refused! on-failure response)))
+           (fn [_]
+             (rf/dispatch (conj on-failure network-error))))))
+
+(defn- answer-to
+  [on-success]
+  (fn [answer]
+    (rf/dispatch (conj on-success (js->clj answer :keywordize-keys true)))))
+
+(defn- client-id
+  []
+  (:user-pool-web-client-id (get-config)))
 
 (fx/reg-fx
  :amplify-register
  (fn [{:keys [username password on-success on-failure]}]
-   (let [config (get-config)]
-     (-> (.fetch js/window (str "https://cognito-idp." "eu-west-1" ".amazonaws.com")
-                 (clj->js {:method  "POST"
-                           :body    (-> {}
-                                        (assoc
-                                         :ClientId (:user-pool-web-client-id config)
-                                         :Username username
-                                         :Password password
-                                         :UserAttributes [{:Name  "email"
-                                                           :Value username}])
-                                        (clj->js)
-                                        (#(.stringify js/JSON %)))
-                           :headers {"X-Amz-Target" "AWSCognitoIdentityProviderService.SignUp"
-                                     "Content-Type" "application/x-amz-json-1.1"}}))
-         (.then (fn [%]
-                  (let [status (.-status %)]
-                    (if (> status 299)
-                      (throw (ex-info status %))
-                      (.json %)))))
-         (.then (fn [%]
-                  (rf/dispatch [:bla (js->clj % :keywordize-keys true)])
-                  (rf/dispatch (conj on-success (js->clj % :keywordize-keys true)))))
-         (.catch (fn [e]
-                   (-> (ex-data e)
-                       (.json)
-                       (.then (fn [body]
-                                (rf/dispatch (conj on-failure
-                                                   (match-error-message body))))))))))))
+   (let [email
+         (utils/sent-email username)]
+     (cognito-call! "SignUp"
+                    {:ClientId       (client-id)
+                     :Username       email
+                     :Password       password
+                     :UserAttributes [{:Name  "email"
+                                       :Value email}]}
+                    on-failure
+                    (answer-to on-success)))))
 
 (fx/reg-fx
  :amplify-verify
  (fn [{:keys [username code on-success on-failure]}]
-   (let [config (get-config)]
-     (-> (.fetch js/window (str "https://cognito-idp." "eu-west-1" ".amazonaws.com")
-                 (clj->js {:method  "POST"
-                           :body    (-> {}
-                                        (assoc
-                                         :ClientId (:user-pool-web-client-id config)
-                                         :Username username
-                                         :ConfirmationCode code)
-                                        (clj->js)
-                                        (#(.stringify js/JSON %)))
-                           :headers {"X-Amz-Target" "AWSCognitoIdentityProviderService.ConfirmSignUp"
-                                     "Content-Type" "application/x-amz-json-1.1"}}))
-         (.then (fn [%]
-                  (let [status (.-status %)]
-                    (if (> status 299)
-                      (throw (ex-info status %))
-                      (.json %)))))
-         (.then (fn [%]
-                  (rf/dispatch (conj on-success (js->clj % :keywordize-keys true)))))
-         (.catch (fn [e]
-                   (-> (ex-data e)
-                       (.json)
-                       (.then (fn [body]
-                                (rf/dispatch (conj on-failure
-                                                   (match-error-message body))))))))))))
+   (cognito-call! "ConfirmSignUp"
+                  {:ClientId         (client-id)
+                   :Username         (utils/sent-email username)
+                   :ConfirmationCode (str/trim (str code))}
+                  on-failure
+                  (answer-to on-success))))
+
+(defn- authenticated!
+  [on-success on-failure answer]
+  (let [response
+        (:AuthenticationResult (js->clj answer :keywordize-keys true))
+
+        id-token
+        (:IdToken response)]
+    (if (valid-id-token? id-token)
+      (let [auth
+            {:id-token      id-token
+             :refresh-token (:RefreshToken response)
+             :access-token  (:AccessToken response)}]
+        (store-auth! auth)
+        (rf/dispatch (conj on-success auth)))
+      (rf/dispatch (conj on-failure
+                         {:message :unknown-error
+                          :type    "NoAuthenticationResult"})))))
 
 (fx/reg-fx
  :amplify-login
  (fn [{:keys [username password on-success on-failure]}]
-   (let [config (get-config)]
-     (-> (.fetch js/window (str "https://cognito-idp." "eu-west-1" ".amazonaws.com")
-                 (clj->js {:method  "POST"
-                           :body    (-> {}
-                                        (assoc
-                                         :ClientId (:user-pool-web-client-id config)
-                                         :AuthFlow "USER_PASSWORD_AUTH"
-                                         :AuthParameters {:USERNAME username
-                                                          :PASSWORD password})
-                                        (clj->js)
-                                        (#(.stringify js/JSON %)))
-                           :headers {"X-Amz-Target" "AWSCognitoIdentityProviderService.InitiateAuth"
-                                     "Content-Type" "application/x-amz-json-1.1"}}))
-         (.then (fn [%]
-                  (let [status (.-status %)]
-                    (if (> status 299)
-                      (throw (ex-info status %))
-                      (.json %)))))
-         (.then (fn [%]
-                   (let [response (-> %
-                                      (js->clj :keywordize-keys true)
-                                      (:AuthenticationResult))
-                         id-token (:IdToken response)]
-                     (if (valid-id-token? id-token)
-                       (let [auth {:id-token      id-token
-                                   :refresh-token (:RefreshToken response)
-                                   :access-token  (:AccessToken response)}]
-                         (store-auth! auth)
-                         (rf/dispatch (conj on-success auth)))
-                       (rf/dispatch (conj on-failure
-                                          {:message :unknown-error
-                                           :type    "NoAuthenticationResult"}))))))
-         (.catch (fn [e]
-                   (-> (ex-data e)
-                       (.json)
-                       (.then (fn [body]
-                                (rf/dispatch (conj on-failure
-                                                   (match-error-message body))))))))))))
+   (cognito-call! "InitiateAuth"
+                  {:ClientId       (client-id)
+                   :AuthFlow       "USER_PASSWORD_AUTH"
+                   :AuthParameters {:USERNAME (utils/sent-email username)
+                                    :PASSWORD password}}
+                  on-failure
+                  #(authenticated! on-success on-failure %))))
 
 (defn auth []
   (try
@@ -311,88 +300,31 @@
 (fx/reg-fx
  :amplify-forgot-password
  (fn [{:keys [username on-success on-failure]}]
-   (let [config (get-config)]
-     (-> (.fetch js/window (str "https://cognito-idp." "eu-west-1" ".amazonaws.com")
-                 (clj->js {:method  "POST"
-                           :body    (-> {}
-                                        (assoc
-                                         :ClientId (:user-pool-web-client-id config)
-                                         :Username username)
-                                        (clj->js)
-                                        (#(.stringify js/JSON %)))
-                           :headers {"X-Amz-Target" "AWSCognitoIdentityProviderService.ForgotPassword"
-                                     "Content-Type" "application/x-amz-json-1.1"}}))
-         (.then (fn [%]
-                  (let [status (.-status %)]
-                    (if (> status 299)
-                      (throw (ex-info status %))
-                      (.json %)))))
-         (.then (fn [%]
-                  (rf/dispatch (conj on-success (js->clj % :keywordize-keys true)))))
-         (.catch (fn [e]
-                   (-> (ex-data e)
-                       (.json)
-                       (.then (fn [body]
-                                (rf/dispatch (conj on-failure
-                                                   (match-error-message body))))))))))))
+   (cognito-call! "ForgotPassword"
+                  {:ClientId (client-id)
+                   :Username (utils/sent-email username)}
+                  on-failure
+                  (answer-to on-success))))
 
 (fx/reg-fx
  :amplify-conform-forgot-password
  (fn [{:keys [username password code on-success on-failure]}]
-   (let [config (get-config)]
-     (-> (.fetch js/window (str "https://cognito-idp." "eu-west-1" ".amazonaws.com")
-                 (clj->js {:method  "POST"
-                           :body    (-> {}
-                                        (assoc
-                                         :ClientId (:user-pool-web-client-id config)
-                                         :Username username
-                                         :ConfirmationCode code
-                                         :Password password)
-                                        (clj->js)
-                                        (#(.stringify js/JSON %)))
-                           :headers {"X-Amz-Target" "AWSCognitoIdentityProviderService.ConfirmForgotPassword"
-                                     "Content-Type" "application/x-amz-json-1.1"}}))
-         (.then (fn [%]
-                  (let [status (.-status %)]
-                    (if (> status 299)
-                      (throw (ex-info status %))
-                      (.json %)))))
-         (.then (fn [%]
-                  (rf/dispatch (conj on-success (js->clj % :keywordize-keys true)))))
-         (.catch (fn [e]
-                   (-> (ex-data e)
-                       (.json)
-                       (.then (fn [body]
-                                (rf/dispatch (conj on-failure
-                                                   (match-error-message body))))))))))))
+   (cognito-call! "ConfirmForgotPassword"
+                  {:ClientId         (client-id)
+                   :Username         (utils/sent-email username)
+                   :ConfirmationCode (str/trim (str code))
+                   :Password         password}
+                  on-failure
+                  (answer-to on-success))))
 
 (fx/reg-fx
  :amplify-resend-confirmation-code
  (fn [{:keys [username on-success on-failure]}]
-   (let [config (get-config)]
-     (-> (.fetch js/window (str "https://cognito-idp." "eu-west-1" ".amazonaws.com")
-                 (clj->js {:method  "POST"
-                           :body    (-> {}
-                                        (assoc
-                                         :ClientId (:user-pool-web-client-id config)
-                                         :Username username)
-                                        (clj->js)
-                                        (#(.stringify js/JSON %)))
-                           :headers {"X-Amz-Target" "AWSCognitoIdentityProviderService.ResendConfirmationCode"
-                                     "Content-Type" "application/x-amz-json-1.1"}}))
-         (.then (fn [%]
-                  (let [status (.-status %)]
-                    (if (> status 299)
-                      (throw (ex-info status %))
-                      (.json %)))))
-         (.then (fn [%]
-                  (rf/dispatch (conj on-success (js->clj % :keywordize-keys true)))))
-         (.catch (fn [e]
-                   (-> (ex-data e)
-                       (.json)
-                       (.then (fn [body]
-                                (rf/dispatch (conj on-failure
-                                                   (match-error-message body))))))))))))
+   (cognito-call! "ResendConfirmationCode"
+                  {:ClientId (client-id)
+                   :Username (utils/sent-email username)}
+                  on-failure
+                  (answer-to on-success))))
 
 (fx/reg-fx
  :amplify-logout

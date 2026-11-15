@@ -19,4 +19,4 @@
                                         :optimizations :advanced}}}
           :test     {:target    :karma
                      :output-to "target/ci.js"
-                     :autorun   true}}}
+                     :ns-regexp "^web\\.widgets\\..*-test$"}}}
