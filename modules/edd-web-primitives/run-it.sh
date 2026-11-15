@@ -3,7 +3,7 @@
 #
 # Designed for the ui-runtime image (Playwright image + Java). Browsers
 # are preinstalled there, so nothing is downloaded. Set PLAYWRIGHT_CHROME to
-# drive a different Chrome binary instead (see web.gallery.it.browser).
+# drive a different Chrome binary instead (testing.pw/start-browser).
 #
 # Inputs:
 #   IT_JAR            integration-test uberjar  (default target/it/it-tests.jar)

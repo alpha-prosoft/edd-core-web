@@ -22,13 +22,13 @@
         (doc/start-browser)
 
         results
-        (try
-          (sdk/with-page (:page browser)
-            (doall
-             (for [[guide-name guide body-fn] (chosen names)]
-               [guide-name (doc/run-guide! guide body-fn)])))
-          (finally
-            (doc/stop-browser browser)))]
-    (println "Guides:" (pr-str results))
+        (atom [])]
+    (try
+      (sdk/with-page (:page browser)
+        (doseq [[guide-name guide body-fn] (chosen names)]
+          (swap! results conj [guide-name (doc/run-guide! guide body-fn)])))
+      (finally
+        (doc/stop-browser browser (every? second @results))))
+    (println "Guides:" (pr-str @results))
     (shutdown-agents)
-    (System/exit (if (every? second results) 0 1))))
+    (System/exit (if (every? second @results) 0 1))))

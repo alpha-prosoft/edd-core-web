@@ -59,6 +59,7 @@
      Playwright$CreateOptions
      Tracing$StartOptions
     Tracing$StopOptions]
+   [com.microsoft.playwright.options ColorScheme]
    [java.nio.file Paths]))
 
 ;; ---------------------------------------------------------------------------
@@ -122,6 +123,14 @@
      :test-name   — string used to derive the trace filename.
      :output-dir  — directory for trace zips, default 'target/pw-traces'.
      :slow-mo     — milliseconds to slow down actions (useful headed), default 0.
+     :executable-path — Chromium binary to drive instead of Playwright's own.
+                     Defaults from -Dplaywright.browser.executable-path or env
+                     PLAYWRIGHT_CHROME.
+     :timeout-ms  — default timeout of every action. Defaults from
+                     -Dplaywright.timeout.ms, else Playwright's 30s.
+     :viewport    — [width height].
+     :device-scale-factor — e.g. 2 for sharp screenshots.
+     :color-scheme — :light | :dark.
 
    Returns a map with:
      :playwright  :browser  :context  :page  :trace-path"
@@ -153,11 +162,17 @@
          resolver-rules (or (:host-resolver-rules opts)
                             (System/getProperty "playwright.host-resolver-rules")
                             (System/getenv "PW_HOST_RESOLVER_RULES"))
+         executable (or (:executable-path opts)
+                        (System/getProperty "playwright.browser.executable-path")
+                        (System/getenv "PLAYWRIGHT_CHROME"))
          lo         (cond-> (-> (BrowserType$LaunchOptions.)
                                 (.setHeadless (boolean headless?))
                                 (.setSlowMo (double slow-mo)))
                       resolver-rules
-                      (.setArgs [(str "--host-resolver-rules=" resolver-rules)]))
+                      (.setArgs [(str "--host-resolver-rules=" resolver-rules)])
+
+                      executable
+                      (.setExecutablePath (Paths/get executable (into-array String []))))
          browser-kw (or (:browser opts)
                         (keyword (System/getProperty
                                   "playwright.browser"
@@ -171,9 +186,25 @@
                          (:ignore-https-errors opts)
                          (= "true" (System/getProperty
                                     "playwright.ignore-https-errors" "false")))
+         {:keys [viewport device-scale-factor color-scheme]} opts
          context    (.newContext browser
                                  (cond-> (Browser$NewContextOptions.)
-                                   ignore-https? (.setIgnoreHTTPSErrors true)))
+                                   ignore-https? (.setIgnoreHTTPSErrors true)
+
+                                   viewport
+                                   (.setViewportSize (int (first viewport)) (int (second viewport)))
+
+                                   device-scale-factor
+                                   (.setDeviceScaleFactor (double device-scale-factor))
+
+                                   color-scheme
+                                   (.setColorScheme (if (= :dark color-scheme)
+                                                      ColorScheme/DARK
+                                                      ColorScheme/LIGHT))))
+         timeout-ms (or (:timeout-ms opts)
+                        (some-> (System/getProperty "playwright.timeout.ms") Long/parseLong))
+         _          (when timeout-ms
+                      (.setDefaultTimeout context (double timeout-ms)))
          ;; Start tracing: screenshots + DOM snapshots + source locations
          _          (-> (.tracing context)
                         (.start (-> (Tracing$StartOptions.)

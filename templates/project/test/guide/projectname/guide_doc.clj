@@ -4,10 +4,10 @@
    docs/guide/<file> with images in docs/guide/img."
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
+            [testing.pw :as pw]
             [web.primitives.sdk.core :as sdk])
-  (:import [com.microsoft.playwright Browser Browser$NewContextOptions BrowserType$LaunchOptions
-            Locator$ScreenshotOptions Page$ScreenshotOptions Playwright]
-           [com.microsoft.playwright.options Clip ColorScheme]))
+  (:import [com.microsoft.playwright Locator$ScreenshotOptions Page$ScreenshotOptions]
+           [com.microsoft.playwright.options Clip]))
 
 (def site-dir
   "docs/guide")
@@ -159,28 +159,14 @@
 
 (defn start-browser
   []
-  (let [playwright
-        (Playwright/create)
-
-        headless?
-        (not= "false" (System/getProperty "playwright.browser.headless" "true"))
-
-        ^Browser browser
-        (.launch (.chromium playwright) (.setHeadless (BrowserType$LaunchOptions.) headless?))
-
-        context
-        (.newContext browser (doto (Browser$NewContextOptions.)
-                               (.setViewportSize 1280 800)
-                               (.setDeviceScaleFactor (double device-scale))
-                               (.setColorScheme ColorScheme/LIGHT)))]
-    {:playwright playwright
-     :browser    browser
-     :page       (.newPage context)}))
+  (pw/start-browser {:test-name           "guide"
+                     :viewport            [1280 800]
+                     :device-scale-factor device-scale
+                     :color-scheme        :light}))
 
 (defn stop-browser
-  [{:keys [^Playwright playwright ^Browser browser]}]
-  (.close browser)
-  (.close playwright))
+  [browser ok?]
+  (pw/stop-browser browser (if ok? :pass :fail)))
 
 (defn run-guide!
   "Runs `body-fn` and writes the guide only when it completed, so a failure

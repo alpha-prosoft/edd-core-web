@@ -3,12 +3,8 @@
    pages. All element interaction goes through web.primitives.sdk.*."
   (:require
    [testing.pw :as pw]
-   [web.gallery.it.browser :as browser]
    [web.primitives.sdk.core :as sdk]
    [web.primitives.testing.elements :as els]))
-
-;; Use the configured Chromium (PLAYWRIGHT_CHROME) when set, else Playwright's bundled one.
-(browser/install!)
 
 (defmacro with-gallery
   "Start a traced browser (edd-core-web-playwright) and bind it for the SDK."

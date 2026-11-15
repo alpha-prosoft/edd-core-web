@@ -2,6 +2,13 @@
 
 ## Changes
 
+**[AP-1078]** Use edd-core-web-playwright start-browser in all tests
+- start-browser takes :executable-path (PLAYWRIGHT_CHROME), :timeout-ms,
+  :viewport, :device-scale-factor and :color-scheme
+- primitives IT: remove browser.clj, which replaced start-browser with a
+  copy of the old one
+- scaffold guide starts its browser with pw/start-browser
+
 **[AP-1071]** Add edd-core-web-playwright module, scaffold AGENTS.md, UI tests, guide and explorer
 - modules/edd-core-web-playwright: clojure-playwright moved in (testing.*),
   Playwright 1.64.0, REPL headless option and preloaded namespaces
