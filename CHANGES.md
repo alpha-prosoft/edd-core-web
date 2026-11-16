@@ -2,6 +2,15 @@
 
 ## Changes
 
+**[AL-39]** Folder and lineage widgets
+- web.widgets.folder: pictures kept in a folder of a storage service;
+  ImageList (a list entry, uploads add) and ImageField (one picture, an
+  upload replaces it) upload through the application's call effect and
+  hand on the public URL; ::save sets a folder up, ::retain keeps only
+  what the thing it belongs to uses after it is saved
+- web.widgets.lineage: the history of a thing from a lineage service,
+  moved from allora's lineage-web
+
 **[AP-1088]** Login widget: hidden openers, one live region, retries, region
 - An opener hidden by visibility, opacity, no size or an inert/aria-hidden
   ancestor counts as gone, so :focus-fallback gets the focus

@@ -45,7 +45,8 @@ is already running; read its output for build errors instead.
 
 - Use `web.primitives.components` (`RawButton`, `RawGrid`, `RawTypography`,
   ...) and widgets (`web.widgets.*`: confirmation dialog, snackbar, upload,
-  translation) before MUI directly. Use MUI (`[:> Component ...]`) only for
+  translation, `folder` pictures kept by a storage service, `lineage`
+  history of a thing) before MUI directly. Use MUI (`[:> Component ...]`) only for
   what primitives don't wrap.
 - Style with theme tokens (`"primary.main"`, `"text.secondary"`) and the
   `:theme` passed to `init`; never hex colors or ad-hoc sizes. Add a token to
