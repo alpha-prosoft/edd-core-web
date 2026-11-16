@@ -149,36 +149,59 @@
   {:message :network-error
    :type    "NetworkError"})
 
-(def ^:private cognito-url
-  (str "https://cognito-idp." "eu-west-1" ".amazonaws.com"))
+(defn cognito-url
+  [region]
+  (str "https://cognito-idp." region ".amazonaws.com"))
+
+(defn cognito-region
+  "Cognito's region: `region` when given, else the prefix of the user pool id, else eu-west-1."
+  [region pool-id]
+  (or region (utils/pool-region pool-id) "eu-west-1"))
 
 (defn- refused!
   [on-failure response]
   (let [parsed
         (.then (.json response)
                (fn [body]
-                 (rf/dispatch (conj on-failure (match-error-message body)))))]
+                 (on-failure (match-error-message body))))]
     (.catch parsed
             (fn [_]
-              (rf/dispatch (conj on-failure {:message :unknown-error
-                                             :type    (str (.-status response))}))))))
+              (on-failure {:message :unknown-error
+                           :type    (str (.-status response))})))))
 
-(defn- cognito-call!
-  "Sends `target` with `body` to Cognito. An answer goes to `on-answer`, a refusal to `on-failure` as a
-   translation key, and a request that never reached Cognito to `on-failure` as `network-error`."
-  [target body on-failure on-answer]
+(defn send!
+  "Sends `target` with `body` to Cognito at `url`. An answer goes to `on-answer`, a refusal to `on-failure` as a
+   translation key. A request that never reached Cognito is sent again after each of `retry-delays`, then goes to
+   `on-failure` as `network-error`."
+  [{:keys [url target body retry-delays on-answer on-failure]}]
   (let [request
         (clj->js {:method  "POST"
                   :body    (.stringify js/JSON (clj->js body))
                   :headers {"X-Amz-Target" (str "AWSCognitoIdentityProviderService." target)
                             "Content-Type" "application/x-amz-json-1.1"}})]
-    (.then (.fetch js/window cognito-url request)
-           (fn [response]
-             (if (.-ok response)
-               (.then (.json response) on-answer)
-               (refused! on-failure response)))
-           (fn [_]
-             (rf/dispatch (conj on-failure network-error))))))
+    (letfn [(attempt [retries]
+              (.then (.fetch js/window url request)
+                     (fn [response]
+                       (if (.-ok response)
+                         (.then (.json response) on-answer)
+                         (refused! on-failure response)))
+                     (fn [_]
+                       (if-let [delay
+                                (utils/retry-delay retry-delays retries)]
+                         (js/setTimeout #(attempt (inc retries)) delay)
+                         (on-failure network-error)))))]
+      (attempt 0))))
+
+(defn- cognito-call!
+  [target body {:keys [retry-delays region on-failure]} on-answer]
+  (let [pool-id
+        (:userPoolId (get-config))]
+    (send! {:url          (cognito-url (cognito-region region pool-id))
+            :target       target
+            :body         body
+            :retry-delays (or retry-delays utils/default-retry-delays)
+            :on-answer    on-answer
+            :on-failure   #(rf/dispatch (conj on-failure %))})))
 
 (defn- answer-to
   [on-success]
@@ -191,7 +214,7 @@
 
 (fx/reg-fx
  :amplify-register
- (fn [{:keys [username password on-success on-failure]}]
+ (fn [{:keys [username password on-success] :as request}]
    (let [email
          (utils/sent-email username)]
      (cognito-call! "SignUp"
@@ -200,17 +223,17 @@
                      :Password       password
                      :UserAttributes [{:Name  "email"
                                        :Value email}]}
-                    on-failure
+                    request
                     (answer-to on-success)))))
 
 (fx/reg-fx
  :amplify-verify
- (fn [{:keys [username code on-success on-failure]}]
+ (fn [{:keys [username code on-success] :as request}]
    (cognito-call! "ConfirmSignUp"
                   {:ClientId         (client-id)
                    :Username         (utils/sent-email username)
                    :ConfirmationCode (str/trim (str code))}
-                  on-failure
+                  request
                   (answer-to on-success))))
 
 (defn- authenticated!
@@ -233,13 +256,13 @@
 
 (fx/reg-fx
  :amplify-login
- (fn [{:keys [username password on-success on-failure]}]
+ (fn [{:keys [username password on-success on-failure] :as request}]
    (cognito-call! "InitiateAuth"
                   {:ClientId       (client-id)
                    :AuthFlow       "USER_PASSWORD_AUTH"
                    :AuthParameters {:USERNAME (utils/sent-email username)
                                     :PASSWORD password}}
-                  on-failure
+                  request
                   #(authenticated! on-success on-failure %))))
 
 (defn auth []
@@ -299,31 +322,31 @@
 
 (fx/reg-fx
  :amplify-forgot-password
- (fn [{:keys [username on-success on-failure]}]
+ (fn [{:keys [username on-success] :as request}]
    (cognito-call! "ForgotPassword"
                   {:ClientId (client-id)
                    :Username (utils/sent-email username)}
-                  on-failure
+                  request
                   (answer-to on-success))))
 
 (fx/reg-fx
  :amplify-conform-forgot-password
- (fn [{:keys [username password code on-success on-failure]}]
+ (fn [{:keys [username password code on-success] :as request}]
    (cognito-call! "ConfirmForgotPassword"
                   {:ClientId         (client-id)
                    :Username         (utils/sent-email username)
                    :ConfirmationCode (str/trim (str code))
                    :Password         password}
-                  on-failure
+                  request
                   (answer-to on-success))))
 
 (fx/reg-fx
  :amplify-resend-confirmation-code
- (fn [{:keys [username on-success on-failure]}]
+ (fn [{:keys [username on-success] :as request}]
    (cognito-call! "ResendConfirmationCode"
                   {:ClientId (client-id)
                    :Username (utils/sent-email username)}
-                  on-failure
+                  request
                   (answer-to on-success))))
 
 (fx/reg-fx

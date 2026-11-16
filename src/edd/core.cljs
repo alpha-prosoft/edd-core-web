@@ -50,7 +50,7 @@
 (defn ^:export print-features []
   (let [request-features @(rf/subscribe [::subs/request-features])]
     (if (some? request-features)
-      (cljs.pprint/pprint request-features)
+      (prn request-features)
       (print (str "Request-features were not set")))))
 
 (defn init

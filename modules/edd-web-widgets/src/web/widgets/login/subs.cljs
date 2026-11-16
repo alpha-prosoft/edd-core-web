@@ -126,6 +126,11 @@
    (::db/register-note db)))
 
 (rf/reg-sub
+ ::announce
+ (fn [db]
+   (::db/announce db)))
+
+(rf/reg-sub
  ::focus-fallback
  (fn [db]
    (::db/focus-fallback db)))

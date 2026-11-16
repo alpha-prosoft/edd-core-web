@@ -24,17 +24,25 @@
   "Options of the widget: `:remember-email` (default true) offers the email address that logged in last;
    `:register-note` is shown under the sign-up form (a reagent component, or `{:text \"…\" :links [{:label :href}]}`);
    `:translations` overrides texts per language (`{:en {:login \"Login\"}}`); `:focus-fallback` (a CSS selector or a
-   fn returning an element) gets the focus when the dialog closes and what opened it is gone."
-  [{:keys [db]} [_ {:keys [language-switcher on-logout-hook remember-email register-note translations focus-fallback]
+   fn returning an element) gets the focus when the dialog closes and what opened it is gone; `:announce` (a fn of a
+   text) speaks the dialog's notices through the app's own live region instead of the dialog's; `:retry-delays`
+   (default [1000 3000], [] for none) are the waits before a request that did not reach Cognito is sent again;
+   `:region` is Cognito's region (default: the prefix of the user pool id)."
+  [{:keys [db]} [_ {:keys [language-switcher on-logout-hook remember-email register-note translations focus-fallback
+                           announce retry-delays region]
                     :or   {language-switcher false
-                           remember-email    true}}]]
+                           remember-email    true
+                           retry-delays      utils/default-retry-delays}}]]
   {:db (assoc db
               ::db/show-language-switcher? language-switcher
               ::db/on-logout-hook on-logout-hook
               ::db/remember-email? (boolean remember-email)
               ::db/register-note register-note
               ::db/translations translations
-              ::db/focus-fallback focus-fallback)})
+              ::db/focus-fallback focus-fallback
+              ::db/announce announce
+              ::db/retry-delays (vec retry-delays)
+              ::db/region region)})
 
 (rf/reg-event-fx
  ::init
@@ -43,6 +51,13 @@
 (defn remember-email?
   [db]
   (get db ::db/remember-email? true))
+
+(defn cognito-request
+  "A request of the dialog to Cognito, with how it is sent: `:retry-delays` and `:region`."
+  [db request]
+  (assoc request
+         :retry-delays (get db ::db/retry-delays utils/default-retry-delays)
+         :region (::db/region db)))
 
 (rf/reg-cofx
  ::remembered-email
@@ -127,9 +142,9 @@
 
 (defn request-code
   [db]
-  [:amplify-resend-confirmation-code {:username   (::db/username db)
-                                      :on-success [::resend-code-succeeded]
-                                      :on-failure [::register-failed]}])
+  [:amplify-resend-confirmation-code (cognito-request db {:username   (::db/username db)
+                                                          :on-success [::resend-code-succeeded]
+                                                          :on-failure [::register-failed]})])
 
 (rf/reg-event-fx
  ::confirm-account
@@ -162,10 +177,10 @@
  (fn [{:keys [db]}]
    {:db (assoc db ::db/loading? true
                ::db/error-message-visible false)
-    :fx [[:amplify-login {:username   (::db/username db)
-                          :password   (::db/password db)
-                          :on-success [::login-succeeded]
-                          :on-failure [::login-failed]}]]}))
+    :fx [[:amplify-login (cognito-request db {:username   (::db/username db)
+                                              :password   (::db/password db)
+                                              :on-success [::login-succeeded]
+                                              :on-failure [::login-failed]})]]}))
 
 (rf/reg-event-fx
  ::logout
@@ -196,10 +211,10 @@
                ::db/error-message-visible false)
     :fx [(if (::db/confirmed? db)
            [:dispatch [::do-login]]
-           [:amplify-verify {:username   (::db/username db)
-                             :code       (::db/confirmation-code db)
-                             :on-success [::verification-succeeded]
-                             :on-failure [::verification-failed]}])]}))
+           [:amplify-verify (cognito-request db {:username   (::db/username db)
+                                                 :code       (::db/confirmation-code db)
+                                                 :on-success [::verification-succeeded]
+                                                 :on-failure [::verification-failed]})])]}))
 
 (rf/reg-event-fx
  ::login-and-proceed
@@ -260,10 +275,10 @@
  (fn [{:keys [db]}]
    {:db (assoc db ::db/loading? true
                ::db/error-message-visible false)
-    :fx [[:amplify-register {:username   (::db/username db)
-                             :password   (::db/password db)
-                             :on-success [::register-success]
-                             :on-failure [::register-failed]}]]}))
+    :fx [[:amplify-register (cognito-request db {:username   (::db/username db)
+                                                 :password   (::db/password db)
+                                                 :on-success [::register-success]
+                                                 :on-failure [::register-failed]})]]}))
 
 (rf/reg-event-db
  ::close-error-message
@@ -288,9 +303,9 @@
               ::db/error-message-visible false
               ::db/notice nil
               ::db/loading? true)
-   :fx [[:amplify-forgot-password {:username   (::db/username db)
-                                   :on-success [::reset-code-sent]
-                                   :on-failure [::reset-code-refused]}]]})
+   :fx [[:amplify-forgot-password (cognito-request db {:username   (::db/username db)
+                                                       :on-success [::reset-code-sent]
+                                                       :on-failure [::reset-code-refused]})]]})
 
 (rf/reg-event-fx
  ::reset-password
@@ -337,9 +352,9 @@
    (`ResendConfirmationCode`, which answers an existing account with \"User is already confirmed.\")."
   [{:keys [db]} _]
   (let [request
-        {:username   (::db/username db)
-         :on-success [::code-resent]
-         :on-failure [::code-resend-failed]}]
+        (cognito-request db {:username   (::db/username db)
+                             :on-success [::code-resent]
+                             :on-failure [::code-resend-failed]})]
     {:db (assoc db
                 ::db/error-message ""
                 ::db/error-message-visible false
@@ -382,11 +397,11 @@
    {:db (assoc db ::db/form-type :confirm-password-reset
                ::db/loading? true
                ::db/error-message-visible false)
-    :fx [[:amplify-conform-forgot-password {:username   (::db/username db)
-                                            :password   (::db/password db)
-                                            :code       (::db/confirmation-code db)
-                                            :on-success [::do-login]
-                                            :on-failure [::register-failed]}]]}))
+    :fx [[:amplify-conform-forgot-password (cognito-request db {:username   (::db/username db)
+                                                                :password   (::db/password db)
+                                                                :code       (::db/confirmation-code db)
+                                                                :on-success [::do-login]
+                                                                :on-failure [::register-failed]})]]}))
 
 (rf/reg-event-db
  ::toggle-password-visibility

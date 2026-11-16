@@ -255,6 +255,10 @@
               (is
                (focus-becomes? "login-bar--password")))))))
 
+(def ^:private retries-ms
+  "Long enough for the widget's retries after 1 s and 3 s."
+  12000)
+
 (deftest escape-returns-the-focus-to-the-opener
   (with-gallery
     (step "Escape gives the focus back to the button that opened the dialog"
@@ -279,7 +283,97 @@
               (is
                (focus-becomes? "login-bar--register"))
 
-              (.evaluate opener "element => element.style.display = ''"))))))
+              (.evaluate opener "element => element.style.display = ''"))))
+
+    (step "an opener inside a menu that closed (visibility: hidden) hands the focus to the fallback too"
+          (fn []
+            (let [opener
+                  (sdk/el [:login :states :login])]
+              (.click opener)
+              (dialog/wait-open! dialog-el)
+              (.evaluate opener "element => element.parentElement.style.visibility = 'hidden'")
+              (sdk/press! "Escape")
+              (dialog/wait-closed! dialog-el)
+
+              (is
+               (focus-becomes? "login-bar--register"))
+
+              (.evaluate opener "element => element.parentElement.style.visibility = ''"))))))
+
+(deftest the-focus-starts-in-the-password-when-the-email-is-remembered
+  (with-gallery
+    (step "with no email remembered the focus starts in the email field"
+          (fn []
+            (open-login!)
+
+            (is
+             (focus-becomes? "login-bar--username"))))
+
+    (step "with the email remembered it starts in the password field"
+          (fn []
+            (button/click! [:login-bar :close])
+            (dialog/wait-closed! dialog-el)
+            (.evaluate (sdk/page) "() => localStorage.setItem('web.widgets.login/last-email', 'someone@example.com')")
+            (button/click! [:login-bar :login])
+            (dialog/wait-open! dialog-el)
+
+            (is
+             (= "someone@example.com"
+                (text-field/value [:login-bar :username])))
+
+            (is
+             (focus-becomes? "login-bar--password"))))))
+
+(defn- log-in!
+  []
+  (open-login!)
+  (text-field/fill! [:login-bar :username] "someone@example.com")
+  (text-field/fill! [:login-bar :password] "Passw0rd-x")
+  (button/click! [:login-bar :submit-login]))
+
+(deftest a-request-that-does-not-reach-cognito-is-sent-again
+  (with-gallery
+    (let [aborts
+          (atom 2)
+
+          seen
+          (answer-cognito! (fn [_ _]
+                             (if (pos? (first (swap-vals! aborts dec)))
+                               :abort
+                               [200 {:AuthenticationResult {:IdToken      (id-token "someone@example.com")
+                                                            :RefreshToken "refresh"
+                                                            :AccessToken  "access"}}])))]
+      (step "the first two tries do not reach Cognito, the third logs in"
+            (fn []
+              (log-in!)
+
+              (is
+               (binding [sdk/*timeout-ms* retries-ms]
+                 (sdk/becomes-visible? [:login-bar :logout])))
+
+              (is
+               (= ["InitiateAuth" "InitiateAuth" "InitiateAuth"]
+                  (targets seen))))))))
+
+(deftest after-the-retries-the-dialog-says-cognito-was-not-reached
+  (with-gallery
+    (let [seen
+          (answer-cognito! (fn [_ _] :abort))]
+      (step "no try reaches Cognito: the message comes after the third"
+            (fn []
+              (log-in!)
+
+              (is
+               (binding [sdk/*timeout-ms* retries-ms]
+                 (sdk/eventually= "We couldn't reach the login service. Check your connection and try again."
+                                  #(when (sdk/present? [:login-bar :error-message]) (error-text)))))
+
+              (is
+               (= 3
+                  (count (targets seen))))
+
+              (is
+               (button/enabled? [:login-bar :submit-login])))))))
 
 (defn- ask-reset!
   [email]
@@ -319,8 +413,14 @@
                   (sdk/text [:login-bar :notice])))
 
               (is
-               (= "status"
-                  (sdk/attr [:login-bar :notice] "role")))))
+               (= [1 "polite" nil]
+                  [(.count (sdk/within dialog-el "[aria-live]"))
+                   (sdk/attr [:login-bar :live-region] "aria-live")
+                   (sdk/attr [:login-bar :notice] "role")]))
+
+              (is
+               (= 1
+                  (.count (sdk/within [:login-bar :live-region] "[data-testid='login-bar--notice']"))))))
 
       (step "the code field comes above the new password"
             (fn []
@@ -386,8 +486,9 @@
               (ask-reset! "someone@example.com")
 
               (is
-               (sdk/eventually= "We couldn't reach the login service. Check your connection and try again."
-                                #(when (sdk/present? [:login-bar :error-message]) (error-text))))
+               (binding [sdk/*timeout-ms* retries-ms]
+                 (sdk/eventually= "We couldn't reach the login service. Check your connection and try again."
+                                  #(when (sdk/present? [:login-bar :error-message]) (error-text)))))
 
               (is
                (sdk/present? [:login-bar :username]))

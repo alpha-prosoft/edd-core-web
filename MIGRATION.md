@@ -31,9 +31,20 @@ Events, subs, views and effects keep their names. What changes for an app:
   (`web.widgets.login/last-email`) and filled in when the dialog opens.
   Switch it off with `{:remember-email false}`.
 - The password toggle switches the field to `type="text"` (was `"input"`).
+- The focus starts in the password field when the email is filled in.
+- The dialog's notices are in one `aria-live="polite"` region
+  (`login-bar--live-region`); the notice itself no longer has `role="status"`.
+  With `:announce` the app's announcer says them and the dialog has no region.
+- A request that does not reach Cognito is sent again after 1 s and 3 s.
+  An app that wraps the `:amplify-*` effects to retry should drop its wrapper.
+- Cognito's region comes from the user pool id (`eu-central-1_…`), no longer
+  always eu-west-1.
+- `:focus-fallback` also applies when the opener is hidden by
+  `visibility:hidden`, opacity 0, no size or an `inert`/`aria-hidden` ancestor.
 
 New `::init` options: `:remember-email` (true), `:register-note` (none),
-`:translations` (none), `:focus-fallback` (none).
+`:translations` (none), `:focus-fallback` (none), `:announce` (none),
+`:retry-delays` (`[1000 3000]`, `[]` for none), `:region` (from the pool id).
 
 ## `:classes` removed
 

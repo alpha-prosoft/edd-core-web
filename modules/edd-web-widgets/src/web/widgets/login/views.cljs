@@ -5,6 +5,7 @@
             [web.widgets.login.subs :as subs]
             [web.widgets.login.events :as events]
             [web.widgets.login.utils :as utils]
+            [web.widgets.login.visibility :as visibility]
             [web.widgets.login.i18n.translate :refer [tr known?]]
             [web.primitives.testing.el-id :as el-id]
             [web.primitives.components :refer [RawAlert RawButton RawCircularProgress RawDialog
@@ -27,6 +28,9 @@
 
 (def ^:private title-id
   (field-id :dialog-title))
+
+(def live-region-id
+  (field-id :live-region))
 
 (def submit-elements
   {:login                  :submit-login
@@ -184,6 +188,10 @@
          [RawGrid {:size {:xs 12 :sm "grow"}}
           [submit-button form-type loading?]])]]]))
 
+(defn- starts-here?
+  [field]
+  (= field (utils/start-field @(rf/subscribe [::subs/form-type]) @(rf/subscribe [::subs/username]))))
+
 (defn Username []
   (let [form-type
         @(rf/subscribe [::subs/form-type])]
@@ -193,7 +201,7 @@
                    :name         "email"
                    :type         "email"
                    :autoComplete (if (= :register form-type) "email" "username")
-                   :autoFocus    true
+                   :autoFocus    (starts-here? :username)
                    :value        (or @(rf/subscribe [::subs/username]) "")
                    :disabled     @(rf/subscribe [::subs/loading?])
                    :label        (tr :username)
@@ -224,6 +232,7 @@
                    :margin       "dense"
                    :name         "password"
                    :autoComplete (if new-password? "new-password" "current-password")
+                   :autoFocus    (starts-here? :password)
                    :value        (or @(rf/subscribe [::subs/password]) "")
                    :disabled     @(rf/subscribe [::subs/loading?])
                    :label        (tr (if (= :confirm-password-reset form-type) :new-password :password))
@@ -334,6 +343,19 @@
                :on-click  #(rf/dispatch [::events/open-dialog form-type])}
       link-text]]]])
 
+(defn notices
+  "Where the dialog shows its notices. It is the dialog's one live region, unless the app announces them (`announce`)."
+  [announce text]
+  [:div (if announce
+          {}
+          {:id          live-region-id
+           :data-testid live-region-id
+           :aria-live   "polite"
+           :aria-atomic "true"})
+   (when text
+     [RawAlert {:severity "info" :role nil :el-id [el :notice] :sx {:mb 1}}
+      text])])
+
 (defn- dialog-form
   [form-type]
   (let [show-error?
@@ -345,6 +367,9 @@
         notice
         @(rf/subscribe [::subs/notice])
 
+        announce
+        @(rf/subscribe [::subs/announce])
+
         note
         @(rf/subscribe [::subs/register-note])]
     [:form {:id          form-id
@@ -352,12 +377,8 @@
             :on-submit   (fn [event]
                            (.preventDefault event)
                            (rf/dispatch [::events/submit-form form-type (field-values (.-currentTarget event))]))}
+     [notices announce (when (and notice (utils/code-forms form-type)) (message-text notice))]
      [RawGrid {:container true :spacing 1 :sx {:flex-direction "column" :width "100%"}}
-      (when (and notice (utils/code-forms form-type))
-        [RawGrid {}
-         [RawAlert {:severity "info" :role "status" :el-id [el :notice]}
-          (message-text notice)]])
-
       (when (= :confirm-login form-type)
         [RawGrid {} [code-sent-to]])
 
@@ -420,14 +441,11 @@
                   (js/setTimeout #(attempt (dec left)) 30)))))]
     (js/setTimeout #(attempt 20) 0)))
 
-(defn- shown?
-  [^js element]
-  (and (some? element)
-       (.-isConnected element)
-       (not= element (.-body js/document))
-       (if (fn? (.-checkVisibility element))
-         (.checkVisibility element)
-         (some? (.-offsetParent element)))))
+(defn notice-to-announce
+  "The notice the app's announcer says now: a new one, while the dialog is open."
+  [{:keys [announce open? notice previous]}]
+  (when (and announce open? notice (not= notice previous))
+    notice))
 
 (defn- fallback-element
   [fallback]
@@ -462,6 +480,9 @@
         last-error
         (atom nil)
 
+        last-notice
+        (atom nil)
+
         closed-by-person?
         (atom false)
 
@@ -476,7 +497,7 @@
         exited!
         (fn []
           (let [target
-                (if (shown? @opener)
+                (if (visibility/visible? @opener)
                   @opener
                   (fallback-element @fallback))]
             (when (and @closed-by-person? target)
@@ -491,16 +512,28 @@
 
             error
             (when @(rf/subscribe [::subs/error-message-visible])
-              [form-type @(rf/subscribe [::subs/error-message]) @(rf/subscribe [::subs/submits])])]
+              [form-type @(rf/subscribe [::subs/error-message]) @(rf/subscribe [::subs/submits])])
+
+            notice
+            @(rf/subscribe [::subs/notice])
+
+            announce
+            @(rf/subscribe [::subs/announce])]
         (when (and open? (not @was-open?))
           (let [active
                 (.-activeElement js/document)]
-            (reset! opener (if (shown? active) active @last-focused))))
+            (reset! opener (if (visibility/visible? active) active @last-focused))))
         (reset! was-open? open?)
         (reset! fallback @(rf/subscribe [::subs/focus-fallback]))
         (when (and open? error (not= error @last-error))
           (focus-when-ready! (field-id (utils/error-field form-type (second error)))))
         (reset! last-error error)
+        (when-let [said
+                   (notice-to-announce {:announce announce :open? open? :notice notice :previous @last-notice})]
+          (let [text
+                (message-text said)]
+            (js/setTimeout #(announce text) 0)))
+        (reset! last-notice notice)
         [RawDialog {:el-id               [el :dialog]
                     :open                open?
                     :maxWidth            "xs"

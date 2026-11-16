@@ -109,3 +109,50 @@
   (is
    (= :username
       (utils/error-field :forgot-password :network-error))))
+
+(deftest the-focus-starts-in-the-first-empty-field
+  (is
+   (= :password
+      (utils/start-field :login "someone@example.com")))
+
+  (is
+   (= :username
+      (utils/start-field :login "")))
+
+  (is
+   (= :username
+      (utils/start-field :register nil)))
+
+  (is
+   (= :username
+      (utils/start-field :forgot-password "someone@example.com")))
+
+  (is
+   (= :code
+      (utils/start-field :confirm-password-reset "someone@example.com"))))
+
+(deftest the-region-is-the-prefix-of-the-pool-id
+  (is
+   (= "eu-central-1"
+      (utils/pool-region "eu-central-1_AbC123")))
+
+  (is
+   (= "us-gov-west-1"
+      (utils/pool-region "us-gov-west-1_x")))
+
+  (is
+   (nil?
+    (utils/pool-region "no-region")))
+
+  (is
+   (nil?
+    (utils/pool-region nil))))
+
+(deftest a-request-is-sent-again-after-each-delay
+  (is
+   (= [1000 3000 nil]
+      (mapv #(utils/retry-delay utils/default-retry-delays %) [0 1 2])))
+
+  (is
+   (nil?
+    (utils/retry-delay [] 0))))

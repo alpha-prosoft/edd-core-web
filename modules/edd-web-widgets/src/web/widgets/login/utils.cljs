@@ -115,6 +115,36 @@
     :else
     :code))
 
+(defn start-field
+  "The field that has the focus when a form opens: the password when the email is already filled in."
+  [form-type username]
+  (cond
+    (code-forms form-type)
+    :code
+
+    (and (#{:login :register} form-type) (not (str/blank? username)))
+    :password
+
+    (email-forms form-type)
+    :username
+
+    :else
+    :password))
+
+(defn pool-region
+  "The AWS region of a Cognito user pool id (`eu-west-1_AbC123` -> \"eu-west-1\")."
+  [pool-id]
+  (second (re-matches #"([a-z]{2}(?:-[a-z]+)+-\d+)_.+" (str pool-id))))
+
+(def default-retry-delays
+  [1000 3000])
+
+(defn retry-delay
+  "Milliseconds to wait before sending again a request that did not reach Cognito after `attempt` retries; nil when it
+   is not sent again."
+  [delays attempt]
+  (get (vec delays) attempt))
+
 (defn decode-token-claims [id-token]
   (when-not (str/blank? id-token)
     (try

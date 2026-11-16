@@ -130,5 +130,24 @@
   (let [db
         (:db (events/init {:db {}} [::events/init {}]))]
     (is
-     (= [true nil nil]
-        [(::db/remember-email? db) (::db/register-note db) (::db/translations db)]))))
+     (= [true nil nil nil [1000 3000] nil]
+        [(::db/remember-email? db) (::db/register-note db) (::db/translations db) (::db/announce db)
+         (::db/retry-delays db) (::db/region db)]))))
+
+(deftest every-cognito-request-says-how-it-is-sent
+  (let [db
+        (:db (events/init {:db {::db/username "someone@example.com" ::db/form-type :confirm-password-reset}}
+                          [::events/init {:retry-delays [] :region "eu-central-1"}]))
+
+        requests
+        (for [fx [(events/reset-asked {:db db} nil)
+                  (events/resend-code {:db db} nil)]]
+          (second (first (:fx fx))))]
+    (is
+     (= [[[] "eu-central-1"] [[] "eu-central-1"]]
+        (mapv (juxt :retry-delays :region) requests))))
+
+  (testing "without init the default delays are used"
+    (is
+     (= [1000 3000]
+        (:retry-delays (events/cognito-request {} {}))))))

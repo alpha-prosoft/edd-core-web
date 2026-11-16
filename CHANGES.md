@@ -2,6 +2,19 @@
 
 ## Changes
 
+**[AP-1088]** Login widget: hidden openers, one live region, retries, region
+- An opener hidden by visibility, opacity, no size or an inert/aria-hidden
+  ancestor counts as gone, so :focus-fallback gets the focus
+- Notices in one aria-live region of the dialog; :announce gives them to
+  the app's announcer instead
+- The focus starts in the password when the email is filled in
+- A request that does not reach Cognito is sent again after 1 s and 3 s
+  (:retry-delays, [] for none); answers of Cognito are never repeated
+- Cognito's region from the user pool id, :region overrides
+- edd.core print-features without cljs.pprint
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1087]** Login widget: real form, no lost keystrokes, neutral reset, plain errors
 - Fields keep every keystroke; the email is trimmed and lower-cased only when sent
 - A <form>: Enter sends what the fields hold; buttons disabled only while busy
