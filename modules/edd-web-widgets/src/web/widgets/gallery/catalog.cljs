@@ -2,6 +2,7 @@
   (:require
    [web.widgets.gallery.pages.confirmation-dialog :as confirmation-dialog]
    [web.widgets.gallery.pages.content-switcher :as content-switcher]
+   [web.widgets.gallery.pages.folder :as folder]
    [web.widgets.gallery.pages.login :as login]
    [web.widgets.gallery.pages.snackbar-alert :as snackbar-alert]
    [web.widgets.gallery.pages.translation :as translation]
@@ -12,6 +13,7 @@
   []
   (confirmation-dialog/register!)
   (content-switcher/register!)
+  (folder/register!)
   (login/register!)
   (snackbar-alert/register!)
   (translation/register!)

@@ -1,12 +1,20 @@
 (ns web.widgets.folder.subs
   (:require [re-frame.core :as rf]
-            [web.widgets.folder.db :as db]))
+            [web.widgets.folder.db :as db]
+            [web.widgets.folder.events :as events]))
 
 (defn uploads
-  "Uploads of an entry under way or failed, in the order they started."
+  "Uploads of an entry running, failed or stored but held back by an earlier
+   one, in the order the files were chosen."
   [db [_ props entry]]
-  (vec (sort-by :started
+  (vec (sort-by :order
                 (filter #(= entry (:entry %))
                         (vals (get-in db (db/uploads-path props)))))))
 
+(defn uploading
+  "How many uploads of the folder are running."
+  [db [_ props]]
+  (count (events/running db props)))
+
 (rf/reg-sub ::uploads uploads)
+(rf/reg-sub ::uploading uploading)

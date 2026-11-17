@@ -2,6 +2,16 @@
 
 ## Changes
 
+**[AP-1105]** Folder pictures: only pictures, named messages, saves wait, order
+- :accept (default JPEG, PNG, WebP, GIF), checked by type and first bytes
+- Every upload message names its file
+- ::events/when-uploaded, ::subs/uploading, "Uploading 2 pictures…"
+- Chosen order kept; ImageList :on-reorder moves pictures earlier/later
+- 40 px tile buttons; PUT sends the signed headers; :put-fx
+- Gallery page and browser tests
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AL-39]** Folder and lineage widgets
 - web.widgets.folder: pictures kept in a folder of a storage service;
   ImageList (a list entry, uploads add) and ImageField (one picture, an

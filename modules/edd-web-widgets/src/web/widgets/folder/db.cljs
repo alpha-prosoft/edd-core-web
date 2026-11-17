@@ -11,3 +11,10 @@
 (defn upload-path
   [props item]
   (conj (uploads-path props) item))
+
+(defn waiting-path
+  [props]
+  [::waiting (folder-key props)])
+
+(def order-path
+  [::order])

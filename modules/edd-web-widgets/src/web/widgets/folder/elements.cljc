@@ -25,3 +25,24 @@
 (defn problem
   [entry]
   (str "folder-problem-" (name entry)))
+
+(defn status
+  "How many pictures of the entry are uploading."
+  [entry]
+  (str "folder-status-" (name entry)))
+
+(defn refused
+  [entry]
+  (str "folder-refused-" (name entry)))
+
+(defn remove-image
+  [entry position]
+  (str "folder-remove-" (name entry) "-" position))
+
+(defn move-earlier
+  [entry position]
+  (str "folder-earlier-" (name entry) "-" position))
+
+(defn move-later
+  [entry position]
+  (str "folder-later-" (name entry) "-" position))
