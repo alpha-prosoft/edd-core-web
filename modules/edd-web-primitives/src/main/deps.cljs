@@ -17,6 +17,7 @@
             :react-dom            "19.3.1"
             :react-number-format  "5.4.5"
             :react-dropzone       "20.1.4"
+            :react-image-crop     "11.0.7"
             :shadow-cljs          "3.5.8"
             ;; Only used to vendor its prebuilt bundle and CSS
             ;; (`make suneditor-vendor`); not required from ClojureScript.

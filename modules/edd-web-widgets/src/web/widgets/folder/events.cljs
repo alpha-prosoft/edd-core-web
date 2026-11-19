@@ -25,13 +25,19 @@
 
 (defn images-spec
   "Spec of a folder of public pictures, every entry a list so that each
-   upload is a file of its own."
+   upload is a file of its own. An entry is a keyword, or a map
+   {:name keyword :crop crop} to turn cropping on for it: :crop is carried
+   through to the entry so the widget opens the cropper before uploading
+   (true for a free crop, {:aspect ratio} for a fixed one)."
   [entries]
   (mapv (fn [entry]
-          {:name entry
-           :list true
-           :public true
-           :types files/image-types})
+          (let [{:keys [name crop]}
+                (if (map? entry) entry {:name entry})]
+            (cond-> {:name name
+                     :list true
+                     :public true
+                     :types files/image-types}
+              crop (assoc :crop crop))))
         entries))
 
 (defn- call

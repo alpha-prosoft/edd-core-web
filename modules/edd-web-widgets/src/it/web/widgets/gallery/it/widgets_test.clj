@@ -35,6 +35,9 @@
 (defn- choose-pictures! [& payloads]
   (.setInputFiles (sdk/el "folder-input-photos") ^"[Lcom.microsoft.playwright.options.FilePayload;" (into-array FilePayload payloads)))
 
+(defn- choose-avatar! [& payloads]
+  (.setInputFiles (sdk/el "folder-input-avatar") ^"[Lcom.microsoft.playwright.options.FilePayload;" (into-array FilePayload payloads)))
+
 (defn- pictures []
   (sdk/text (h/readout :folder :list)))
 
@@ -81,8 +84,8 @@
             (button/click! (h/el :folder :save))
 
             (is
-             (= "saved:waiting"
-                (sdk/text (els/testid :folder :list :saved))))
+             (sdk/eventually= "saved:waiting"
+                              #(sdk/text (els/testid :folder :list :saved))))
 
             (button/click! (h/el :folder :release))
 
@@ -146,6 +149,40 @@
 
               (is
                (<= 40.0 (.height box))))))))
+
+(deftest folder-crop-opens-before-upload
+  (with-gallery
+    (step "open folder page" #(h/open-page! :folder))
+
+    (step "a cropping entry opens the cropper when a picture is chosen"
+          (fn []
+            (choose-avatar! (png-payload "face.png"))
+
+            (is
+             (sdk/eventually #(sdk/present? "folder-crop-avatar")))))
+
+    (step "cancel closes the cropper and uploads nothing"
+          (fn []
+            (.click (sdk/el "folder-crop-cancel-avatar"))
+
+            (is
+             (sdk/eventually #(not (sdk/present? "folder-crop-avatar"))))
+
+            (is
+             (zero?
+              (.count (sdk/el "folder-image-avatar-1"))))))
+
+    (step "apply closes the cropper and uploads the cropped picture"
+          (fn []
+            (choose-avatar! (png-payload "face.png"))
+
+            (is
+             (sdk/eventually #(sdk/present? "folder-crop-avatar")))
+
+            (.click (sdk/el "folder-crop-apply-avatar"))
+
+            (is
+             (sdk/eventually #(not (sdk/present? "folder-crop-avatar"))))))))
 
 (deftest confirmation-dialog-proceeds-and-cancels
   (with-gallery

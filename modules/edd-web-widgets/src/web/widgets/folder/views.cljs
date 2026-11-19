@@ -10,6 +10,7 @@
             ["@mui/material" :refer [Box Button CircularProgress IconButton Typography]]
             [re-frame.core :as rf]
             [reagent.core :as r]
+            [web.widgets.folder.crop :as crop]
             [web.widgets.folder.elements :as els]
             [web.widgets.folder.events :as events]
             [web.widgets.folder.files :as files]
@@ -230,9 +231,14 @@
    shows buttons moving a picture earlier or later, :max (default 12),
    :max-mb (default 10), :accept (default JPEG, PNG, WebP and GIF; files are
    checked by their type and first bytes), :size (px of a tile, default
-   112), :texts (overrides of default-texts)."
+   112), :texts (overrides of default-texts), :crop (true or {:aspect ratio}
+   to crop each chosen picture before it is uploaded; defaults to the :crop of
+   the entry in the folder spec)."
   [_props]
   (let [refused-state
+        (r/atom [])
+
+        pending
         (r/atom [])
 
         list-node
@@ -244,6 +250,17 @@
           :or {max 12 max-mb default-max-mb accept files/default-accept size 112}}]
       (let [uploads
             @(rf/subscribe [::subs/uploads props entry])
+
+            crop-cfg
+            (crop/config props)
+
+            send!
+            (fn [files]
+              (choose! props entry files
+                       {:accept accept
+                        :max-mb max-mb
+                        :on-url on-add
+                        :on-refused #(reset! refused-state %)}))
 
             urls
             (vec value)
@@ -280,28 +297,52 @@
                     :disabled (<= room 0)
                     :on-files (fn [chosen]
                                 (reset! refused-state [])
-                                (choose! props entry (take room chosen)
-                                         {:accept accept
-                                          :max-mb max-mb
-                                          :on-url on-add
-                                          :on-refused #(reset! refused-state %)}))}]
+                                (let [[action files]
+                                      (crop/intercept crop-cfg (take room chosen))]
+                                  (case action
+                                    :crop (reset! pending files)
+                                    :upload (send! files))))}]
           (when (<= room 0)
             [:> Typography {:variant "body2" :color "text.secondary"} (text texts :full max)])]
          [status entry uploads texts]
-         [refused-note entry @refused-state {:texts texts :accept accept :max-mb max-mb}]]))))
+         [refused-note entry @refused-state {:texts texts :accept accept :max-mb max-mb}]
+         (when-let [f (first @pending)]
+           [crop/dialog {:entry entry
+                         :file f
+                         :crop crop-cfg
+                         :texts texts
+                         :on-confirm (fn [cropped]
+                                       (swap! pending #(vec (rest %)))
+                                       (send! [cropped]))
+                         :on-cancel #(reset! pending [])}])]))))
 
 (defn ImageField
   "One picture of an entry of a folder: an upload replaces it.
    Props: the folder, :entry, :value (its URL or nil), :on-change
    (fn [url-or-nil]), :removable? (default true), :max-mb, :accept, :size,
-   :texts."
+   :texts, :crop (true or {:aspect ratio} to crop the chosen picture before it
+   is uploaded; defaults to the :crop of the entry in the folder spec)."
   [_props]
   (let [refused-state
-        (r/atom [])]
+        (r/atom [])
+
+        pending
+        (r/atom nil)]
     (fn [{:keys [entry value on-change removable? max-mb accept size texts] :as props
           :or {removable? true max-mb default-max-mb accept files/default-accept size 160}}]
       (let [uploads
             @(rf/subscribe [::subs/uploads props entry])
+
+            crop-cfg
+            (crop/config props)
+
+            send!
+            (fn [files]
+              (choose! props entry files
+                       {:accept accept
+                        :max-mb max-mb
+                        :on-url on-change
+                        :on-refused #(reset! refused-state %)}))
 
             busy?
             (boolean (some #(not= :failed (:status %)) uploads))
@@ -318,10 +359,19 @@
                     :disabled busy?
                     :on-files (fn [chosen]
                                 (reset! refused-state [])
-                                (choose! props entry (take 1 chosen)
-                                         {:accept accept
-                                          :max-mb max-mb
-                                          :on-url on-change
-                                          :on-refused #(reset! refused-state %)}))}]]
+                                (let [[action files]
+                                      (crop/intercept crop-cfg (take 1 chosen))]
+                                  (case action
+                                    :crop (reset! pending (first files))
+                                    :upload (send! files))))}]]
          [status entry uploads texts]
-         [refused-note entry @refused-state {:texts texts :accept accept :max-mb max-mb}]]))))
+         [refused-note entry @refused-state {:texts texts :accept accept :max-mb max-mb}]
+         (when-let [f @pending]
+           [crop/dialog {:entry entry
+                         :file f
+                         :crop crop-cfg
+                         :texts texts
+                         :on-confirm (fn [cropped]
+                                       (reset! pending nil)
+                                       (send! [cropped]))
+                         :on-cancel #(reset! pending nil)}])]))))

@@ -46,3 +46,15 @@
 (defn move-later
   [entry position]
   (str "folder-later-" (name entry) "-" position))
+
+(defn crop-dialog
+  [entry]
+  (str "folder-crop-" (name entry)))
+
+(defn crop-apply
+  [entry]
+  (str "folder-crop-apply-" (name entry)))
+
+(defn crop-cancel
+  [entry]
+  (str "folder-crop-cancel-" (name entry)))

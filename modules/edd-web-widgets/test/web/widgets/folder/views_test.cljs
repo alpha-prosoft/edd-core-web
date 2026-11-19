@@ -125,6 +125,22 @@
      (= [true]
         (found hiccup :disabled)))))
 
+(deftest crop-leaves-the-controls-and-shows-no-dialog-until-a-pick
+  (let [hiccup
+        (rendered views/ImageField (assoc props :value nil :on-change identity :crop {:aspect 1}))
+
+        testids
+        (set (found hiccup :data-testid))]
+    (is
+     (contains? testids (els/add :photos)))
+
+    (is
+     (contains? testids (els/input :photos)))
+
+    (is
+     (not
+      (contains? testids (els/crop-dialog :photos))))))
+
 (deftest field-replaces-its-picture
   (let [hiccup
         (rendered views/ImageField (assoc props :value "https://cdn/a" :on-change identity))]

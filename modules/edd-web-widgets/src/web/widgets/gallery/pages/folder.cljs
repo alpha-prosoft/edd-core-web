@@ -68,7 +68,7 @@
   {:service :gallery-storage
    :application-id "gallery"
    :folder {:kind :room :id "gallery-room"}
-   :spec (events/images-spec [:photos :cover])
+   :spec (events/images-spec [:photos :cover {:name :avatar :crop {:aspect 1}}])
    :call-fx ::call
    :put-fx ::put})
 
@@ -125,6 +125,16 @@
                           :value @value
                           :on-change #(reset! value %))]])))
 
+(defdemo picture-crop []
+  (let [value
+        (r/atom nil)]
+    (fn []
+      [:div
+       [ImageField (assoc folder
+                          :entry :avatar
+                          :value @value
+                          :on-change #(reset! value %))]])))
+
 (def ^:private props-doc
   [{:name :entry      :type "keyword" :default "—"     :doc "Entry of the folder spec the pictures go to."}
    {:name :value      :type "vector"  :default "—"     :doc "URLs of the pictures (ImageField: one URL or nil)."}
@@ -137,7 +147,8 @@
    {:name :max-mb     :type "number"  :default "10"    :doc "Largest file."}
    {:name :call-fx    :type "keyword" :default "edd.client call" :doc "Effect sending requests to the storage service."}
    {:name :put-fx     :type "keyword" :default "::events/put" :doc "Effect sending the bytes."}
-   {:name :texts      :type "map"     :default "—"     :doc "Overrides of default-texts."}])
+   {:name :texts      :type "map"     :default "—"     :doc "Overrides of default-texts."}
+   {:name :crop       :type "true | map" :default "—"  :doc "true or {:aspect ratio} to crop each chosen picture before upload; defaults to the entry's :crop in the spec."}])
 
 (defn register! []
   (page/register!
@@ -151,4 +162,7 @@
               [picture-list])
 
      (example {:id :field :title "One picture"}
-              [picture-field])]}))
+              [picture-field])
+
+     (example {:id :crop :title "Crop before upload"}
+              [picture-crop])]}))

@@ -2,6 +2,16 @@
 
 ## Changes
 
+**[AP-1123]** Folder pictures: crop before upload
+- a new web.widgets.folder.crop ns (canvas + react-image-crop), ported
+  from web-samurai, generic with no app deps
+- an entry turns cropping on with :crop (true or {:aspect r}) via
+  images-spec or a prop; without it the widget is unchanged
+- a cropped file still runs the type and first-byte check before upload
+- adds react-image-crop 11.0.7; gallery variant and a browser test
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1105]** Folder pictures: only pictures, named messages, saves wait, order
 - :accept (default JPEG, PNG, WebP, GIF), checked by type and first bytes
 - Every upload message names its file

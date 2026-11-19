@@ -37,6 +37,18 @@
        {:name :cover :list true :public true :types ["image/jpeg" "image/png" "image/webp" "image/gif"]}]
       (events/images-spec [:logo :cover]))))
 
+(deftest an-entry-carries-its-crop
+  (testing "a map entry keeps its :crop in the spec"
+    (is
+     (= [{:name :photos :list true :public true :types ["image/jpeg" "image/png" "image/webp" "image/gif"]}
+         {:name :avatar :list true :public true :types ["image/jpeg" "image/png" "image/webp" "image/gif"] :crop {:aspect 1}}]
+        (events/images-spec [:photos {:name :avatar :crop {:aspect 1}}]))))
+
+  (testing "a plain keyword entry has no :crop"
+    (is
+     (not
+      (contains? (first (events/images-spec [:photos])) :crop)))))
+
 (deftest saving-sets-the-folder-up
   (is
    (= [[:app/call {:service :storage-svc
