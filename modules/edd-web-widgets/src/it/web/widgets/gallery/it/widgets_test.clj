@@ -20,6 +20,11 @@
 (def ^:private one-pixel-png
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=")
 
+(def ^:private square-png
+  "A 64x64 PNG, large enough that the crop selection drawn over it has a
+   clearly non-zero box."
+  "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAT0lEQVR42u3PQQkAAAgEsItz/VMYywi+hcEKLNO+FgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQGBywLvDoEAVSaz4wAAAABJRU5ErkJggg==")
+
 (defn- png-file ^Path []
   (let [path
         (Files/createTempFile "widgets-gallery" ".png" (make-array FileAttribute 0))]
@@ -28,6 +33,9 @@
 
 (defn- png-payload ^FilePayload [file-name]
   (FilePayload. file-name "image/png" (.decode (Base64/getDecoder) ^String one-pixel-png)))
+
+(defn- square-payload ^FilePayload [file-name]
+  (FilePayload. file-name "image/png" (.decode (Base64/getDecoder) ^String square-png)))
 
 (defn- text-payload ^FilePayload [file-name mime-type]
   (FilePayload. file-name mime-type (.getBytes "just some notes" StandardCharsets/UTF_8)))
@@ -43,6 +51,16 @@
 
 (defn- focused-testid []
   (.evaluate (sdk/page) "() => document.activeElement && document.activeElement.dataset.testid"))
+
+(def ^:private crop-selection-js
+  "Reads the react-image-crop selection's computed position and its box; nil
+   when it is not rendered. Without the widget's stylesheet the selection is a
+   static block of height 0 sitting below the image, so position and height
+   tell the laid-over selection apart from the unstyled one."
+  "() => { const s = document.querySelector('.ReactCrop__crop-selection'); if (!s) return null; const cs = getComputedStyle(s); const r = s.getBoundingClientRect(); return { position: cs.position, width: r.width, height: r.height }; }")
+
+(defn- number ^double [value]
+  (.doubleValue ^Number value))
 
 (deftest folder-list-refuses-what-is-not-a-picture
   (with-gallery
@@ -174,10 +192,28 @@
 
     (step "apply closes the cropper and uploads the cropped picture"
           (fn []
-            (choose-avatar! (png-payload "face.png"))
+            (choose-avatar! (square-payload "face.png"))
 
             (is
              (sdk/eventually #(sdk/present? "folder-crop-avatar")))
+
+            (let [metrics
+                  (sdk/eventually
+                   (fn []
+                     (let [m (.evaluate (sdk/page) crop-selection-js)]
+                       (when (and m (pos? (number (.get ^java.util.Map m "height")))) m))))]
+
+              (is
+               (= "absolute"
+                  (.get ^java.util.Map metrics "position")))
+
+              (is
+               (pos?
+                (number (.get ^java.util.Map metrics "width"))))
+
+              (is
+               (pos?
+                (number (.get ^java.util.Map metrics "height")))))
 
             (.click (sdk/el "folder-crop-apply-avatar"))
 

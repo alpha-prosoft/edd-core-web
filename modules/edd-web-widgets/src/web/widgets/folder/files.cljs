@@ -90,3 +90,11 @@
               :declared-type (.-type file)
               :sniffed-type (sniffed-type (vec (js/Array.from (js/Uint8Array. buffer))))
               :size (.-size file)}))))
+
+(defn screen
+  "A promise of the examined files, each tagged with its :reason to refuse it
+   (nil when it is an accepted picture small enough), in the order given."
+  [files limits]
+  (.then (js/Promise.all (into-array (map examine files)))
+         (fn [examined]
+           (mapv #(assoc % :reason (refusal % limits)) examined))))

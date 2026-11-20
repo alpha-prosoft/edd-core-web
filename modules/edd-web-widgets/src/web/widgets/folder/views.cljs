@@ -65,20 +65,16 @@
    order they were chosen; on-url gets the URL of each once it is stored,
    on-refused the others with their :reason."
   [props entry files {:keys [accept max-mb on-url on-refused]}]
-  (let [examining
-        (js/Promise.all (into-array (map files/examine files)))]
-    (.then examining
-           (fn [examined]
-             (let [checked
-                   (map #(assoc % :reason (files/refusal % {:accept accept :max-mb max-mb})) examined)]
-               (doseq [{:keys [file file-name sniffed-type]} (remove :reason checked)]
-                 (rf/dispatch [::events/upload props {:entry entry
-                                                      :item (str (random-uuid))
-                                                      :file file
-                                                      :file-name file-name
-                                                      :content-type sniffed-type
-                                                      :on-uploaded on-url}]))
-               (on-refused (vec (filter :reason checked))))))))
+  (.then (files/screen files {:accept accept :max-mb max-mb})
+         (fn [checked]
+           (doseq [{:keys [file file-name sniffed-type]} (remove :reason checked)]
+             (rf/dispatch [::events/upload props {:entry entry
+                                                  :item (str (random-uuid))
+                                                  :file file
+                                                  :file-name file-name
+                                                  :content-type sniffed-type
+                                                  :on-uploaded on-url}]))
+           (on-refused (vec (filter :reason checked))))))
 
 (defn- tile-sx
   [size]
@@ -262,6 +258,13 @@
                         :on-url on-add
                         :on-refused #(reset! refused-state %)}))
 
+            guard-crop!
+            (fn [files]
+              (.then (files/screen files {:accept accept :max-mb max-mb})
+                     (fn [checked]
+                       (reset! pending (crop/to-open checked))
+                       (reset! refused-state (vec (filter :reason checked))))))
+
             urls
             (vec value)
 
@@ -300,7 +303,7 @@
                                 (let [[action files]
                                       (crop/intercept crop-cfg (take room chosen))]
                                   (case action
-                                    :crop (reset! pending files)
+                                    :crop (guard-crop! files)
                                     :upload (send! files))))}]
           (when (<= room 0)
             [:> Typography {:variant "body2" :color "text.secondary"} (text texts :full max)])]
@@ -344,6 +347,13 @@
                         :on-url on-change
                         :on-refused #(reset! refused-state %)}))
 
+            guard-crop!
+            (fn [files]
+              (.then (files/screen files {:accept accept :max-mb max-mb})
+                     (fn [checked]
+                       (reset! pending (first (crop/to-open checked)))
+                       (reset! refused-state (vec (filter :reason checked))))))
+
             busy?
             (boolean (some #(not= :failed (:status %)) uploads))
 
@@ -362,7 +372,7 @@
                                 (let [[action files]
                                       (crop/intercept crop-cfg (take 1 chosen))]
                                   (case action
-                                    :crop (reset! pending (first files))
+                                    :crop (guard-crop! files)
                                     :upload (send! files))))}]]
          [status entry uploads texts]
          [refused-note entry @refused-state {:texts texts :accept accept :max-mb max-mb}]

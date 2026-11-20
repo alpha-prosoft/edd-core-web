@@ -8,6 +8,16 @@
   [name type]
   (js/File. #js ["x"] name #js {:type type}))
 
+(defn- png-file
+  "A file whose first bytes are a real PNG signature."
+  [name]
+  (js/File. #js [(js/Uint8Array. #js [0x89 0x50 0x4E 0x47 0x0D 0x0A 0x1A 0x0A 0 0 0 0])]
+            name
+            #js {:type "image/png"}))
+
+(def ^:private limits
+  {:accept files/default-accept :max-mb 10})
+
 (defn- drawable
   "A drawn canvas standing in for a loaded <img>: it carries naturalWidth and
    naturalHeight the way percent-crop->blob reads them and is a valid source
@@ -95,6 +105,34 @@
                           (.-type f)))
 
                       (done)))
+             (.catch (fn [e] (is (nil? e)) (done))))))
+
+(deftest the-guard-screens-a-non-picture-before-the-cropper-opens
+  (async done
+         (-> (js/Promise.all
+              #js [(files/screen [(source-file "fake.png" "image/png")] limits)
+                   (files/screen [(png-file "face.png")] limits)])
+             (.then (fn [results]
+                      (let [bad
+                            (aget results 0)
+
+                            good
+                            (aget results 1)]
+                        (testing "a non-picture does not open the cropper"
+                          (is
+                           (empty?
+                            (crop/to-open bad)))
+
+                          (is
+                           (= [:not-picture]
+                              (mapv :reason (filter :reason bad)))))
+
+                        (testing "a real picture opens the cropper"
+                          (is
+                           (= ["face.png"]
+                              (mapv #(.-name ^js %) (crop/to-open good)))))
+
+                        (done))))
              (.catch (fn [e] (is (nil? e)) (done))))))
 
 (deftest a-cropped-picture-still-passes-the-first-byte-check

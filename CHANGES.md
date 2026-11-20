@@ -2,6 +2,17 @@
 
 ## Changes
 
+**[AP-1126]** Folder crop: ship the stylesheet self-contained, guard before the dialog
+- embed the react-image-crop stylesheet, scoped under a crop class and
+  injected into the document head on mount, so the crop rectangle, handles
+  and overlay render wherever the widget is used, with no host change
+- run the image type and magic-byte check before opening the crop dialog,
+  so a non-picture is refused up front
+- the gallery test now asserts the crop selection is positioned over the
+  image, so a missing stylesheet fails the build
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1127]** Folder pictures: Content-MD5 on every upload
 - The widget reads the chosen file, computes its MD5 (goog.crypt.Md5) and
   asks :folder->upload-url with :md5, so the storage service signs it
