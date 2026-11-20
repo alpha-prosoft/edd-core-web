@@ -2,6 +2,15 @@
 
 ## Changes
 
+**[AP-1127]** Folder pictures: Content-MD5 on every upload
+- The widget reads the chosen file, computes its MD5 (goog.crypt.Md5) and
+  asks :folder->upload-url with :md5, so the storage service signs it
+- The PUT sends Content-MD5 (put-headers adds it when the storage service
+  did not list it): S3 buckets with Object Lock refuse a PUT without
+  Content-MD5 or a checksum header
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1123]** Folder pictures: crop before upload
 - a new web.widgets.folder.crop ns (canvas + react-image-crop), ported
   from web-samurai, generic with no app deps

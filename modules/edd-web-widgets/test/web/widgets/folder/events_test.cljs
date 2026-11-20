@@ -122,15 +122,43 @@
      (= "image/png"
         (get-in fx [0 1 :commands 1 :attrs :content-type])))))
 
-(deftest the-file-goes-to-its-presigned-url
-  (testing "the upload URL is asked for with the size of the file"
+(deftest the-md5-of-the-file-is-signed
+  (testing "an added file is read for its MD5 first"
+    (is
+     (= [::events/digest file [::events/digested props upload]]
+        (let [[[effect request]]
+              (:fx (events/added {} [::events/added props upload]))]
+          [effect (:file request) (:on-success request)]))))
+
+  (testing "MD5 as Content-MD5 wants it, base64 of the digest"
+    (is
+     (= "XUFAKrxLKna5cZ2REBfFkg=="
+        (events/md5-base64 (.-buffer (.encode (js/TextEncoder.) "hello"))))))
+
+  (testing "the upload URL is asked for with the size and MD5 of the file"
     (is
      (= {:query-id :folder->upload-url
          :folder {:kind :room :id "room-1"}
          :entry :photos
          :item "item-1"
-         :content-length 2048}
-        (get-in (events/added {} [::events/added props upload]) [:fx 0 1 :query]))))
+         :content-length 2048
+         :md5 "XUFAKrxLKna5cZ2REBfFkg=="}
+        (get-in (events/digested {} [::events/digested props upload "XUFAKrxLKna5cZ2REBfFkg=="])
+                [:fx 0 1 :query]))))
+
+  (testing "the PUT sends Content-MD5 when the storage service did not list it"
+    (is
+     (= {"Content-Type" "image/jpeg"
+         "Content-MD5" "XUFAKrxLKna5cZ2REBfFkg=="}
+        (events/put-headers {:headers {"Content-Type" "image/jpeg"}
+                             :md5 "XUFAKrxLKna5cZ2REBfFkg=="})))
+
+    (is
+     (= {"content-md5" "listed=="}
+        (events/put-headers {:headers {"content-md5" "listed=="}
+                             :md5 "XUFAKrxLKna5cZ2REBfFkg=="})))))
+
+(deftest the-file-goes-to-its-presigned-url
 
   (testing "the bytes go to the URL, then the public URL is handed on"
     (let [[[effect request]]

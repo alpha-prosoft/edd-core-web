@@ -19,9 +19,11 @@
    finished ones; [::subs/uploading folder] counts the running ones, to
    disable a save button or say what it waits for."
   (:require [edd.client :as client]
+            [goog.crypt.base64 :as b64]
             [re-frame.core :as rf]
             [web.widgets.folder.db :as db]
-            [web.widgets.folder.files :as files]))
+            [web.widgets.folder.files :as files])
+  (:import [goog.crypt Md5]))
 
 (defn images-spec
   "Spec of a folder of public pictures, every entry a list so that each
@@ -120,21 +122,49 @@
                        :on-success [::added props started]
                        :on-failure [::upload-failed props started]})]}))
 
+(defn md5-base64
+  "Content-MD5 value of bytes (an ArrayBuffer or Uint8Array)."
+  [bytes]
+  (let [md5
+        (Md5.)]
+    (.update md5 (js/Uint8Array. bytes))
+    (b64/encodeByteArray (.digest md5))))
+
+(defn digest!
+  [{:keys [^js file on-success on-failure]}]
+  (let [read
+        (.then (.arrayBuffer file)
+               (fn [bytes]
+                 (rf/dispatch (conj on-success (md5-base64 bytes)))))]
+    (.catch read
+            (fn [error]
+              (rf/dispatch (conj on-failure {:error (str error)}))))))
+
 (defn added
-  [_cofx [_ props {:keys [entry item ^js file] :as upload}]]
+  "The MD5 of the file is signed into its upload URL: storage buckets with
+   Object Lock refuse a PUT without Content-MD5."
+  [_cofx [_ props {:keys [file] :as upload}]]
+  {:fx [[::digest {:file file
+                   :on-success [::digested props upload]
+                   :on-failure [::upload-failed props upload]}]]})
+
+(defn digested
+  [_cofx [_ props {:keys [entry item ^js file] :as upload} md5]]
   {:fx [(call props {:service (:service props)
                      :query (scoped props {:query-id :folder->upload-url
                                            :entry entry
                                            :item item
-                                           :content-length (.-size file)})
-                     :on-success [::url-received props upload]
+                                           :content-length (.-size file)
+                                           :md5 md5})
+                     :on-success [::url-received props (assoc upload :md5 md5)]
                      :on-failure [::upload-failed props upload]})]})
 
 (defn url-received
-  [_cofx [_ props {:keys [file content-type] :as upload} {:keys [result]}]]
+  [_cofx [_ props {:keys [file content-type md5] :as upload} {:keys [result]}]]
   {:fx [[(or (:put-fx props) ::put) {:url (:url result)
                                      :headers (:headers result)
                                      :content-type content-type
+                                     :md5 md5
                                      :file file
                                      :on-success [::stored props upload (:public-url result)]
                                      :on-failure [::upload-failed props upload]}]]})
@@ -208,19 +238,33 @@
     {:db (update-in db (db/waiting-path props) (fnil conj []) event)}
     {:fx [[:dispatch event]]}))
 
+(defn put-headers
+  "The headers the URL was signed for, with the Content-MD5 of the file when
+   the storage service did not list it."
+  [{:keys [headers content-type md5]}]
+  (let [signed
+        (or headers
+            (when content-type
+              {"Content-Type" content-type})
+            {})
+
+        listed?
+        (some #(= "content-md5" (.toLowerCase (name %))) (keys signed))]
+    (if (and md5 (not listed?))
+      (assoc signed "Content-MD5" md5)
+      signed)))
+
 (defn put!
   "PUT of the bytes to a presigned URL with the headers it was signed for;
    the browser sets their length."
-  [{:keys [url headers content-type ^js file on-success on-failure]}]
+  [{:keys [url ^js file on-success on-failure] :as request}]
   (let [sent-headers
-        (or headers
-            (when content-type
-              {"Content-Type" content-type}))
+        (put-headers request)
 
         sending
         (js/fetch url #js {:method "PUT"
                            :body file
-                           :headers (clj->js (or sent-headers {}))})
+                           :headers (clj->js sent-headers)})
 
         answered
         (.then sending
@@ -237,11 +281,13 @@
   {:fx [[::callback (into [f] args)]]})
 
 (rf/reg-fx ::put put!)
+(rf/reg-fx ::digest digest!)
 (rf/reg-fx ::callback (fn [[f & args]] (apply f args)))
 (rf/reg-event-fx ::save save)
 (rf/reg-event-fx ::retain retain)
 (rf/reg-event-fx ::upload upload)
 (rf/reg-event-fx ::added added)
+(rf/reg-event-fx ::digested digested)
 (rf/reg-event-fx ::url-received url-received)
 (rf/reg-event-fx ::stored stored)
 (rf/reg-event-fx ::upload-failed upload-failed)
