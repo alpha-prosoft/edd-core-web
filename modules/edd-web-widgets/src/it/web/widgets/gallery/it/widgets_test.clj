@@ -46,6 +46,15 @@
 (defn- choose-avatar! [& payloads]
   (.setInputFiles (sdk/el "folder-input-avatar") ^"[Lcom.microsoft.playwright.options.FilePayload;" (into-array FilePayload payloads)))
 
+(defn- choose-scans! [& payloads]
+  (.setInputFiles (sdk/el "folder-input-scans") ^"[Lcom.microsoft.playwright.options.FilePayload;" (into-array FilePayload payloads)))
+
+(defn- image-src [testid]
+  (let [img
+        (.locator (sdk/el testid) "img")]
+    (when (pos? (.count img))
+      (.getAttribute img "src"))))
+
 (defn- pictures []
   (sdk/text (h/readout :folder :list)))
 
@@ -219,6 +228,46 @@
 
             (is
              (sdk/eventually #(not (sdk/present? "folder-crop-avatar"))))))))
+
+(deftest folder-private-shows-a-signed-url-and-the-public-path-does-not-poll
+  (with-gallery
+    (step "open folder page" #(h/open-page! :folder))
+
+    (step "a public upload is served from the CDN, never read back from folder->get"
+          (fn []
+            (choose-pictures! (png-payload "pub.png"))
+
+            (is
+             (sdk/eventually #(str/includes? (pictures) "pub.png")))
+
+            (is
+             (= "gets:0"
+                (sdk/text (els/testid :folder :list :gets))))))
+
+    (step "a private picture uploads and shows through its presigned url"
+          (fn []
+            (choose-scans! (png-payload "scan.png"))
+
+            (let [src
+                  (sdk/eventually #(image-src "folder-image-scans-1"))]
+
+              (is
+               (str/starts-with? src "https://signed.example/"))
+
+              (is
+               (str/includes? src "?token=")))))
+
+    (step "the field stores the stable ref, not the expiring signed url"
+          (fn []
+            (is
+             (sdk/eventually #(str/includes? (sdk/text (els/testid :folder :private :readout)) "refs:/private/")))
+
+            (is
+             (not
+              (str/includes? (sdk/text (els/testid :folder :private :readout)) "?token=")))
+
+            (is
+             (sdk/eventually #(not= "gets:0" (sdk/text (els/testid :folder :private :gets)))))))))
 
 (deftest confirmation-dialog-proceeds-and-cancels
   (with-gallery

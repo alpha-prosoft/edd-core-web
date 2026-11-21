@@ -4,6 +4,7 @@
             [re-frame.db :as rf-db]
             [web.widgets.folder.db :as db]
             [web.widgets.folder.elements :as els]
+            [web.widgets.folder.events :as events]
             [web.widgets.folder.files :as files]
             [web.widgets.folder.views :as views]))
 
@@ -11,6 +12,12 @@
   {:service :storage-svc
    :folder {:kind :room :id "views-room"}
    :entry :photos})
+
+(def private-props
+  {:service :storage-svc
+   :folder {:kind :room :id "views-room"}
+   :entry :docs
+   :spec (events/images-spec [{:name :docs :public false}])})
 
 (defn- expanded
   "Hiccup with the components inside it rendered."
@@ -150,3 +157,24 @@
 
     (is
      (some #{"Replace picture"} (tree-seq coll? seq hiccup)))))
+
+(deftest a-private-entry-shows-the-signed-url-of-the-ref-it-holds
+  (reset! rf-db/app-db
+          (assoc-in {} (db/files-path private-props)
+                    [{:entry :docs :item "i1" :status :ready
+                      :url "https://signed.example/private/x/docs/i1/v1?token=9"}]))
+  (let [hiccup
+        (rendered views/ImageList (assoc private-props
+                                         :value ["/private/x/docs/i1/v1"]
+                                         :on-remove identity))
+
+        sources
+        (set (found hiccup :src))]
+    (reset! rf-db/app-db {})
+
+    (is
+     (contains? sources "https://signed.example/private/x/docs/i1/v1?token=9"))
+
+    (is
+     (not
+      (contains? sources "/private/x/docs/i1/v1")))))

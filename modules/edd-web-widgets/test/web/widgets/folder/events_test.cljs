@@ -10,6 +10,12 @@
    :spec (events/images-spec [:photos])
    :call-fx :app/call})
 
+(def private-props
+  {:service :storage-svc
+   :folder {:kind :room :id "room-1"}
+   :spec (events/images-spec [{:name :docs :public false}])
+   :call-fx :app/call})
+
 (def file
   #js {:name "hall.jpg" :type "image/jpeg" :size 2048})
 
@@ -282,3 +288,140 @@
     (is
      (= []
         (subs/uploads db [::subs/uploads (assoc-in props [:folder :id] "room-2") :photos])))))
+
+(deftest an-entry-can-be-private
+  (testing "a map entry with :public false is a private, image-only entry"
+    (is
+     (= [{:name :docs
+          :list true
+          :public false
+          :types ["image/jpeg" "image/png" "image/webp" "image/gif"]}]
+        (events/images-spec [{:name :docs :public false}]))))
+
+  (testing ":public defaults to true, so the public path is unchanged"
+    (is
+     (true?
+      (:public (first (events/images-spec [:photos])))))
+
+    (is
+     (true?
+      (events/private-entry? private-props :docs)))
+
+    (is
+     (false?
+      (events/private-entry? props :photos)))))
+
+(deftest a-file-ref-is-the-stable-path-of-its-url
+  (testing "the ref is the url path (\"/\" + storage key), what ::retain matches"
+    (is
+     (= "/private/app/room/r/docs/item/v2"
+        (events/file-ref "https://b.s3.amazonaws.com/private/app/room/r/docs/item/v2?X-Amz-Signature=abc"))))
+
+  (testing "a signed url resolves by its stable ref, even as its token rotates"
+    (is
+     (= "https://b/p?token=9"
+        (events/signed-url [{:entry :docs :item "i" :url "https://b/p?token=9"}]
+                           "/p")))))
+
+(deftest a-private-upload-reads-its-signed-url-not-a-public-one
+  (testing "a private file, having no public url, resolves it from the folder"
+    (let [[[_ request]]
+          (:fx (events/url-received {} [::events/url-received private-props
+                                        (assoc upload :entry :docs)
+                                        {:result {:url "https://s3/put"}}]))]
+      (is
+       (= ::events/resolve-private
+          (first (:on-success request))))))
+
+  (testing "a public file still hands on its immutable public url"
+    (let [[[_ request]]
+          (:fx (events/url-received {} [::events/url-received props upload
+                                        {:result {:url "https://s3/put" :public-url "https://cdn/p"}}]))]
+      (is
+       (= [::events/stored props upload "https://cdn/p"]
+          (:on-success request))))))
+
+(deftest a-stored-private-file-keeps-the-ref-and-shows-the-signed-url
+  (let [db
+        (-> {}
+            (assoc-in (db/upload-path private-props "earlier") {:entry :docs :item "earlier" :order 0 :status :uploading})
+            (assoc-in (db/upload-path private-props "x") {:entry :docs :item "x" :order 1 :status :uploading}))
+
+        {db' :db}
+        (events/stored {:db db} [::events/stored private-props
+                                 {:item "x" :preview-url "https://b/p?token=1"}
+                                 "/private/app/docs/x/v1"])
+
+        file
+        (get-in db' (db/upload-path private-props "x"))]
+
+    (is
+     (= "/private/app/docs/x/v1"
+        (:value file)))
+
+    (is
+     (= "https://b/p?token=1"
+        (:preview-url file)))))
+
+(deftest a-private-file-resolves-its-ref-from-folder-get
+  (let [p-upload
+        (assoc upload :entry :docs :on-uploaded [:app/photo-added])
+
+        db
+        (assoc-in {} (db/upload-path private-props "item-1")
+                  (assoc p-upload :order 0 :status :uploading))
+
+        files
+        [{:entry :docs :item "item-1" :status :ready
+          :url "https://b/private/app/docs/item-1/v1?token=7"}]
+
+        {db' :db fx :fx}
+        (events/private-resolved {:db db}
+                                 [::events/private-resolved private-props p-upload 0 {:result {:files files}}])]
+
+    (is
+     (= [[:dispatch [:app/photo-added "/private/app/docs/item-1/v1"]]]
+        fx))
+
+    (is
+     (= files
+        (get-in db' (db/files-path private-props)))))
+
+  (testing "while not yet ready it polls again, caching nothing new"
+    (let [p-upload
+          (assoc upload :entry :docs)
+
+          db
+          (assoc-in {} (db/upload-path private-props "item-1")
+                    (assoc p-upload :order 0 :status :uploading))
+
+          {fx :fx}
+          (events/private-resolved {:db db}
+                                   [::events/private-resolved private-props p-upload 0 {:result {:files []}}])]
+      (is
+       (= :dispatch-later
+          (ffirst fx))))))
+
+(deftest a-private-entry-refreshes-but-a-public-one-does-not
+  (let [{:keys [db fx]}
+        (events/watch {:db {}} [::events/watch private-props :docs])]
+
+    (is
+     (true?
+      (get-in db (db/watch-path private-props :docs))))
+
+    (is
+     (some #(= [::events/fetch private-props] (last %)) fx))
+
+    (is
+     (some #(= :dispatch-later (first %)) fx)))
+
+  (testing "a public entry reads nothing and schedules nothing"
+    (is
+     (= {}
+        (events/watch {:db {}} [::events/watch props :photos]))))
+
+  (testing "once unwatched a refresh stops rescheduling"
+    (is
+     (nil?
+      (events/refresh {:db {}} [::events/refresh private-props :docs])))))

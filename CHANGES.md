@@ -2,6 +2,17 @@
 
 ## Changes
 
+**[AP-1128]** Folder pictures: private images via signed urls, public path unchanged
+- an entry may set :public false; the image is uploaded to a private folder
+  and shown through the storage service's short-lived signed GET url, read
+  from :folder->get (query id overridable with :get-query-id) and refreshed
+  before it expires; the field keeps the stable file ref, not the signed url
+- public entries are unchanged: their immutable CDN url, no extra query or
+  polling
+- private entries keep the image type and magic-byte guard; gallery demo
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1126]** Folder crop: ship the stylesheet self-contained, guard before the dialog
 - embed the react-image-crop stylesheet, scoped under a crop class and
   injected into the document head on mount, so the crop rectangle, handles

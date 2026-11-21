@@ -123,7 +123,7 @@
                :on-click on-later}])])
 
 (defn- upload-tile
-  [{:keys [file-name status response item public-url]} {:keys [props entry size texts]}]
+  [{:keys [file-name status response item preview-url]} {:keys [props entry size texts]}]
   (case status
     :failed
     [:> Box {:component "li" :role "alert" :data-testid (els/problem entry)
@@ -135,7 +135,7 @@
 
     :stored
     [:> Box {:component "li" :data-testid (els/uploading entry) :sx (tile-sx size)}
-     [:> Box {:component "img" :src public-url :alt file-name
+     [:> Box {:component "img" :src preview-url :alt file-name
               :sx {:width "100%" :height "100%" :objectFit "cover" :display "block"}}]]
 
     [:> Box {:component "li" :data-testid (els/uploading entry)
@@ -148,7 +148,7 @@
                  :sx {:listStyle "none" :m 0 :p 0 :display "flex" :flexWrap "wrap" :gap 1}}]
         (concat
          (for [shown pictures]
-           ^{:key (:url shown)}
+           ^{:key (or (:ref shown) (:url shown))}
            [picture (assoc shown :entry entry :size size :texts texts)])
          (for [upload uploads]
            ^{:key (:item upload)}
@@ -219,6 +219,33 @@
     (when button
       (.focus button))))
 
+(defn- folder-reader
+  "Renders nothing; while mounted it keeps a private entry's presigned urls
+   fresh (::watch reads the folder and refreshes before they expire, ::unwatch
+   stops the timer). A public entry's ::watch is a no-op, so no query runs."
+  [_props _entry]
+  (let [current
+        (atom nil)]
+    (r/create-class
+     {:component-did-mount
+      (fn [_] (let [[props entry] @current]
+                (rf/dispatch [::events/watch props entry])))
+
+      :component-will-unmount
+      (fn [_] (let [[props entry] @current]
+                (rf/dispatch [::events/unwatch props entry])))
+
+      :reagent-render
+      (fn [props entry] (reset! current [props entry]) nil)})))
+
+(defn- display-src
+  "The image src for a stored value: the value itself for a public entry, the
+   resolved presigned url for a private one (nil until the folder was read)."
+  [private? files value]
+  (if private?
+    (events/signed-url files value)
+    value))
+
 (defn ImageList
   "Pictures of a list entry of a folder, in the order the files were chosen.
    Props: the folder (:service :folder :spec :application-id :call-fx, see
@@ -229,7 +256,11 @@
    checked by their type and first bytes), :size (px of a tile, default
    112), :texts (overrides of default-texts), :crop (true or {:aspect ratio}
    to crop each chosen picture before it is uploaded; defaults to the :crop of
-   the entry in the folder spec)."
+   the entry in the folder spec).
+   A private entry (:public false in the spec) keeps each file's stable ref as
+   its value, not an expiring signed url, and shows it through the presigned
+   url read from :folder->get (:get-query-id, default :folder->get; refreshed
+   every :refresh-ms, default 25 min, before the url expires)."
   [_props]
   (let [refused-state
         (r/atom [])
@@ -246,6 +277,12 @@
           :or {max 12 max-mb default-max-mb accept files/default-accept size 112}}]
       (let [uploads
             @(rf/subscribe [::subs/uploads props entry])
+
+            private?
+            (events/private-entry? props entry)
+
+            files
+            @(rf/subscribe [::subs/files props])
 
             crop-cfg
             (crop/config props)
@@ -283,7 +320,8 @@
 
             pictures
             (map-indexed (fn [index url]
-                           {:url url
+                           {:url (display-src private? files url)
+                            :ref url
                             :position (inc index)
                             :on-remove (when on-remove #(on-remove url))
                             :on-earlier (when (and on-reorder (pos? index)) #(move! index -1))
@@ -294,6 +332,8 @@
             (reset! pending-focus nil)
             (r/after-render #(focus-control! @list-node entry index direction n))))
         [:> Box {:sx {:display "grid" :gap 1.5} :ref #(reset! list-node %)}
+         (when private?
+           [folder-reader props entry])
          [tiles entry pictures uploads {:props props :size size :texts texts}]
          [:> Box {:sx {:display "flex" :flexWrap "wrap" :alignItems "center" :gap 1.5}}
           [chooser {:entry entry :label (text texts :add) :multiple true :accept accept
@@ -324,7 +364,10 @@
    Props: the folder, :entry, :value (its URL or nil), :on-change
    (fn [url-or-nil]), :removable? (default true), :max-mb, :accept, :size,
    :texts, :crop (true or {:aspect ratio} to crop the chosen picture before it
-   is uploaded; defaults to the :crop of the entry in the folder spec)."
+   is uploaded; defaults to the :crop of the entry in the folder spec).
+   A private entry (:public false in the spec) keeps the file's stable ref as
+   its value and shows it through the presigned url of :folder->get, like
+   ImageList."
   [_props]
   (let [refused-state
         (r/atom [])
@@ -335,6 +378,12 @@
           :or {removable? true max-mb default-max-mb accept files/default-accept size 160}}]
       (let [uploads
             @(rf/subscribe [::subs/uploads props entry])
+
+            private?
+            (events/private-entry? props entry)
+
+            files
+            @(rf/subscribe [::subs/files props])
 
             crop-cfg
             (crop/config props)
@@ -359,10 +408,13 @@
 
             pictures
             (when (and value (not busy?))
-              [{:url value
+              [{:url (display-src private? files value)
+                :ref value
                 :position 1
                 :on-remove (when removable? #(on-change nil))}])]
         [:> Box {:sx {:display "grid" :gap 1.5}}
+         (when private?
+           [folder-reader props entry])
          [tiles entry pictures uploads {:props props :size size :texts texts}]
          [:div
           [chooser {:entry entry :label (text texts (if value :replace :add-one)) :multiple false :accept accept

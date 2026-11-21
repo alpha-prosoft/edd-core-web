@@ -16,5 +16,12 @@
   [db [_ props]]
   (count (events/running db props)))
 
+(defn files
+  "The files of the last :folder->get, for resolving a private entry's signed
+   url."
+  [db [_ props]]
+  (get-in db (db/files-path props)))
+
 (rf/reg-sub ::uploads uploads)
 (rf/reg-sub ::uploading uploading)
+(rf/reg-sub ::files files)

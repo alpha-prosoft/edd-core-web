@@ -25,22 +25,67 @@
             [web.widgets.folder.files :as files])
   (:import [goog.crypt Md5]))
 
+(def default-refresh-ms
+  "How often a private entry re-reads :folder->get to refresh its presigned
+   urls. The storage service signs a GET url for download-expires-sec (3600 s
+   = 1 h); 25 min is comfortably under half of that, so a url is replaced long
+   before it expires. A prop :refresh-ms overrides it."
+  (* 25 60 1000))
+
+(def ^:private ref-poll-ms
+  "Between polls of :folder->get while a private upload is becoming ready."
+  2000)
+
+(def ^:private ref-poll-max
+  30)
+
 (defn images-spec
-  "Spec of a folder of public pictures, every entry a list so that each
-   upload is a file of its own. An entry is a keyword, or a map
-   {:name keyword :crop crop} to turn cropping on for it: :crop is carried
-   through to the entry so the widget opens the cropper before uploading
-   (true for a free crop, {:aspect ratio} for a fixed one)."
+  "Spec of a folder of pictures, every entry a list so that each upload is a
+   file of its own. An entry is a keyword, or a map {:name keyword :crop crop
+   :public bool}: :crop turns cropping on (true for a free crop, {:aspect
+   ratio} for a fixed one); :public false makes the entry private, its files
+   reachable only through a short-lived presigned url. Private entries are
+   still pictures (image type and magic-byte check), only not served from the
+   CDN. :public defaults to true."
   [entries]
   (mapv (fn [entry]
-          (let [{:keys [name crop]}
+          (let [{:keys [name crop public]
+                 :or {public true}}
                 (if (map? entry) entry {:name entry})]
             (cond-> {:name name
                      :list true
-                     :public true
+                     :public public
                      :types files/image-types}
               crop (assoc :crop crop))))
         entries))
+
+(defn entry-spec
+  [{:keys [spec]} entry]
+  (first (filter #(= entry (:name %)) spec)))
+
+(defn private-entry?
+  "A private entry has :public false in the folder spec; without a spec or a
+   flag an entry is public, so the public path is the default."
+  [props entry]
+  (false? (:public (entry-spec props entry))))
+
+(defn file-ref
+  "The stable identity of a stored file: the path of its url, which is
+   \"/\" followed by the storage key. A public url and a private presigned
+   url both carry it, and it does not change when the signed url is
+   refreshed, so a form field holds it (never the expiring signed url) and
+   ::retain keeps the file by it."
+  [url]
+  (when url
+    (.-pathname (js/URL. url))))
+
+(defn signed-url
+  "The current presigned url of the private file the stable ref names, read
+   from the files of the last :folder->get; nil until the folder was read."
+  [files ref]
+  (some (fn [{:keys [url]}]
+          (when (and url (= ref (file-ref url))) url))
+        files))
 
 (defn- call
   [{:keys [call-fx]} request]
@@ -55,6 +100,17 @@
   [props cmd-id attrs]
   (scoped props {:cmd-id cmd-id
                  :attrs attrs}))
+
+(defn get-query
+  "Reads the folder. The query id is :folder->get for the allora storage
+   service; a service using another id overrides it with the :get-query-id
+   prop."
+  [props]
+  (scoped props {:query-id (or (:get-query-id props) :folder->get)}))
+
+(defn refresh-ms
+  [props]
+  (or (:refresh-ms props) default-refresh-ms))
 
 (defn save-command
   "Creates the folder, or gives it the spec of props."
@@ -160,13 +216,18 @@
                      :on-failure [::upload-failed props upload]})]})
 
 (defn url-received
-  [_cofx [_ props {:keys [file content-type md5] :as upload} {:keys [result]}]]
+  "A public file is handed on by its immutable :public-url once the bytes are
+   stored. A private file has none: it reads the folder for the presigned url
+   and hands on the stable ref instead."
+  [_cofx [_ props {:keys [entry file content-type md5] :as upload} {:keys [result]}]]
   {:fx [[(or (:put-fx props) ::put) {:url (:url result)
                                      :headers (:headers result)
                                      :content-type content-type
                                      :md5 md5
                                      :file file
-                                     :on-success [::stored props upload (:public-url result)]
+                                     :on-success (if (private-entry? props entry)
+                                                   [::resolve-private props upload 0]
+                                                   [::stored props upload (:public-url result)])
                                      :on-failure [::upload-failed props upload]}]]})
 
 (defn- handed-on
@@ -176,13 +237,15 @@
           (take-while #(not= :uploading (:status %)) uploads)))
 
 (defn- hand-on
-  [{:keys [on-uploaded public-url]}]
+  "Hands the field the stored file's saved value: the public url of a public
+   file, the stable ref of a private one. Never an expiring signed url."
+  [{:keys [on-uploaded value]}]
   (cond
     (fn? on-uploaded)
-    [::callback [on-uploaded public-url]]
+    [::callback [on-uploaded value]]
 
     on-uploaded
-    [:dispatch (conj on-uploaded public-url)]))
+    [:dispatch (conj on-uploaded value)]))
 
 (defn- settled
   "After an upload ended: the stored ones go to their fields in the order
@@ -210,13 +273,60 @@
                (map (fn [event] [:dispatch event]) waiting))}))
 
 (defn stored
-  [{:keys [db]} [_ props {:keys [item]} public-url]]
+  "value is what the field keeps (public url or private stable ref);
+   preview-url is what the tile shows while it is handed on (the signed url
+   for a private file, the public url otherwise)."
+  [{:keys [db]} [_ props {:keys [item preview-url]} value]]
   (if (get-in db (db/upload-path props item))
     (settled (update-in db (db/upload-path props item) assoc
                         :status :stored
-                        :public-url public-url)
+                        :value value
+                        :preview-url (or preview-url value))
              props)
     {:db db}))
+
+(defn- ready-file
+  [files {:keys [entry item]}]
+  (first (filter #(and (= entry (:entry %))
+                       (= item (:item %))
+                       (:url %))
+                 files)))
+
+(defn resolve-private
+  "A private file's bytes are stored; its presigned url and stable ref come
+   from :folder->get once the storage service marks it ready. Polls until it
+   is, then stores it like a public one but with the ref as the saved value."
+  [_cofx [_ props upload attempt]]
+  {:fx [(call props {:service (:service props)
+                     :query (get-query props)
+                     :on-success [::private-resolved props upload attempt]
+                     :on-failure [::private-resolved props upload attempt]})]})
+
+(defn private-resolved
+  [{:keys [db]} [_ props {:keys [item] :as upload} attempt {:keys [result]}]]
+  (let [files
+        (:files result)
+
+        ready
+        (ready-file files upload)
+
+        cached
+        (assoc-in db (db/files-path props) (or files (get-in db (db/files-path props))))]
+    (cond
+      ready
+      (stored {:db cached}
+              [::stored props (assoc upload :preview-url (:url ready)) (file-ref (:url ready))])
+
+      (< attempt ref-poll-max)
+      {:db cached
+       :fx [[:dispatch-later {:ms ref-poll-ms
+                              :dispatch [::resolve-private props upload (inc attempt)]}]]}
+
+      :else
+      (settled (update-in cached (db/upload-path props item) assoc
+                          :status :failed
+                          :response {:error "not ready"})
+               props))))
 
 (defn upload-failed
   [{:keys [db]} [_ props {:keys [item]} response]]
@@ -237,6 +347,44 @@
   (if (uploading? db props)
     {:db (update-in db (db/waiting-path props) (fnil conj []) event)}
     {:fx [[:dispatch event]]}))
+
+(defn fetch
+  "Reads the folder and caches its files, so a private entry can resolve the
+   presigned url of each stored file."
+  [_cofx [_ props]]
+  {:fx [(call props {:service (:service props)
+                     :query (get-query props)
+                     :on-success [::fetched props]
+                     :on-failure [::ignored]})]})
+
+(defn fetched
+  [{:keys [db]} [_ props {:keys [result]}]]
+  {:db (assoc-in db (db/files-path props) (:files result))})
+
+(defn watch
+  "On mount of an entry: a private entry reads the folder for its presigned
+   urls and keeps them fresh until unmount; a public entry reads nothing, so
+   its immutable CDN urls never trigger a query or a timer."
+  [{:keys [db]} [_ props entry]]
+  (if (private-entry? props entry)
+    {:db (assoc-in db (db/watch-path props entry) true)
+     :fx [[:dispatch [::fetch props]]
+          [:dispatch-later {:ms (refresh-ms props)
+                            :dispatch [::refresh props entry]}]]}
+    {}))
+
+(defn refresh
+  "Re-reads the folder and schedules the next refresh, while the entry is
+   still watched (mounted)."
+  [{:keys [db]} [_ props entry]]
+  (when (get-in db (db/watch-path props entry))
+    {:fx [[:dispatch [::fetch props]]
+          [:dispatch-later {:ms (refresh-ms props)
+                            :dispatch [::refresh props entry]}]]}))
+
+(defn unwatch
+  [db [_ props entry]]
+  (update-in db (vec (butlast (db/watch-path props entry))) dissoc entry))
 
 (defn put-headers
   "The headers the URL was signed for, with the Content-MD5 of the file when
@@ -290,8 +438,15 @@
 (rf/reg-event-fx ::digested digested)
 (rf/reg-event-fx ::url-received url-received)
 (rf/reg-event-fx ::stored stored)
+(rf/reg-event-fx ::resolve-private resolve-private)
+(rf/reg-event-fx ::private-resolved private-resolved)
 (rf/reg-event-fx ::upload-failed upload-failed)
 (rf/reg-event-db ::dismiss dismiss)
 (rf/reg-event-fx ::when-uploaded when-uploaded)
+(rf/reg-event-fx ::fetch fetch)
+(rf/reg-event-fx ::fetched fetched)
+(rf/reg-event-fx ::watch watch)
+(rf/reg-event-fx ::refresh refresh)
+(rf/reg-event-db ::unwatch unwatch)
 (rf/reg-event-fx ::run-callback run-callback)
 (rf/reg-event-db ::ignored (fn [db _] db))
