@@ -2,6 +2,17 @@
 
 ## Changes
 
+**[AP-1134]** Client: requests time out, so a stalled one is retried
+- edd.client/fetch turns the :timeout of the request params (31 s for
+  commands and queries, 50 s for loads) into an AbortSignal; window.fetch
+  has no timeout, so a request on a connection that stalled (network
+  change, sleep) never settled and its retry never ran
+- the aborted request rejects into the existing retry with backoff; a
+  repeated command carries the same request id, so edd answers it from
+  the stored response
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1128]** Folder pictures: private images via signed urls, public path unchanged
 - an entry may set :public false; the image is uploaded to a private folder
   and shown through the storage service's short-lived signed GET url, read

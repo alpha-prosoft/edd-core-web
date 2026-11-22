@@ -115,11 +115,27 @@
     {"X-Authorization" (get-in db [::db/user :id-token])
      "Accept"          "*/*"}))
 
+(defn timeout-signal
+  "An abort signal that fires after ms."
+  [ms]
+  (let [controller
+        (js/AbortController.)]
+    (js/setTimeout #(.abort controller) ms)
+    (.-signal controller)))
+
+(defn fetch-options
+  "fetch takes no :timeout: it becomes an abort signal, so a request on a
+   connection that stalled (network change, sleep) rejects and the caller's
+   retry runs instead of waiting forever."
+  [{:keys [timeout] :as params} signal-for]
+  (cond-> (dissoc params :timeout)
+    timeout (assoc :signal (signal-for timeout))))
+
 (defn fetch
   [uri params]
   (.fetch js/window
           uri
-          (clj->js params)))
+          (clj->js (fetch-options params timeout-signal))))
 
 (defn resolve-call-hook [response]
   (let [{:keys [item result]} response

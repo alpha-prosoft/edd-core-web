@@ -8,7 +8,7 @@ calls to edd services.
 Needs a JVM, the Clojure CLI and Node.js.
 
 ```sh
-clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.271.0"}}}' \
+clojure -Sdeps '{:deps {com.alpha-prosoft/edd-core-web {:mvn/version "2.272.0"}}}' \
   -M -m edd.bootstrap create-project my-app my-app
 cd my-app
 clojure -M:shadow-cljs:dev:test:run
