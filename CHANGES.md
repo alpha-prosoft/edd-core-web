@@ -2,6 +2,15 @@
 
 ## Changes
 
+**[AP-1138]** NOTICE: alpha-prosoft keeps copyright, licenses RBI
+- Replaces the earlier statement that alpha-prosoft contributions are
+  donated to RBI and that RBI holds their copyright
+- alpha-prosoft keeps the copyright in its contributions, including
+  edd-web-widgets, and grants RBI a perpetual, irrevocable license to
+  use, modify, distribute, sublicense and relicense them
+
+Signed-off-by: Robert Pofuk <robert.pofuk@allora-it.com>
+
 **[AP-1137]** Extend client POST timeout to 121 seconds
 Slow queries and commands can exceed the old 31-second deadline.
 Give the server more time to respond before the client retries.

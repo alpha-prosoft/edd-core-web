@@ -1,11 +1,14 @@
 edd-core-web
 Copyright 2020-2026 Raiffeisen Bank International AG
+Copyright 2020-2026 alpha-prosoft (contributions by alpha-prosoft,
+including edd-web-widgets)
 
 Licensed under the Apache License, Version 2.0, see LICENSE.
 
-All contributions by alpha-prosoft to this project, including
-edd-web-widgets, are donated to Raiffeisen Bank International AG,
-which holds the copyright.
+alpha-prosoft keeps the copyright in its contributions and grants
+Raiffeisen Bank International AG a perpetual, worldwide, irrevocable,
+royalty-free, non-exclusive license to use, modify, distribute,
+sublicense and relicense them under any terms.
 
 edd-core-web and edd-web-widgets were published under the MIT License
 before this relicensing; earlier releases remain available under MIT.
