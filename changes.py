@@ -33,17 +33,18 @@ def make_ticket_bold(line):
     return re.sub(r'(\[[\w-]+\])', r'**\1**', line)
 
 
+def format_commit(message):
+    lines = [line for line in message.strip().split('\n') if 'Change-Id' not in line]
+    if not lines:
+        return ''
+    subject = make_ticket_bold(lines[0])
+    lines[0] = subject if subject.startswith('**[') else '### ' + subject
+    return '\n'.join(lines).rstrip()
+
+
 def get_last_commit():
-    """Extract last commit message (subject + body), excluding Change-Id."""
-    output = run_git_command(["log", "-1", "--pretty=format:%s%n%b"])
-    lines = [line for line in output.split('\n') if 'Change-Id' not in line]
-    # Remove trailing empty lines
-    while lines and not lines[-1].strip():
-        lines.pop()
-    # Make ticket IDs bold in the first line (if it exists and starts with [)
-    if lines and lines[0].startswith('['):
-        lines[0] = make_ticket_bold(lines[0])
-    return '\n'.join(lines)
+    """Format the latest commit as a changelog entry."""
+    return format_commit(run_git_command(["log", "-1", "--pretty=format:%s%n%b"]))
 
 
 def get_first_entry_from_changes():
@@ -71,12 +72,12 @@ def get_first_entry_from_changes():
             if not found_first_entry and not line.strip():
                 continue
 
-            # Start of first entry (line starts with "**[")
-            if line.startswith('**[') and not found_first_entry:
+            # Public commits without ticket prefixes use a Markdown heading.
+            if line.startswith(('**[', '### ')) and not found_first_entry:
                 found_first_entry = True
                 entry_lines.append(line)
-            # Next entry (starts with "**[") - end of first entry
-            elif found_first_entry and line.startswith('**['):
+            # The next heading ends the first entry.
+            elif found_first_entry and line.startswith(('**[', '### ')):
                 break
             # Continuation of entry (any line including empty lines)
             elif found_first_entry:
@@ -93,30 +94,9 @@ def get_all_commits():
     """Get all commit messages since initial commit."""
     initial_commit = Path("initial-public-commit.txt").read_text().strip()
     output = run_git_command([
-        "log",
-        "--pretty=format:%s%n%b%n",
-        f"{initial_commit}..HEAD"
+        "log", "-z", "--pretty=format:%s%n%b", f"{initial_commit}..HEAD"
     ])
-
-    lines = []
-    for line in output.split('\n'):
-        if 'Change-Id' not in line:
-            # Make ticket IDs bold in lines that start with "["
-            if line.startswith('['):
-                lines.append(make_ticket_bold(line))
-            else:
-                lines.append(line)
-
-    # Clean up multiple consecutive empty lines
-    result = []
-    prev_empty = False
-    for line in lines:
-        is_empty = not line.strip()
-        if not (is_empty and prev_empty):
-            result.append(line)
-        prev_empty = is_empty
-
-    return '\n'.join(result).strip()
+    return '\n\n'.join(format_commit(commit) for commit in output.split('\0'))
 
 
 def regenerate_changes_file():
