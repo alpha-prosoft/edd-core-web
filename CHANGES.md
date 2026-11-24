@@ -2,6 +2,14 @@
 
 ## Changes
 
+**[AP-1137]** Extend client POST timeout to 121 seconds
+Slow queries and commands can exceed the old 31-second deadline.
+Give the server more time to respond before the client retries.
+
+- allow 121 seconds for each default POST attempt
+- distinguish a deadline from cancellation with TimeoutError
+- leave configured overrides and retry backoff unchanged
+
 **[AP-1134]** Client: requests time out, so a stalled one is retried
 - edd.client/fetch turns the :timeout of the request params (31 s for
   commands and queries, 50 s for loads) into an AbortSignal; window.fetch

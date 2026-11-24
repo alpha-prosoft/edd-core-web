@@ -1,5 +1,5 @@
 (ns edd.client-test
-  (:require [cljs.test :refer-macros [deftest is testing]]
+  (:require [cljs.test :refer-macros [async deftest is testing]]
             [edd.client :as client]))
 
 (deftest a-timeout-becomes-an-abort-signal
@@ -22,8 +22,28 @@
      (= {:method :put}
         (client/fetch-options {:method :put} (fn [_] :never))))))
 
-(deftest the-timeout-signal-aborts
-  (let [signal
-        (client/timeout-signal 0)]
+(deftest post-deadline-defaults-to-121-seconds
+  (with-redefs [client/get-config (constantly {})]
     (is
-     (false? (.-aborted signal)))))
+     (= 121000
+        (:signal (client/fetch-options (client/post-params {}) identity)))))
+
+  (with-redefs [client/get-config (constantly {:post-params {:timeout 45000}})]
+    (is
+     (= 45000
+        (:timeout (client/post-params {}))))))
+
+(deftest the-timeout-signal-aborts-with-a-timeout-error
+  (async done
+         (let [signal
+               (client/timeout-signal 0)]
+           (is
+            (false? (.-aborted signal)))
+
+           (.addEventListener signal "abort"
+                              (fn []
+                                (is
+                                 (= "TimeoutError"
+                                    (.. signal -reason -name)))
+
+                                (done))))))

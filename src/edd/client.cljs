@@ -120,7 +120,7 @@
   [ms]
   (let [controller
         (js/AbortController.)]
-    (js/setTimeout #(.abort controller) ms)
+    (js/setTimeout #(.abort controller (js/DOMException. "Request timed out" "TimeoutError")) ms)
     (.-signal controller)))
 
 (defn fetch-options
@@ -259,7 +259,7 @@
    {:method           :post
     :mode             :cors
     :body             (.stringify js/JSON body-str)
-    :timeout          31000
+    :timeout          121000
     :response-format  (json/custom-response-format {:keywords? true})
     :headers          (make-headers)}
    (-> (get-config) :post-params)))
